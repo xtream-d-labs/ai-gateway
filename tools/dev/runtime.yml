@@ -1,0 +1,59 @@
+version: "2.1"
+
+services:
+  api:
+    image: scaleshift:go-20190403
+    build: docker/go
+    command: go run generated/cmd/scale-shift-server/main.go --host 0.0.0.0 --port 80
+    ports:
+      - 9000:80
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - SS_DOCKER_REGISTRY_ENDPOINT=https://registry.nvidia.com
+      - SS_DOCKER_REGISTRY_HOST_NAME=nvcr.io
+      - SS_RESCALE_ENDPOINT=https://platform.rescale.jp
+      - SS_RESCALE_API_TOKEN
+      - SS_LOG_LEVEL=debug
+      - SS_WORKSPACE_HOST_DIR=${PWD}/tmp/work
+      - SS_SINGULARITY_HOST_DIR=${PWD}/tmp/simg
+    volumes:
+      - ../../api:/go/src/github.com/rescale/scaleshift/api
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ../../api/tmp/work:/tmp/work
+      - ../../api/tmp/simg:/tmp/simg
+      - ../../api/tmp/db:/tmp/badger
+    working_dir: /go/src/github.com/rescale/scaleshift/api/src
+    restart: always
+    container_name: api
+
+  web:
+    image: supinf/hugo:0.x
+    command: server --bind=0.0.0.0 -p=80 -b=http://localhost:8080/ --appendPort=false --disableLiveReload
+    ports:
+      - 8080:80
+    volumes:
+      - ../../web/src:/app
+    depends_on:
+      - api
+    logging:
+      driver: "none"
+    restart: always
+    container_name: web
+
+  gulp:
+    image: scaleshift:gulp-20190403
+    build: docker/gulp
+    volumes:
+      - ../../web/src:/monitor
+      - /var/run/docker.sock:/var/run/docker.sock
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "1"
+    ulimits:
+      cpu:
+        soft: 10
+        hard: 20
+    restart: always
+    container_name: gulp

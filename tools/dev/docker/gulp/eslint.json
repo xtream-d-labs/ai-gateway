@@ -1,0 +1,37 @@
+{
+    "env": {
+        "browser": true,
+        "es6": true
+    },
+    "extends": [
+        "eslint:recommended"
+    ],
+    "parserOptions": {
+        "ecmaFeatures": {
+            "experimentalObjectRestSpread": true,
+            "modules": true
+        },
+        "sourceType": "module"
+    },
+    "plugins": [
+        "vue"
+    ],
+    "rules": {
+        "indent": [
+            0
+        ]
+    },
+    "globals": {
+      "window": true,
+      "$": true,
+      "Vue": true,
+      "vuelidate": true,
+      "validators": true,
+      "Materialize": true,
+      "marked": true,
+      "API": true,
+      "models": true,
+      "auth": true,
+      "app": true
+    }
+}
