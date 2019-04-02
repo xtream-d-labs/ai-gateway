@@ -1,0 +1,850 @@
+swagger: '2.0'
+info:
+  title: ScaleShift
+  version: 1.0.0
+  description: |
+    A platform for machine learning & high performance computing
+consumes:
+  - application/json
+produces:
+  - application/json
+schemes:
+  - http
+host: 'localhost:9000'
+basePath: /api/v1
+securityDefinitions:
+  api-authorizer:
+    name: Authorization
+    type: apiKey
+    in: header
+paths:
+  /sessions:
+    post:
+      description: |
+        login with NGC accounts
+      operationId: postNewSession
+      tags:
+        - session
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            title: AccountInfo
+            type: object
+            required:
+              - ngc_email
+              - ngc_password
+              - ngc_apikey
+            properties:
+              ngc_email:
+                description: E-mail address for NGC console
+                type: string
+                format: email
+              ngc_password:
+                description: Password for NGC console
+                type: string
+                format: password
+              ngc_apikey:
+                description: NGC - API Key
+                type: string
+              rescale_key:
+                description: Rescale - API Key
+                type: string
+      responses:
+        '201':
+          description: OK
+          schema:
+            $ref: '#/definitions/Session'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /repositories:
+    get:
+      description: |
+        returns NGC repositories
+      operationId: getRepositories
+      tags:
+        - repository
+      security:
+        - api-authorizer: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Repository'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /repositories/{namespace}/images/{id}:
+    get:
+      description: |
+        returns NGC repositories
+      operationId: getNgcImages
+      tags:
+        - repository
+      security:
+        - api-authorizer: []
+      parameters:
+        - name: namespace
+          in: path
+          description: Docker repositry namespace
+          type: string
+          required: true
+        - name: id
+          in: path
+          description: Docker image name
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/NgcImage'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /images:
+    get:
+      description: |
+        returns NGC images
+      operationId: getImages
+      tags:
+        - image
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Image'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      description: |
+        pull a specified image from NGC
+      operationId: postNewImage
+      tags:
+        - image
+      security:
+        - api-authorizer: []
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            title: ImageName
+            type: object
+            required:
+              - image
+            properties:
+              image:
+                description: Docker image name
+                type: string
+      responses:
+        '201':
+          description: OK
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      description: |
+        delete a specified image
+      operationId: deleteImage
+      tags:
+        - image
+      security:
+        - api-authorizer: []
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            title: ImageName
+            type: object
+            required:
+              - image
+            properties:
+              image:
+                description: Docker image name
+                type: string
+      responses:
+        '204':
+          description: OK
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/notebooks':
+    get:
+      description: |
+        returns Jupyter notebook information
+      operationId: getNotebooks
+      tags:
+        - notebook
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Notebook'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      description: |
+        creates Jupyter notebook container
+      operationId: postNewNotebook
+      tags:
+        - notebook
+      security:
+        - api-authorizer: []
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            title: ImageName
+            type: object
+            required:
+              - image
+            properties:
+              image:
+                description: Docker image name
+                type: string
+              workspace:
+                description: workspace to be mounted
+                type: string
+      responses:
+        '201':
+          description: OK
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/notebooks/{id}':
+    get:
+      description: |
+        returns Jupyter notebook detail information
+      operationId: getNotebookDetails
+      tags:
+        - notebook
+      parameters:
+        - name: id
+          in: path
+          description: Notebook container ID
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/NotebookDetail'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    patch:
+      description: |
+        modify the notebook status
+      operationId: modifyNotebook
+      tags:
+        - notebook
+      parameters:
+        - name: id
+          in: path
+          description: Notebook container ID
+          type: string
+          required: true
+        - name: body
+          in: body
+          required: true
+          schema:
+            title: NotebookAttrs
+            type: object
+            properties:
+              status:
+                description: status
+                type: string
+                enum:
+                    - started
+                    - stopped
+      responses:
+        '200':
+          description: OK
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      description: |
+        delete a specified notebook
+      operationId: deleteNotebook
+      tags:
+        - notebook
+      parameters:
+        - name: id
+          in: path
+          description: Notebook container ID
+          type: string
+          required: true
+      responses:
+        '204':
+          description: OK
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/notebooks/{id}/ipynbs':
+    get:
+      description: |
+        returns ipynb files on the specified notebook
+      operationId: getIPythonNotebooks
+      tags:
+        - notebook
+      parameters:
+        - name: id
+          in: path
+          description: Notebook container ID
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/IPythonNotebook'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /jobs:
+    get:
+      description: |
+        returns training jobs on cloud
+      operationId: getJobs
+      tags:
+        - job
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Job'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      description: |
+        Submit a job with the specified image
+      operationId: postNewJob
+      tags:
+        - job
+      security:
+        - api-authorizer: []
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            title: JobAttrs
+            type: object
+            properties:
+              notebook_id:
+                description: Notebook container ID
+                type: string
+              entrypoint_file:
+                description: The entrypoint file of the job
+                type: string
+              commands:
+                description: commands to be excuted after the entrypoint
+                type: array
+                items:
+                  type: string
+              coretype:
+                description: Rescale CoreType as its infrastructure
+                type: string
+              cores:
+                description: The number of CPU cores
+                type: integer
+                format: int64
+      responses:
+        '201':
+          description: OK
+          schema:
+            title: newJobID
+            type: object
+            properties:
+              id:
+                description: ID of the new job
+                type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/jobs/{id}':
+    patch:
+      description: |
+        modify the job status
+      operationId: modifyJob
+      tags:
+        - job
+      parameters:
+        - name: id
+          in: path
+          description: Job ID
+          type: string
+          required: true
+        - name: body
+          in: body
+          required: true
+          schema:
+            title: JobAttrs
+            type: object
+            properties:
+              status:
+                description: status
+                type: string
+                enum:
+                    - stopped
+      responses:
+        '200':
+          description: OK
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      description: |
+        delete a job
+      operationId: deleteJob
+      tags:
+        - job
+      parameters:
+        - name: id
+          in: path
+          description: Job ID
+          type: string
+          required: true
+      responses:
+        '204':
+          description: OK
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/workspaces':
+    get:
+      description: |
+        returns user's workspaces
+      operationId: getWorkspaces
+      tags:
+        - workspace
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Workspace'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      description: |
+        delete user's workspace
+      operationId: deleteWorkspace
+      tags:
+        - workspace
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            title: workspace
+            type: object
+            required:
+              - path
+            properties:
+              path:
+                type: string
+      responses:
+        '204':
+          description: OK
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/coretypes':
+    get:
+      description: |
+        returns Rescale CoreTypes
+      operationId: getCoreTypes
+      tags:
+        - rescale
+      security:
+        - api-authorizer: []
+      parameters:
+        - name: app_ver
+          in: query
+          type: string
+          description: Application version
+          required: false
+        - name: min_gpus
+          in: query
+          type: integer
+          description: Required number of GPUs
+          required: false
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CoreType'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/applications/{code}/':
+    get:
+      description: |
+        returns a Rescale application
+      operationId: getApplication
+      tags:
+        - rescale
+      security:
+        - api-authorizer: []
+      parameters:
+        - name: code
+          in: path
+          description: application code
+          type: string
+          enum:
+            - singularity
+            - singularity_mpi
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Application'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/applications/{code}/{version}/':
+    get:
+      description: |
+        returns version information of a specified Rescale application
+      operationId: getApplicationVersion
+      tags:
+        - rescale
+      security:
+        - api-authorizer: []
+      parameters:
+        - name: code
+          in: path
+          description: application code
+          type: string
+          enum:
+            - singularity
+            - singularity_mpi
+          required: true
+        - name: version
+          in: path
+          description: application version
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/ApplicationVersion'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  Session:
+    description: docker image information
+    required:
+      - token
+    properties:
+      token:
+        description: API Token
+        type: string
+  Repository:
+    description: docker image information
+    required:
+      - namespace
+      - name
+    properties:
+      namespace:
+        description: the repositry's namespace
+        type: string
+      name:
+        description: the image name
+        type: string
+      description:
+        description: the image description
+        type: string
+  NgcImage:
+    description: NGC docker image information
+    required:
+      - tag
+      - size
+      - updated
+    properties:
+      tag:
+        description: the image tag
+        type: string
+      size:
+        description: the image size
+        type: integer
+        format: int64
+      updated:
+        description: updated unix timestamp
+        type: string
+        format: date-time
+  Image:
+    description: docker image information
+    required:
+      - id
+      - repoTags
+    properties:
+      id:
+        description: the image ID
+        type: string
+      parentID:
+        description: the image parent ID
+        type: string
+      repoDigests:
+        description: the image digests
+        type: array
+        items:
+          type: string
+      repoTags:
+        description: the image name/tag
+        type: array
+        items:
+          type: string
+      status:
+        description: status of the image
+        type: string
+      size:
+        description: size of the image
+        type: integer
+        format: int64
+      virtualSize:
+        description: virtual size of the image
+        type: integer
+        format: int64
+      created:
+        description: created unix timestamp
+        type: string
+  Notebook:
+    description: Jupyter notebook information
+    required:
+      - id
+      - name
+      - image
+    properties:
+      id:
+        description: the container ID
+        type: string
+      name:
+        description: the container name
+        type: string
+      image:
+        description: the image ID
+        type: string
+      state:
+        description: state of the container
+        type: string
+      port:
+        description: the container published port
+        type: integer
+        format: int64
+      started:
+        description: started unix timestamp
+        type: string
+        format: date-time
+  NotebookDetail:
+    description: Rescale Job information
+    required:
+      - id
+      - token
+    properties:
+      id:
+        description: the container ID
+        type: string
+      name:
+        description: the container name
+        type: string
+      state:
+        description: state of the container
+        type: string
+      port:
+        description: the container published port
+        type: integer
+        format: int64
+      token:
+        description: Jupyter notebook's login token
+        type: string
+      mounts:
+        description: the container labels
+        type: array
+        items:
+          type: string
+      started:
+        description: started unix timestamp
+        type: string
+        format: date-time
+      ended:
+        description: ended unix timestamp
+        type: string
+        format: date-time
+  IPythonNotebook:
+    description: .ipynb file attributes
+    required:
+      - name
+    properties:
+      name:
+        description: file name
+        type: string
+  Job:
+    description: Rescale Job information
+    required:
+      - id
+    properties:
+      id:
+        description: Job ID
+        type: string
+      status:
+        description: the status of the job
+        type: string
+      image:
+        description: the image ID
+        type: string
+      mounts:
+        description: the container labels
+        type: array
+        items:
+          type: string
+      commands:
+        description: the container labels
+        type: array
+        items:
+          type: string
+      started:
+        description: started unix timestamp
+        type: string
+        format: date-time
+  Workspace:
+    description: User's workspace
+    required:
+      - path
+    properties:
+      notebooks:
+        description: Notebooks which are mounting the workspace
+        type: array
+        items:
+          type: string
+      jobs:
+        description: Jobs which are mounting the workspace
+        type: array
+        items:
+          type: string
+      path:
+        type: string
+      absolute_path:
+        type: string
+  CoreTypeResources:
+    description: CPU/GPU cores
+    required:
+      - cores
+      - gpus
+    properties:
+      cores:
+        description: the number of CPU cores
+        type: integer
+        format: int64
+      gpus:
+        description: the number of GPUs
+        type: integer
+        format: int64
+  CoreType:
+    description: Rescale CoreType
+    required:
+      - code
+      - name
+    properties:
+      code:
+        type: string
+      name:
+        type: string
+      processor:
+        type: string
+      baseClock:
+        type: string
+      interconnect:
+        type: string
+      resources:
+        type: array
+        items:
+          $ref: '#/definitions/CoreTypeResources'
+  ApplicationVersion:
+    description: version of Rescale Applications
+    required:
+      - id
+      - code
+      - version
+    properties:
+      id:
+        type: string
+      code:
+        type: string
+      version:
+        type: string
+      coretypes:
+        description: supported CoreTypes
+        type: array
+        items:
+          type: string
+  Application:
+    description: Rescale Application
+    required:
+      - code
+    properties:
+      code:
+        type: string
+      versions:
+        type: array
+        items:
+          $ref: '#/definitions/ApplicationVersion'
+  Error:
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: string
+      message:
+        type: string
