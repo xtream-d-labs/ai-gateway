@@ -1,4 +1,10 @@
+api/certs
 api/src/vendor
-api/tmp
 doc
+tmp
 todo
+web/src/dist
+web/src/node_modules
+web/src/openapi.yaml
+docker-compose-80*.yml
+latest-version.json

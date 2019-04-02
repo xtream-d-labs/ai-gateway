@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <title> {{ .Title }} | {{ .Site.Title }} </title>
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="version" content="%{CI_BUILD_KEY}">
+  <meta http-equiv="Expires" content="0">
+  <meta http-equiv='Pragma' content='no-cache'>
+  <meta http-equiv='Cache-Control' content='no-cache'>
+  <meta http-equiv='X-XSS-Protection' content='1; mode=block'>
+  <meta http-equiv='X-Content-Type-Options' content='nosniff'>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com/; script-src 'self' 'unsafe-eval'; connect-src 'self' {{ .Site.Params.apiHost }}; img-src 'self' https://mapr.com data:;font-src 'self' https://fonts.gstatic.com/ data:">
+  <link rel="icon" type="image/png" href="{{ .Site.BaseURL }}img/favicon.png">
+  <link rel="apple-touch-icon" href="{{ .Site.BaseURL }}img/logo.png" sizes="180x180">
+  <link rel="stylesheet" type="text/css" href="{{ .Site.BaseURL }}css/lib/admin-lte/skins/_all-skins.min.css" />
+  <link rel="stylesheet" type="text/css" href="{{ .Site.BaseURL }}css/lib/bootstrap-4.0.0.min.css" />
+  <link rel="stylesheet" type="text/css" href="{{ .Site.BaseURL }}css/lib/fontawesome-5.8.1.min.css" />
+  <link rel="stylesheet" type="text/css" href="{{ .Site.BaseURL }}css/lib/admin-lte/2.3.0.min.css" />
+  <link rel="stylesheet" type="text/css" href="{{ .Site.BaseURL }}fonts/google/material-icons.css" />
+  <link rel="stylesheet" type="text/css" href="{{ .Site.BaseURL }}css/lib/materialize-1.0.0.min.css" />
+  {{ if .Params.Css }}
+    <link rel="stylesheet" type="text/css" href="{{ .Site.BaseURL }}css/{{ .Params.Css }}" />
+  {{ end }}
+</head>
+<body class="skin-black sidebar-mini" style="padding-top: 0px;">
+  <input type="hidden" id="api-base" value="{{ .Site.Params.apiBasePath }}" />
+
+  <div class="wrapper">
+    <header class="main-header">
+      <a href="/images/" class="logo" style="height: 49px;">
+        <span class="logo-mini"><img src="{{ .Site.BaseURL }}img/logo.png" style="width: 43px;margin-top: -3px;"/></span>
+        <span class="logo-lg" style="padding-right: 22px;">
+          <img src="/img/logo.png" style="width: 43px;margin: -3px 5px 0 0;"/><b>ScaleShift</b>
+        </span>
+      </a>
+      <nav class="navbar navbar-static-top" role="navigation"
+           style="min-height: 49px;box-shadow: 1px 1px 2px 0 rgba(0,0,0,0.3);width: inherit;padding: 0;">
+        <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button"
+            style="padding: 1px 15px;line-height: 48px;">
+          <span class="sr-only">Toggle navigation</span>
+        </a>
+        <div class="navbar-custom-menu" style="line-height: 48px;max-height: 48px;">
+          <ul class="nav navbar-nav">
+            <li class="dropdown user user-menu user-info" style="margin-right: 10px;">
+              <a href="#" data-toggle="dropdown"
+                 style="padding: 0px 10px 0px 15px;margin: 0;float: right;">
+                <i class="fa fa-cogs" style="font-size: 18px;height: 18px;"></i>
+              </a>
+              <div style="margin: -2px 11px 0 0;color: #7b7b7b;line-height: 19px;min-width: 85px;"
+                   class="input-field inline right">
+                <small class="hidden-xs" style="display: block;margin-top: 8px;">Account</small>
+                <span style="margin: -2px 5px 0 1px;display: block;font-size: 14px;"
+                      class="hidden-xs user-name">---</span>
+              </div>
+              <span class="hidden-xs right local-government-name"
+                    style="display: block;margin: 14px 5px 0 0;"></span>
+              <ul class="dropdown-menu" style="width: 200px;">
+                <li class="user-footer" style="float: none;padding: 0;">
+                  <div>
+                    <a href="/settings/" class="btn btn-default btn-flat"
+                       style="width: 100%;height: inherit;margin: 0;">Settings</a>
+                  </div>
+                  <div style="border-top: 1px solid #ddd;">
+                    <a href="/about/" class="btn btn-default btn-flat"
+                       style="width: 100%;height: inherit;margin: 0;">About ScaleShift</a>
+                  </div>
+                  <div style="border-top: 1px solid #ddd;">
+                    <a href="/doc/api/" target="_blank" class="btn btn-default btn-flat"
+                       style="width: 100%;height: inherit;margin: 0;">API document</a>
+                  </div>
+                  <div style="border-top: 1px solid #ddd;display: none;">
+                    <a id="signout" href="#" class="btn btn-default btn-flat"
+                       style="width: 100%;height: inherit;margin: 0;">Sign out</a>
+                  </div>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+
+      </nav>
+    </header>
+
+    <aside class="main-sidebar">
+      <section class="sidebar" style="height: auto;">
+        <ul class="sidebar-menu">
+          <li class="header">Navigation</li>
+
+          {{/* <!-- Menus --> */}}
+          <li id="menu-ngc-repositories" class="treeview" style="display: none;">
+            <a href="/ngc-repositories/">
+              <i class="fas fa-cloud fa-fw"></i> <span>&nbsp;NGC Images</span>
+            </a>
+          </li>
+          <li id="menu-images" class="treeview">
+            <a href="/images/">
+              <i class="fas fa-tags fa-fw"></i> <span>&nbsp;Local Images</span>
+            </a>
+          </li>
+          <li id="menu-notebooks" class="treeview">
+            <a href="/notebooks/">
+              <i class="fas fa-file-alt fa-fw"></i> <span>&nbsp;Notebooks</span>
+            </a>
+          </li>
+          <li id="menu-workspaces" class="treeview">
+            <a href="/workspaces/">
+              <i class="fas fa-folder-open fa-fw"></i> <span>&nbsp;Workspaces</span>
+            </a>
+          </li>
+          {{/* <li id="menu-jobs" class="treeview" style="display: none;">
+            <a href="/jobs/">
+              <i class="fas fa-tasks fa-fw"></i> <span>&nbsp;Training Tasks</span>
+            </a>
+          </li> */}}
+
+        </ul>
+      </section>
+    </aside>
+
+    <div class="content-wrapper" style="position: relative;padding: 10px 0 0 0;"><div>
+      {{ .Content }}
+    </div></div>
+
+    <div class="control-sidebar-bg" style="position: fixed; height: auto;"></div>
+  </div>
+  <script type="text/javascript" src="{{ .Site.BaseURL }}js/lib/jquery-3.3.1.min.js"></script>
+  <script type="text/javascript" src="{{ .Site.BaseURL }}js/lib/bootstrap-4.0.0.min.js"></script>
+  <script type="text/javascript" src="{{ .Site.BaseURL }}js/lib/admin-lte-2.3.0.min.js"></script>
+  <script type="text/javascript" src="{{ .Site.BaseURL }}js/lib/materialize-1.0.0.min.js"></script>
+  <script type="text/javascript" src="{{ .Site.BaseURL }}js/lib/vue-v2.4.2.min.js"></script>
+  <script type="text/javascript" src="{{ .Site.BaseURL }}js/lib/vuelidate-v0.5.0.min.js"></script>
+  <script type="text/javascript" src="{{ .Site.BaseURL }}js/lib/validators-v0.5.0.min.js"></script>
+  <script type="text/javascript" src="{{ .Site.BaseURL }}js/lib/marked-0.6.1.js"></script>
+  <script type="text/javascript" src="{{ .Site.BaseURL }}js/lib/api.v1.js"></script>
+  <script type="text/javascript" src="{{ .Site.BaseURL }}js/min/common.js"></script>
+  {{ if .Params.Js }}
+    <script type="text/javascript" src="{{ .Site.BaseURL }}js/min/{{ .Params.Js }}"></script>
+  {{ end }}
+</body>
+</html>

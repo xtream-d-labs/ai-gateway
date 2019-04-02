@@ -1,0 +1,33 @@
+@import "../common";
+
+.row .col {
+  padding: 0 5px 0 0;
+}
+
+.select-wrapper {
+  input.select-dropdown {
+    margin: 0;
+    color: #848484;
+    font-size: 1.5rem;
+  }
+  span.caret {
+    height: 0px;
+  }
+}
+
+#data {
+  display: none;
+
+  .table {
+    margin-bottom: 0px;
+  }
+  h1 {
+    font-size: 2.2rem;
+  }
+  h2 {
+    font-size: 2rem;
+  }
+  p, li {
+    white-space: normal !important;
+  }
+}

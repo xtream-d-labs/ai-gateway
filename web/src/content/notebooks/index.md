@@ -1,0 +1,186 @@
++++
+title = "Notebooks"
+css = "notebooks/index.css"
+js = "notebooks/index.js"
++++
+
+<main>
+  <section class="container content-header">
+    <div class="row">
+      <div class="col s12" style="min-height: 182px;">
+        <h5 class="light grey-text text-darken-2">Notebooks</h5>
+
+        <form>
+          <div class="row hide-on-small-only">
+            <div class="col m12" style="padding-right: 0;">
+              <div class="input-field" style="width: 90%;margin: 13px 0 -13px 0;">
+                <input id="query-words" type="text" style="font-size: 1.5rem;">
+                <label for="query-words">Search words</label>
+              </div>
+            </div>
+          </div>
+          <div class="clear-both"></div>
+
+          <div class="row">
+            <div class="col s3">
+              <div style="margin: 5px 0 0 2px;line-height: 3rem;">
+                <span id="record-count">0</span>&nbsp;hits
+              </div>
+            </div>
+            <div class="col s9">
+              <div class="row">
+                <div class="input-field inline thin-input right col m5 s12" style="max-width: 180px;">
+                  <select id="query-order-type">
+                    <option value="1">Sort by name</option>
+                    <option value="2" selected="selected">Sort by started time</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="container main">
+    <div class="row">
+      <div class="col s12" style="margin-bottom: 15px;">
+        <div id="data">
+
+          <ul class="collapsible" id="accordion">
+            <li v-for="notebook in notebooks" :key="notebook.id"
+                :data-id="notebook.id" :data-url="notebook.url">
+              <div class="row row-header" style="padding: 13px 30px 10px 15px;"
+                   :id="notebook.id" :data-target="'#body-'+notebook.id"
+                   data-toggle="collapse" aria-expanded="true"
+                   :aria-controls="'body-'+notebook.id">
+                <div class="col-1">
+                  <i v-if="notebook.url.length > 0"
+                     class="material-icons" style="float: right;">chevron_right</i>
+                </div>
+                <div class="col-6">
+                  <div class="cut-text">{{ notebook.image }}</div>
+                </div>
+                <div class="col-3 cut-text">{{ notebook.started }}</div>
+                <div class="col-2" style="text-align: center;">
+                  <div class="label" style="margin-left: 5px;"
+                      :class="notebook.classObject">{{ notebook.state }}</div>
+                </div>
+              </div>
+              <div v-if="notebook.url.length > 0"
+                   :id="'body-'+notebook.id" class="row collapse row-body"
+                   :aria-labelledby="notebook.id"
+                   data-parent="#accordion">
+                <div class="col-12" v-if="notebook.state != 'exited'"
+                     style="margin-bottom: 20px;">
+                  <h5>Endpoint</h5>
+                  <a href="#" target="_blank" class="endpoint"
+                     style="font-size: 1.5rem;">{{ notebook.url }}</a>
+                </div>
+                <div class="col-12" style="margin-bottom: 20px;">
+                  <h5>Actions</h5>
+                  <div style="margin: 20px 0 5px 0;">
+                    <!-- <a class="waves-effect waves-light btn blue darken-1"
+                       tabindex="0" v-on:click="train">train on cloud</a>
+                    <span>&nbsp;</span> -->
+                    <a class="waves-effect waves-light btn red lighten-2 act-stop" tabindex="0"
+                       v-if="notebook.state != 'exited'" v-on:click="stop">stop</a>
+                    <a class="waves-effect waves-light btn red lighten-2 act-delete"
+                       tabindex="0" v-if="notebook.state == 'exited'"
+                       v-on:click="del">delete</a>
+                  </div>
+                </div>
+                <div class="col-12" style="margin-bottom: 0px;">
+                  <h5>Properties</h5>
+                  <table class="table highlight">
+                    <tbody>
+                      <tr><td>container name:</td><td class="notebook-name"></td></tr>
+                      <tr><td>started time:</td><td class="notebook-started"></td></tr>
+                      <tr><td>ended time:</td><td class="notebook-ended"></td></tr>
+                      <tr><td>mounted volumes:</td><td class="notebook-volumes"></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="clear-both"></div>
+              </div>
+            </li>
+          </ul>
+
+        </div>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+<div id="training-dialog" class="modal popup-dialog"
+    style="height: 525px;width: 60%;max-height: 85%;">
+  <div class="modal-content">
+    <h5>Task definition</h5>
+  </div>
+  <div class="modal-footer row" style="margin: 0;">
+    <form autocomplete="off" v-on:submit.prevent>
+      <div class="form-group row considerable">
+        <label class="col-sm-3 control-label">Job type</label>
+        <div class="col-sm-9 training-type">
+          <select>
+            <option value="0">Run your iPython notebook</option>
+            <option value="1">Run commmands</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group row considerable">
+        <label class="col-sm-3 control-label">Notebook</label>
+        <div class="col-sm-9 training-notebook">
+          <select></select>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-3 control-label">Commands</label>
+        <div class="col-sm-9">
+          <input type="text" class="form-control training-cmds" v-model="cmd"
+                 placeholder="python train.py --epoch 10 --gpu 1" />
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-3 control-label">Hardware</label>
+        <div class="col-sm-9 training-coretype">
+          <select>
+            <option value="emerald">CPU only</option>
+            <option value="dolomite">GPU (Tesla V100)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-3 control-label">Cores</label>
+        <div class="col-sm-9 training-cores">
+          <select></select>
+        </div>
+      </div>
+      <div class="clear-both"></div>
+    </form>
+    <div class="row" style="margin-top: 7px;">
+      <a class="waves-effect waves-light btn cancel" tabindex="0" v-on:click="close">Cancel</a>
+      <a class="waves-effect waves-light btn submit" tabindex="0" v-on:click="submit">Start</a>
+    </div>
+  </div>
+</div>
+
+<div id="notebook-modify" class="modal popup-dialog" style="height: 245px;">
+  <div class="modal-content">
+    <h5>Confirmation</h5>
+  </div>
+  <div class="modal-footer row">
+    <div class="col-12" style="margin: 15px 0 20px 0;min-height: 50px;">
+      <span>Is it okay to <span style="color: red;font-weight: 600;">{{ action }}</span> the following notebook?</span><br>
+      <strong style="font-weight: bold;font-size: 1.5rem;">{{ name }}</strong>
+    </div>
+    <div class="clear-both"></div>
+    <div class="col-12">
+      <a class="waves-effect waves-light btn cancel" tabindex="0" v-on:click="close">Cancel</a>
+      <a class="waves-effect waves-light btn blue darken-1 delete" tabindex="0"
+         style="float: right;color: white !important;" v-on:click="exec">{{ action }}</a>
+    </div>
+  </div>
+</div>

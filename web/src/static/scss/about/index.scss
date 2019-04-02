@@ -1,0 +1,15 @@
+@import "../common";
+
+.row .col {
+  padding: 0 5px 0 0;
+}
+
+#data {
+  display: none;
+  min-height: 50px;
+  margin-bottom: 0px;
+
+  td, th {
+    padding: 0;
+  }
+}

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <title> {{ .Site.Title }} </title>
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="version" content="%{CI_BUILD_KEY}">
+  <meta http-equiv="Expires" content="0">
+  <meta http-equiv='Pragma' content='no-cache'>
+  <meta http-equiv='Cache-Control' content='no-cache'>
+  <meta http-equiv='X-XSS-Protection' content='1; mode=block'>
+  <meta http-equiv='X-Content-Type-Options' content='nosniff'>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com/; script-src 'self' 'unsafe-eval'; connect-src 'self' {{ .Site.Params.apiHost }}; img-src 'self' data:;font-src 'self' https://fonts.gstatic.com/ data:">
+  <link rel="icon" type="image/png" href="{{ .Site.BaseURL }}img/favicon.png">
+  <link rel="apple-touch-icon" href="{{ .Site.BaseURL }}img/logo.png" sizes="180x180">
+  <link rel="stylesheet" type="text/css" href="{{ .Site.BaseURL }}css/lib/bootstrap-4.0.0.min.css" />
+  <link rel="stylesheet" type="text/css" href="{{ .Site.BaseURL }}css/index.css" />
+</head>
+<body>
+  <input type="hidden" id="api-base" value="{{ .Site.Params.apiBasePath }}" />
+  <div class="container" style="margin: 15% 0 0 0;">
+    <form class="form-signin">
+      <h3 class="form-signin-heading">Sign in <span class="helper">with your account<span id="endpoint"></span>.</span></h3>
+      <label for="input-username" class="sr-only">User</label>
+      <input type="text" id="input-username" class="form-control" placeholder="Username" required
+             v-model="username" v-on:input="$v.username.$touch" v-on:change="usernameChanged"
+             v-bind:class="{invalid: $v.username.$error, valid: $v.username.$dirty && !$v.username.$invalid}" />
+      <p class="errors"><transition name="fade">
+        <span v-if="msgUsername != ''">{{`{{ msgUsername }}`}}</span>
+      </transition></p>
+      <label for="input-password" class="sr-only">Password</label>
+      <input type="password" id="input-password" class="form-control" placeholder="Password" required
+             v-model="password" v-on:input="$v.password.$touch" v-on:change="passwordChanged"
+             v-bind:class="{invalid: $v.password.$error, valid: $v.password.$dirty && !$v.password.$invalid}" />
+      <p class="errors"><transition name="fade">
+        <span v-if="msgPassword != ''">{{`{{ msgPassword }}`}}</span>
+      </transition></p>
+      <div class="btn btn-lg btn-primary btn-block" v-on:click="submit">Sign in</div>
+    </form>
+  </div>
+  <script type="text/javascript" src="{{ .Site.BaseURL }}js/lib/jquery-3.3.1.min.js"></script>
+  <script type="text/javascript" src="{{ .Site.BaseURL }}js/lib/bootstrap-4.0.0.min.js"></script>
+  <script type="text/javascript" src="{{ .Site.BaseURL }}js/lib/materialize-1.0.0.min.js"></script>
+  <script type="text/javascript" src="{{ .Site.BaseURL }}js/lib/vue-v2.4.2.min.js"></script>
+  <script type="text/javascript" src="{{ .Site.BaseURL }}js/lib/vuelidate-v0.5.0.min.js"></script>
+  <script type="text/javascript" src="{{ .Site.BaseURL }}js/lib/validators-v0.5.0.min.js"></script>
+  <script type="text/javascript" src="{{ .Site.BaseURL }}js/lib/api.v1.js"></script>
+  <script type="text/javascript" src="{{ .Site.BaseURL }}js/min/common.js"></script>
+  <script type="text/javascript" src="{{ .Site.BaseURL }}js/min/index.js"></script>
+</body>
+</html>

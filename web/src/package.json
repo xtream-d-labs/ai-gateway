@@ -1,0 +1,13 @@
+{
+  "name": "scaleshift",
+  "description": "A tool which assists us in making deep learning models locally or on cloud.",
+  "repository": "https://github.com/rescale-labs/scaleshift/",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "src/index.js",
+  "dependencies": {
+    "jwt-decode": "2.1.0",
+    "superagent": "^3.5.0",
+    "vue": "^2.2.6"
+  }
+}

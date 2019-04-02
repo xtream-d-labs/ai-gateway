@@ -1,0 +1,51 @@
+#cloud-config
+repo_update: true
+repo_upgrade: all
+
+write_files:
+  - path: /home/ubuntu/.env
+    permissions: '0666'
+    content: |
+      SS_LOG_LEVEL=debug
+      PWD=/home/ubuntu
+
+  - path: /etc/systemd/system/scaleshift.service
+    permissions: '0666'
+    content: |
+      [Unit]
+      Description=ScaleShift services
+      After=docker.service
+      Requires=docker.service
+
+      [Service]
+      Type=simple
+      EnvironmentFile=/home/ubuntu/.env
+      Environment=COMPOSE_FILE=/home/ubuntu/docker-compose.yml
+      ExecStartPre=-/usr/local/bin/docker-compose -f ${COMPOSE_FILE} down
+      ExecStart=/usr/local/bin/docker-compose -f ${COMPOSE_FILE} up --force-recreate --abort-on-container-exit
+      ExecStop=/usr/local/bin/docker-compose -f ${COMPOSE_FILE} down
+      Restart=always
+      RestartSec=60s
+
+      [Install]
+      WantedBy=multi-user.target
+
+runcmd:
+  - apt-get remove -y docker docker-engine docker.io
+  - apt-get install curl apt-transport-https ca-certificates software-properties-common
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+  - add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  - apt-get update
+  - apt-get install -y docker-ce
+  - curl -L https://github.com/docker/compose/releases/download/1.24.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+  - chmod +x /usr/local/bin/docker-compose
+  - usermod -aG docker ubuntu
+  - systemctl enable docker
+  - systemctl start docker
+  - echo 'SS_API_ENDPOINT=http://'$( curl -s http://169.254.169.254/latest/meta-data/public-ipv4 ) >> /home/ubuntu/.env
+  - curl -L https://s3-ap-northeast-1.amazonaws.com/scaleshift/docker-compose.yml -o /home/ubuntu/docker-compose.yml
+  - systemctl enable scaleshift
+  - systemctl start scaleshift
+  - docker pull tensorflow/tensorflow:1.13.1-py3
+  - docker pull mxnet/python:1.4.0_cpu_py3
+  - docker pull chainer/chainer:v5.4.0-intel-python3

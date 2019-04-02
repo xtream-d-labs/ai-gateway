@@ -1,0 +1,40 @@
+version: "3.2"
+
+services:
+  api:
+    image: scaleshift/api:%{version}
+    environment:
+      - SS_API_ENDPOINT
+      - SS_JUPYTER_MINIMUM_PORT=30000
+      - SS_MUST_SIGN_IN=false
+      - SS_LOG_LEVEL=debug
+      - SS_WORKSPACE_HOST_DIR=${PWD}/scaleshift/workspaces
+      - SS_SINGULARITY_HOST_DIR=${PWD}/scaleshift/simages
+    volumes:
+      - ${PWD}/scaleshift/workspaces:/tmp/work
+      - ${PWD}/scaleshift/simages:/tmp/simg
+      - database:/tmp/badger
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+    container_name: api
+
+  web:
+    image: scaleshift/web:%{version}
+    environment:
+      - SS_API_ENDPOINT
+    logging:
+      driver: none
+    restart: always
+    container_name: web
+
+  proxy:
+    image: scaleshift/proxy:1.10
+    ports:
+      - "%{publish_port}:80"
+    logging:
+      driver: none
+    restart: always
+    container_name: proxy
+
+volumes:
+  database:

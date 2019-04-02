@@ -1,7 +1,6 @@
 FROM supinf/swagger-codegen:2.3
 
 RUN apk --no-cache add nodejs yarn \
-    && yarn install \
     && yarn global add browserify uglify-js
 
 ADD entrypoint.sh /

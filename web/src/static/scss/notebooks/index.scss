@@ -1,0 +1,27 @@
+@import "../common";
+
+.row .col {
+  padding: 0 5px 0 0;
+}
+
+#data {
+  display: none;
+
+  .table {
+    margin-bottom: 0px;
+  }
+}
+
+.control-label {
+  display: inline-block;
+  margin: 18px 0 0 0;
+}
+
+form .form-group {
+  input[type=text].form-control {
+    &:focus, &:valid, &:invalid {
+      border-bottom: 1px solid rgb(158, 158, 158);
+      box-shadow: none;
+    }
+  }
+}

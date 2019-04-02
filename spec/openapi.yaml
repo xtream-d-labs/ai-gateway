@@ -18,13 +18,28 @@ securityDefinitions:
     type: apiKey
     in: header
 paths:
-  /sessions:
+  '/configurations':
+    get:
+      description: |
+        returns app configurations
+      operationId: getConfigurations
+      tags:
+        - app
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Configuration'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
     post:
       description: |
-        login with NGC accounts
-      operationId: postNewSession
+        set app configurations
+      operationId: postConfigurations
       tags:
-        - session
+        - app
       parameters:
         - name: body
           in: body
@@ -32,11 +47,20 @@ paths:
           schema:
             title: AccountInfo
             type: object
-            required:
-              - ngc_email
-              - ngc_password
-              - ngc_apikey
             properties:
+              docker_registry:
+                description: Docker Registry endpoint
+                type: string
+              docker_hostname:
+                description: Hostname for the private Docker registry
+                type: string
+              docker_username:
+                description: Username for the private Docker registry
+                type: string
+              docker_password:
+                description: Password for the private Docker registry
+                type: string
+                format: password
               ngc_email:
                 description: E-mail address for NGC console
                 type: string
@@ -48,6 +72,17 @@ paths:
               ngc_apikey:
                 description: NGC - API Key
                 type: string
+              k8s_config:
+                description: kubecfg
+                type: string
+              rescale_platform:
+                description: Rescale platform endopoint
+                type: string
+                enum:
+                  - https://platform.rescale.com
+                  - https://platform.rescale.jp
+                  - https://kr.rescale.com
+                  - https://eu.rescale.com
               rescale_key:
                 description: Rescale - API Key
                 type: string
@@ -60,11 +95,45 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /repositories:
+  '/sessions':
+    post:
+      description: |
+        login
+      operationId: postNewSession
+      tags:
+        - app
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            title: AccountInfo
+            type: object
+            required:
+              - docker_username
+              - docker_password
+            properties:
+              docker_username:
+                description: Username for the private Docker registry
+                type: string
+              docker_password:
+                description: Password for the private Docker registry
+                type: string
+                format: password
+      responses:
+        '201':
+          description: OK
+          schema:
+            $ref: '#/definitions/Session'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/nvidia/repositories':
     get:
       description: |
         returns NGC repositories
-      operationId: getRepositories
+      operationId: getNgcRepositories
       tags:
         - repository
       security:
@@ -80,10 +149,10 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /repositories/{namespace}/images/{id}:
+  '/nvidia/repositories/{namespace}/images/{id}':
     get:
       description: |
-        returns NGC repositories
+        returns NGC images
       operationId: getNgcImages
       tags:
         - repository
@@ -111,10 +180,10 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /images:
+  '/images':
     get:
       description: |
-        returns NGC images
+        returns local images
       operationId: getImages
       tags:
         - image
@@ -131,12 +200,10 @@ paths:
             $ref: '#/definitions/Error'
     post:
       description: |
-        pull a specified image from NGC
+        pull a specified image from Docker registry
       operationId: postNewImage
       tags:
         - image
-      security:
-        - api-authorizer: []
       parameters:
         - name: body
           in: body
@@ -159,12 +226,10 @@ paths:
             $ref: '#/definitions/Error'
     delete:
       description: |
-        delete a specified image
+        delete a specified local image
       operationId: deleteImage
       tags:
         - image
-      security:
-        - api-authorizer: []
       parameters:
         - name: body
           in: body
@@ -209,8 +274,6 @@ paths:
       operationId: postNewNotebook
       tags:
         - notebook
-      security:
-        - api-authorizer: []
       parameters:
         - name: body
           in: body
@@ -404,6 +467,8 @@ paths:
       operationId: modifyJob
       tags:
         - job
+      security:
+        - api-authorizer: []
       parameters:
         - name: id
           in: path
@@ -435,6 +500,8 @@ paths:
       operationId: deleteJob
       tags:
         - job
+      security:
+        - api-authorizer: []
       parameters:
         - name: id
           in: path
@@ -491,11 +558,11 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  '/coretypes':
+  '/rescale/coretypes':
     get:
       description: |
         returns Rescale CoreTypes
-      operationId: getCoreTypes
+      operationId: getRescaleCoreTypes
       tags:
         - rescale
       security:
@@ -504,7 +571,7 @@ paths:
         - name: app_ver
           in: query
           type: string
-          description: Application version
+          description: Rescale Application version
           required: false
         - name: min_gpus
           in: query
@@ -517,16 +584,16 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/CoreType'
+              $ref: '#/definitions/RescaleCoreType'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  '/applications/{code}/':
+  '/rescale/applications/{code}/':
     get:
       description: |
         returns a Rescale application
-      operationId: getApplication
+      operationId: getRescaleApplication
       tags:
         - rescale
       security:
@@ -544,16 +611,16 @@ paths:
         '200':
           description: OK
           schema:
-            $ref: '#/definitions/Application'
+            $ref: '#/definitions/RescaleApplication'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  '/applications/{code}/{version}/':
+  '/rescale/applications/{code}/{version}/':
     get:
       description: |
         returns version information of a specified Rescale application
-      operationId: getApplicationVersion
+      operationId: getRescaleApplicationVersion
       tags:
         - rescale
       security:
@@ -561,7 +628,7 @@ paths:
       parameters:
         - name: code
           in: path
-          description: application code
+          description: Rescale application code
           type: string
           enum:
             - singularity
@@ -569,19 +636,121 @@ paths:
           required: true
         - name: version
           in: path
-          description: application version
+          description: Rescale application version
           type: string
           required: true
       responses:
         '200':
           description: OK
           schema:
-            $ref: '#/definitions/ApplicationVersion'
+            $ref: '#/definitions/RescaleApplicationVersion'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/versions':
+    get:
+      description: |
+        returns application versions
+      operationId: getVersions
+      tags:
+        - app
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Versions'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/endpoints':
+    get:
+      description: |
+        returns third-party endpoints
+      operationId: getEndpoints
+      tags:
+        - app
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Endpoints'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
 definitions:
+  Configuration:
+    description: app's configurations
+    required:
+      - must_signed_in
+    properties:
+      must_signed_in:
+        description: Users should be signed in
+        type: string
+        enum:
+          - "yes"
+          - "no"
+      use_private_registry:
+        description: Private registry will be used or not
+        type: string
+        enum:
+          - "yes"
+          - "no"
+      use_ngc:
+        description: NGC will be used or not
+        type: string
+        enum:
+          - "yes"
+          - "no"
+      use_k8s:
+        description: Kubernetes will be used or not
+        type: string
+        enum:
+          - "yes"
+          - "no"
+      use_rescale:
+        description: Rescale will be used or not
+        type: string
+        enum:
+          - "yes"
+          - "no"
+      docker_registry:
+        description: Docker Registry endpoint
+        type: string
+      docker_hostname:
+        description: Hostname for the private Docker registry
+        type: string
+      docker_username:
+        description: Username for the private Docker registry
+        type: string
+      docker_password:
+        description: Fist 3 chars of the password of the private Docker registry
+        type: string
+      ngc_email:
+        description: E-mail address for NGC console
+        type: string
+        format: email
+      ngc_password:
+        description: Fist 3 chars of the password for NGC console
+        type: string
+      ngc_apikey:
+        description: Fist 5 chars of NGC API Key
+        type: string
+      k8s_config:
+        description: kubecfg
+        type: string
+      rescale_platform:
+        type: string
+        enum:
+          - https://platform.rescale.com
+          - https://platform.rescale.jp
+          - https://kr.rescale.com
+          - https://eu.rescale.com
+      rescale_key:
+        description: Fist 5 chars of Rescal API Key
+        type: string
   Session:
     description: docker image information
     required:
@@ -776,7 +945,7 @@ definitions:
         type: string
       absolute_path:
         type: string
-  CoreTypeResources:
+  RescaleCoreTypeResources:
     description: CPU/GPU cores
     required:
       - cores
@@ -790,7 +959,7 @@ definitions:
         description: the number of GPUs
         type: integer
         format: int64
-  CoreType:
+  RescaleCoreType:
     description: Rescale CoreType
     required:
       - code
@@ -809,8 +978,8 @@ definitions:
       resources:
         type: array
         items:
-          $ref: '#/definitions/CoreTypeResources'
-  ApplicationVersion:
+          $ref: '#/definitions/RescaleCoreTypeResources'
+  RescaleApplicationVersion:
     description: version of Rescale Applications
     required:
       - id
@@ -828,7 +997,7 @@ definitions:
         type: array
         items:
           type: string
-  Application:
+  RescaleApplication:
     description: Rescale Application
     required:
       - code
@@ -838,7 +1007,48 @@ definitions:
       versions:
         type: array
         items:
-          $ref: '#/definitions/ApplicationVersion'
+          $ref: '#/definitions/RescaleApplicationVersion'
+  Version:
+    description: application version
+    type: object
+    required:
+      - version
+    properties:
+      version:
+        description: version name
+        type: string
+      build_date:
+        description: date which this app was built at
+        type: string
+  Versions:
+    description: application versions
+    type: object
+    required:
+      - current
+      - latest
+    properties:
+      current:
+        description: Current running service version
+        $ref: '#/definitions/Version'
+      latest:
+        description: The latest application version which can be installed
+        $ref: '#/definitions/Version'
+  Endpoints:
+    description: third-party endpoints
+    type: object
+    properties:
+      docker_registry:
+        description: The endpoint for private docker registry
+        type: string
+      ngc_registry:
+        description: The endpoint for NGC registry
+        type: string
+      kubernetes_api:
+        description: The endpoint for Kubernetes API
+        type: string
+      rescale_api:
+        description: The endpoint for Rescale API
+        type: string
   Error:
     required:
       - code

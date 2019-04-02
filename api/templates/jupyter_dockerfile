@@ -1,0 +1,19 @@
+FROM %s
+
+ENV WORKDIR=%s \
+    PYTHONPATH="%s:$PYTHONPATH" \
+    PATH="%s$PATH"
+
+RUN %s
+RUN %s install jupyter backcall bash_kernel \
+    && %s -m bash_kernel.install \
+    && rm -rf /root/.cache
+
+COPY pip.conf /root/.pip/
+COPY ipython_config.py /root/.ipython/profile_default/
+COPY jupyter_notebook_config.py /root/.jupyter/
+COPY bash-scripts.ipynb "$WORKDIR/bash-scripts.ipynb"
+COPY python-get-started.ipynb "$WORKDIR/python-get-started.ipynb"
+
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["jupyter", "notebook"]

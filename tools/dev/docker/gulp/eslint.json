@@ -27,11 +27,12 @@
       "Vue": true,
       "vuelidate": true,
       "validators": true,
-      "Materialize": true,
+      "M": true,
       "marked": true,
       "API": true,
       "models": true,
       "auth": true,
+      "config": true,
       "app": true
     }
 }

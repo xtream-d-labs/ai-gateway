@@ -1,0 +1,41 @@
+@import "./common";
+
+body {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+.helper {
+  font-size: 1.0rem;
+  font-weight: 100;
+  color: gray;
+}
+
+.form-signin {
+  max-width: 500px;
+  padding: 15px;
+  margin: 0 auto;
+
+  .form-signin-heading {
+    margin-bottom: 10px;
+  }
+  .form-control {
+    position: relative;
+    height: auto;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 17px;
+  }
+  .form-control:focus {
+    z-index: 2;
+  }
+  input[type="text"] {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+  .errors {
+    color: red;
+  }
+}

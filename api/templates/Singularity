@@ -1,0 +1,20 @@
+BootStrap: docker
+From: %s
+
+%%files
+    /var/workspace /
+
+%%labels
+    Maintainer %s
+
+%%environment
+    PYTHONPATH="%s:$PYTHONPATH"
+    PATH="/workspace/bin:$PATH"
+    export PYTHONPATH PATH
+
+%%post
+    %s
+
+%%runscript
+    cd /workspace
+    %s
