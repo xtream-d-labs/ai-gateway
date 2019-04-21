@@ -1,0 +1,48 @@
+#cloud-config
+repo_update: true
+repo_upgrade: all
+
+packages:
+  - docker
+
+write_files:
+  - path: /home/ec2-user/.env
+    permissions: '0666'
+    content: |
+      SS_LOG_LEVEL=info
+      PWD=/home/ec2-user
+
+  - path: /etc/systemd/system/scaleshift.service
+    permissions: '0666'
+    content: |
+      [Unit]
+      Description=ScaleShift services
+      After=docker.service
+      Requires=docker.service
+
+      [Service]
+      Type=simple
+      EnvironmentFile=/home/ec2-user/.env
+      Environment=COMPOSE_FILE=/home/ec2-user/docker-compose.yml
+      ExecStartPre=-/usr/local/bin/docker-compose -f ${COMPOSE_FILE} down
+      ExecStart=/usr/local/bin/docker-compose -f ${COMPOSE_FILE} up --force-recreate --abort-on-container-exit
+      ExecStop=/usr/local/bin/docker-compose -f ${COMPOSE_FILE} down
+      Restart=always
+      RestartSec=60s
+
+      [Install]
+      WantedBy=multi-user.target
+
+runcmd:
+  - curl -L https://github.com/docker/compose/releases/download/1.24.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+  - chmod +x /usr/local/bin/docker-compose
+  - usermod -aG docker ec2-user
+  - systemctl enable docker
+  - systemctl start docker
+  - echo 'SS_API_ENDPOINT=http://'$( curl -s http://169.254.169.254/latest/meta-data/public-ipv4 ) >> /home/ec2-user/.env
+  - curl -L https://s3-ap-northeast-1.amazonaws.com/scaleshift/docker-compose.yml -o /home/ec2-user/docker-compose.yml
+  - systemctl enable scaleshift
+  - systemctl start scaleshift
+  - docker pull tensorflow/tensorflow:1.13.1-py3
+  - docker pull mxnet/python:1.4.0_cpu_py3
+  - docker pull chainer/chainer:v5.4.0-intel-python3

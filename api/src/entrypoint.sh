@@ -5,7 +5,7 @@ if [ -z "${SS_JWS_PRIVATE_KEY}" ]; then
   export SS_JWS_PRIVATE_KEY
 fi
 if [ ! -e "${SS_JWS_PRIVATE_KEY}" ]; then
-  mkdir -p $( dirname "${SS_JWS_PRIVATE_KEY}" )
+  mkdir -p "$( dirname "${SS_JWS_PRIVATE_KEY}" )"
   openssl genrsa -out "${SS_JWS_PRIVATE_KEY}"
 fi
 if [ -z "${SS_JWS_PUBLIC_KEY}" ]; then
@@ -13,7 +13,7 @@ if [ -z "${SS_JWS_PUBLIC_KEY}" ]; then
   export SS_JWS_PUBLIC_KEY
 fi
 if [ ! -e "${SS_JWS_PUBLIC_KEY}" ]; then
-  mkdir -p $( dirname "${SS_JWS_PUBLIC_KEY}" )
+  mkdir -p "$( dirname "${SS_JWS_PUBLIC_KEY}" )"
   openssl rsa -in "${SS_JWS_PRIVATE_KEY}" -pubout -out "${SS_JWS_PUBLIC_KEY}"
 fi
 

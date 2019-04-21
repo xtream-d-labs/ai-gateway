@@ -6,6 +6,8 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**getNgcImages**](RepositoryApi.md#getNgcImages) | **GET** /nvidia/repositories/{namespace}/images/{id} | 
 [**getNgcRepositories**](RepositoryApi.md#getNgcRepositories) | **GET** /nvidia/repositories | 
+[**getRemoteImages**](RepositoryApi.md#getRemoteImages) | **GET** /remote-images/{id} | 
+[**getRemoteRepositories**](RepositoryApi.md#getRemoteRepositories) | **GET** /repositories | 
 
 
 <a name="getNgcImages"></a>
@@ -93,6 +95,106 @@ var callback = function(error, data, response) {
   }
 };
 apiInstance.getNgcRepositories(callback);
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**[Repository]**](Repository.md)
+
+### Authorization
+
+[api-authorizer](../README.md#api-authorizer)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+<a name="getRemoteImages"></a>
+# **getRemoteImages**
+> [Image] getRemoteImages(id)
+
+
+
+returns remote images 
+
+### Example
+```javascript
+var ScaleShift = require('scale_shift');
+var defaultClient = ScaleShift.ApiClient.instance;
+
+// Configure API key authorization: api-authorizer
+var api-authorizer = defaultClient.authentications['api-authorizer'];
+api-authorizer.apiKey = 'YOUR API KEY';
+// Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
+//api-authorizer.apiKeyPrefix = 'Token';
+
+var apiInstance = new ScaleShift.RepositoryApi();
+
+var id = "id_example"; // String | Docker image name
+
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+apiInstance.getRemoteImages(id, callback);
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**| Docker image name | 
+
+### Return type
+
+[**[Image]**](Image.md)
+
+### Authorization
+
+[api-authorizer](../README.md#api-authorizer)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+<a name="getRemoteRepositories"></a>
+# **getRemoteRepositories**
+> [Repository] getRemoteRepositories()
+
+
+
+returns remote repositories 
+
+### Example
+```javascript
+var ScaleShift = require('scale_shift');
+var defaultClient = ScaleShift.ApiClient.instance;
+
+// Configure API key authorization: api-authorizer
+var api-authorizer = defaultClient.authentications['api-authorizer'];
+api-authorizer.apiKey = 'YOUR API KEY';
+// Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
+//api-authorizer.apiKeyPrefix = 'Token';
+
+var apiInstance = new ScaleShift.RepositoryApi();
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+apiInstance.getRemoteRepositories(callback);
 ```
 
 ### Parameters

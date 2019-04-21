@@ -1,6 +1,6 @@
 api/certs
 api/src/vendor
-doc
+doc/draft
 tmp
 todo
 web/src/dist

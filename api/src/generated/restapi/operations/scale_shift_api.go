@@ -85,6 +85,12 @@ func NewScaleShiftAPI(spec *loads.Document) *ScaleShiftAPI {
 		NotebookGetNotebooksHandler: notebook.GetNotebooksHandlerFunc(func(params notebook.GetNotebooksParams) middleware.Responder {
 			return middleware.NotImplemented("operation NotebookGetNotebooks has not yet been implemented")
 		}),
+		RepositoryGetRemoteImagesHandler: repository.GetRemoteImagesHandlerFunc(func(params repository.GetRemoteImagesParams, principal *auth.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation RepositoryGetRemoteImages has not yet been implemented")
+		}),
+		RepositoryGetRemoteRepositoriesHandler: repository.GetRemoteRepositoriesHandlerFunc(func(params repository.GetRemoteRepositoriesParams, principal *auth.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation RepositoryGetRemoteRepositories has not yet been implemented")
+		}),
 		RescaleGetRescaleApplicationHandler: rescale.GetRescaleApplicationHandlerFunc(func(params rescale.GetRescaleApplicationParams, principal *auth.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation RescaleGetRescaleApplication has not yet been implemented")
 		}),
@@ -194,6 +200,10 @@ type ScaleShiftAPI struct {
 	NotebookGetNotebookDetailsHandler notebook.GetNotebookDetailsHandler
 	// NotebookGetNotebooksHandler sets the operation handler for the get notebooks operation
 	NotebookGetNotebooksHandler notebook.GetNotebooksHandler
+	// RepositoryGetRemoteImagesHandler sets the operation handler for the get remote images operation
+	RepositoryGetRemoteImagesHandler repository.GetRemoteImagesHandler
+	// RepositoryGetRemoteRepositoriesHandler sets the operation handler for the get remote repositories operation
+	RepositoryGetRemoteRepositoriesHandler repository.GetRemoteRepositoriesHandler
 	// RescaleGetRescaleApplicationHandler sets the operation handler for the get rescale application operation
 	RescaleGetRescaleApplicationHandler rescale.GetRescaleApplicationHandler
 	// RescaleGetRescaleApplicationVersionHandler sets the operation handler for the get rescale application version operation
@@ -335,6 +345,14 @@ func (o *ScaleShiftAPI) Validate() error {
 
 	if o.NotebookGetNotebooksHandler == nil {
 		unregistered = append(unregistered, "notebook.GetNotebooksHandler")
+	}
+
+	if o.RepositoryGetRemoteImagesHandler == nil {
+		unregistered = append(unregistered, "repository.GetRemoteImagesHandler")
+	}
+
+	if o.RepositoryGetRemoteRepositoriesHandler == nil {
+		unregistered = append(unregistered, "repository.GetRemoteRepositoriesHandler")
 	}
 
 	if o.RescaleGetRescaleApplicationHandler == nil {
@@ -559,6 +577,16 @@ func (o *ScaleShiftAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/notebooks"] = notebook.NewGetNotebooks(o.context, o.NotebookGetNotebooksHandler)
+
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/remote-images/{id}"] = repository.NewGetRemoteImages(o.context, o.RepositoryGetRemoteImagesHandler)
+
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/repositories"] = repository.NewGetRemoteRepositories(o.context, o.RepositoryGetRemoteRepositoriesHandler)
 
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)

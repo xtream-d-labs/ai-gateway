@@ -16,18 +16,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/Error', 'model/NgcImage', 'model/Repository'], factory);
+    define(['ApiClient', 'model/Error', 'model/Image', 'model/NgcImage', 'model/Repository'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/Error'), require('../model/NgcImage'), require('../model/Repository'));
+    module.exports = factory(require('../ApiClient'), require('../model/Error'), require('../model/Image'), require('../model/NgcImage'), require('../model/Repository'));
   } else {
     // Browser globals (root is window)
     if (!root.ScaleShift) {
       root.ScaleShift = {};
     }
-    root.ScaleShift.RepositoryApi = factory(root.ScaleShift.ApiClient, root.ScaleShift.Error, root.ScaleShift.NgcImage, root.ScaleShift.Repository);
+    root.ScaleShift.RepositoryApi = factory(root.ScaleShift.ApiClient, root.ScaleShift.Error, root.ScaleShift.Image, root.ScaleShift.NgcImage, root.ScaleShift.Repository);
   }
-}(this, function(ApiClient, Error, NgcImage, Repository) {
+}(this, function(ApiClient, Error, Image, NgcImage, Repository) {
   'use strict';
 
   /**
@@ -136,6 +136,93 @@
 
       return this.apiClient.callApi(
         '/nvidia/repositories', 'GET',
+        pathParams, queryParams, collectionQueryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the getRemoteImages operation.
+     * @callback module:api/RepositoryApi~getRemoteImagesCallback
+     * @param {String} error Error message, if any.
+     * @param {Array.<module:model/Image>} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * returns remote images 
+     * @param {String} id Docker image name
+     * @param {module:api/RepositoryApi~getRemoteImagesCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link Array.<module:model/Image>}
+     */
+    this.getRemoteImages = function(id, callback) {
+      var postBody = null;
+
+      // verify the required parameter 'id' is set
+      if (id === undefined || id === null) {
+        throw new Error("Missing the required parameter 'id' when calling getRemoteImages");
+      }
+
+
+      var pathParams = {
+        'id': id
+      };
+      var queryParams = {
+      };
+      var collectionQueryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = ['api-authorizer'];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = [Image];
+
+      return this.apiClient.callApi(
+        '/remote-images/{id}', 'GET',
+        pathParams, queryParams, collectionQueryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the getRemoteRepositories operation.
+     * @callback module:api/RepositoryApi~getRemoteRepositoriesCallback
+     * @param {String} error Error message, if any.
+     * @param {Array.<module:model/Repository>} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * returns remote repositories 
+     * @param {module:api/RepositoryApi~getRemoteRepositoriesCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link Array.<module:model/Repository>}
+     */
+    this.getRemoteRepositories = function(callback) {
+      var postBody = null;
+
+
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var collectionQueryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = ['api-authorizer'];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = [Repository];
+
+      return this.apiClient.callApi(
+        '/repositories', 'GET',
         pathParams, queryParams, collectionQueryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );

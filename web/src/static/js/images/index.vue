@@ -138,7 +138,8 @@ var vue = new Vue({
       var body = new models.ImageName1(tag);
       API('Image').deleteImage(body, function (err, _, res) {
         if (app.shouldExit(res, err)) {
-          auth.exit();
+          alert('Something went wrong. Check your configurations!')
+          window.location.href = '/settings/';
           return;
         }
         if (! $.isEmptyObject(err)) {
@@ -195,7 +196,8 @@ var image = new Vue({
       var body = new models.ImageName(name);
       API('Image').postNewImage(body, function (err, _, res) {
         if (app.shouldExit(res, err)) {
-          auth.exit();
+          alert('Something went wrong. Check your configurations!')
+          window.location.href = '/settings/';
           return;
         }
         if (! $.isEmptyObject(err)) {
@@ -239,7 +241,8 @@ var runner = new Vue({
           });
       API('Notebook').postNewNotebook(body, function (err, _, res) {
         if (app.shouldExit(res, err)) {
-          auth.exit();
+          alert('Something went wrong. Check your configurations!')
+          window.location.href = '/settings/';
           return;
         }
         location.href = '/notebooks/?q=' + encodeURIComponent(tag);

@@ -733,6 +733,77 @@ func init() {
         }
       }
     },
+    "/remote-images/{id}": {
+      "get": {
+        "security": [
+          {
+            "api-authorizer": []
+          }
+        ],
+        "description": "returns remote images\n",
+        "tags": [
+          "repository"
+        ],
+        "operationId": "getRemoteImages",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Docker image name",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Image"
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/repositories": {
+      "get": {
+        "security": [
+          {
+            "api-authorizer": []
+          }
+        ],
+        "description": "returns remote repositories\n",
+        "tags": [
+          "repository"
+        ],
+        "operationId": "getRemoteRepositories",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Repository"
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
     "/rescale/applications/{code}/": {
       "get": {
         "security": [
@@ -2101,6 +2172,77 @@ func init() {
               "type": "array",
               "items": {
                 "$ref": "#/definitions/NgcImage"
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/remote-images/{id}": {
+      "get": {
+        "security": [
+          {
+            "api-authorizer": []
+          }
+        ],
+        "description": "returns remote images\n",
+        "tags": [
+          "repository"
+        ],
+        "operationId": "getRemoteImages",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Docker image name",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Image"
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/repositories": {
+      "get": {
+        "security": [
+          {
+            "api-authorizer": []
+          }
+        ],
+        "description": "returns remote repositories\n",
+        "tags": [
+          "repository"
+        ],
+        "operationId": "getRemoteRepositories",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Repository"
               }
             }
           },

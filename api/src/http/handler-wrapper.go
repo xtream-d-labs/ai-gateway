@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-openapi/swag"
+	"github.com/rescale-labs/scaleshift/api/src/auth"
 	"github.com/rescale-labs/scaleshift/api/src/config"
 	"github.com/rescale-labs/scaleshift/api/src/db"
 	"github.com/rescale-labs/scaleshift/api/src/log"
@@ -62,6 +64,21 @@ func Wrap(handler http.Handler) http.Handler {
 						ioWriter = z
 						break
 					}
+				}
+			}
+			if sess, err := auth.RetriveSession(r); err == nil && sess != nil {
+				creds := auth.FindCredentials(sess.DockerUsername)
+				if !swag.IsZero(creds.Base.DockerRegistry) {
+					config.Config.DockerRegistryEndpoint = creds.Base.DockerRegistry
+				}
+				if !swag.IsZero(creds.Base.DockerHostname) {
+					config.Config.DockerRegistryHostName = creds.Base.DockerHostname
+				}
+				if !swag.IsZero(creds.Base.RescalePlatform) {
+					config.Config.RescaleEndpoint = creds.Base.RescalePlatform
+				}
+				if !swag.IsZero(creds.Base.RescaleKey) {
+					config.Config.RescaleAPIToken = creds.Base.RescaleKey
 				}
 			}
 			writer := overrideWriter(w, ioWriter)

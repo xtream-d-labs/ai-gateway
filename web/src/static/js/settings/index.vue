@@ -3,6 +3,8 @@ Vue.use(vuelidate.default);
 
 API('App').getConfigurations(function (err, _, res) {
   if (! $.isEmptyObject(err) || ! res || ! res.body) {
+    vue.message = 'It seems that the API server doesn\'t work properly (yet).';
+    $('.errors').css({fontWeight: 600});
     return;
   }
   vue.registry    = res.body.docker_registry;
@@ -96,5 +98,6 @@ var vue = new Vue({
 });
 $(document).ready(function () {
   $('#input-username').focus();
+  $('.errors').parent().show();
 });
 // </script>

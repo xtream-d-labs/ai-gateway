@@ -1,23 +1,32 @@
 // <script>
 Vue.use(vuelidate.default);
 
-API('App').getEndpoints(function (err, _, res) {
-  if ($.isEmptyObject(err) && res.body) {
-    var registry = res.body.docker_registry;
-    if (registry == "https://registry-1.docker.io") {
-      registry = "DockerHub";
-    }
-    $('#endpoint').text(' on '+registry);
+var apiWorks = false;
+
+API('App').getConfigurations(function (err, _, res) {
+  if (! $.isEmptyObject(err) || ! res.body) {
+    setTimeout(function () {window.location.reload();}, 5000);
+    $("#api-server-error").fadeIn();
+    return;
+  }
+  $('#act-signin').removeClass('disabled');
+  apiWorks = true;
+
+  config.set(res.body);
+  if (! config.get().mustSignedIn) {
+    window.location.href = '/images/';
   }
 });
 
-API('App').getConfigurations(function (err, _, res) {
-  if ($.isEmptyObject(err) && res.body) {
-    config.set(res.body);
-    if (! config.get().mustSignedIn) {
-      window.location.href = '/images/';
-    }
+API('App').getEndpoints(function (err, _, res) {
+  if (! $.isEmptyObject(err) || ! res.body) {
+    return;
   }
+  var registry = res.body.docker_registry;
+  if (registry == "https://registry-1.docker.io") {
+    registry = "DockerHub";
+  }
+  $('#endpoint').text(' on '+registry);
 });
 
 var vue = new Vue({
@@ -56,6 +65,9 @@ var vue = new Vue({
       $('#input-password').val('').focus();
     },
     submit: function () {
+      if (! apiWorks) {
+        return;
+      }
       setTimeout(function() {$('.btn-primary').blur();}, 500);
       if ($('.btn-primary').attr('disabled')) {
         return;

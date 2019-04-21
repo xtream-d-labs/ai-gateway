@@ -37,5 +37,9 @@ body {
   }
   .errors {
     color: red;
+
+    span {
+      display: none;
+    }
   }
 }

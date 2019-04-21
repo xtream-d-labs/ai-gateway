@@ -207,6 +207,11 @@ window.app = {
     }
   },
   refreshMenus: function (config) {
+    if (config.use_private_registry == "yes") {
+      $('#menu-repositories').fadeIn();
+    } else {
+      $('#menu-repositories').hide();
+    }
     if (config.use_ngc == "yes") {
       $('#menu-ngc-repositories').fadeIn();
     } else {

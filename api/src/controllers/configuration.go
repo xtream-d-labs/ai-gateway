@@ -32,14 +32,6 @@ func configRoute(api *operations.ScaleShiftAPI) {
 func getConfigurations(params app.GetConfigurationsParams) middleware.Responder {
 	if sess, err := auth.RetriveSession(params.HTTPRequest); err == nil && sess != nil {
 		creds := auth.FindCredentials(sess.DockerUsername)
-		rescalePlatform := creds.Base.RescalePlatform
-		if swag.IsZero(rescalePlatform) {
-			rescalePlatform = config.Config.RescaleEndpoint
-		}
-		rescaleKey := creds.Base.RescaleKey
-		if swag.IsZero(rescaleKey) {
-			rescaleKey = config.Config.RescaleAPIToken
-		}
 		return app.NewGetConfigurationsOK().WithPayload(&models.Configuration{
 			MustSignedIn:       config.MustSignInToDockerRegistry(),
 			UsePrivateRegistry: creds.Base.UsePrivateRegistry,
@@ -52,8 +44,8 @@ func getConfigurations(params app.GetConfigurationsParams) middleware.Responder 
 			NgcPassword:        hideChars(creds.Base.NgcPassword, 3),
 			NgcApikey:          hideChars(creds.Base.NgcApikey, 5),
 			UseRescale:         creds.Base.UseRescale,
-			RescalePlatform:    rescalePlatform,
-			RescaleKey:         hideChars(rescaleKey, 5),
+			RescalePlatform:    config.Config.RescaleEndpoint,
+			RescaleKey:         hideChars(config.Config.RescaleAPIToken, 5),
 			UseK8s:             creds.Base.UseK8s,
 			K8sConfig:          creds.Base.K8sConfig,
 		})
@@ -61,8 +53,6 @@ func getConfigurations(params app.GetConfigurationsParams) middleware.Responder 
 	return app.NewGetConfigurationsOK().WithPayload(&models.Configuration{
 		MustSignedIn:       config.MustSignInToDockerRegistry(),
 		UsePrivateRegistry: "no",
-		DockerRegistry:     config.Config.DockerRegistryEndpoint,
-		DockerHostname:     config.Config.DockerRegistryHostName,
 		UseNgc:             "no",
 		UseRescale:         "no",
 		RescalePlatform:    config.Config.RescaleEndpoint,
@@ -86,19 +76,16 @@ func postConfigurations(params app.PostConfigurationsParams) middleware.Responde
 
 	// Docker registry
 	if params.Body.DockerRegistry != "" {
-		config.Config.DockerRegistryEndpoint = params.Body.DockerRegistry
 		creds.Base.DockerRegistry = params.Body.DockerRegistry
 	} else {
-		config.Config.DockerRegistryEndpoint = repoutils.DefaultDockerRegistry
 		creds.Base.DockerRegistry = repoutils.DefaultDockerRegistry
 	}
 	if params.Body.DockerHostname != "" {
-		config.Config.DockerRegistryHostName = params.Body.DockerHostname
 		creds.Base.DockerHostname = params.Body.DockerHostname
 	} else {
-		config.Config.DockerRegistryHostName = "docker.io"
 		creds.Base.DockerHostname = "docker.io"
 	}
+	creds.Base.DockerUsername = params.Body.DockerUsername
 	password := params.Body.DockerPassword.String()
 	if password != hideChars(creds.Base.DockerPassword, 3) {
 		creds.Base.DockerPassword = password
@@ -123,7 +110,6 @@ func postConfigurations(params app.PostConfigurationsParams) middleware.Responde
 	}
 
 	// Rescale
-	config.Config.RescaleEndpoint = params.Body.RescalePlatform
 	creds.Base.RescalePlatform = params.Body.RescalePlatform
 	if params.Body.RescaleKey != hideChars(creds.Base.RescaleKey, 5) {
 		creds.Base.RescaleKey = params.Body.RescaleKey
@@ -140,7 +126,7 @@ func postConfigurations(params app.PostConfigurationsParams) middleware.Responde
 		config, e1 := repoutils.GetAuthConfig(
 			creds.Base.DockerUsername,
 			creds.Base.DockerPassword,
-			config.Config.DockerRegistryEndpoint,
+			creds.Base.DockerRegistry,
 		)
 		if e1 != nil {
 			return xerrors.Errorf("[Docker registry] %s", e1.Error())

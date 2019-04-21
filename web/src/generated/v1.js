@@ -74,7 +74,7 @@ function exit() {
     window.location.href = '/';
     return;
   }
-  window.location.reload();
+  window.location.href = '/settings/';
 }
 
 window.auth = {

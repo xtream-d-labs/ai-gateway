@@ -8,8 +8,8 @@ js = "settings/index.js"
     <div class="row">
       <div class="col s12" style="min-height: 182px;margin-bottom: 40px;">
         <form class="form-signin">
-          <div class="form-group">
-            <p class="errors" style="display: none;"><transition name="fade">
+          <div class="form-group" style="display: none;">
+            <p class="errors"><transition name="fade">
               <span v-if="message != ''">{{ message }}</span>
             </transition></p>
           </div>
@@ -20,14 +20,14 @@ js = "settings/index.js"
             <label for="input-registry" class="row control-label">Registry</label>
             <div class="row">
               <input type="text" id="input-registry" class="form-control" v-model="registry"
-                 placeholder="https://registry-1.docker.io (DockerHub)" />
+                 placeholder="Your private docker registry endpoint (default: DockerHub) " />
             </div>
           </div>
           <div class="form-group">
             <label for="input-hostname" class="row control-label">Hostname</label>
             <div class="row">
               <input type="text" id="input-hostname" class="form-control" v-model="hostname"
-                 placeholder="docker.io (DockerHub)" />
+                 placeholder="Your private docker registry hostname (default: DockerHub) " />
             </div>
           </div>
           <div class="form-group">
@@ -49,19 +49,22 @@ js = "settings/index.js"
           <div class="form-group">
             <label for="input-ngc-email" class="row control-label">Email</label>
             <div class="row">
-              <input type="text" id="input-ngc-email" class="form-control" v-model="ngcEmail" />
+              <input type="text" id="input-ngc-email" class="form-control" v-model="ngcEmail"
+                     placeholder="Email address for the web console: foo@bar.com" />
             </div>
           </div>
           <div class="form-group">
             <label for="input-ngc-password" class="row control-label">Password</label>
             <div class="row">
-              <input type="password" id="input-ngc-password" class="form-control" v-model="ngcPassword" />
+              <input type="password" id="input-ngc-password" class="form-control" v-model="ngcPassword"
+                     placeholder="Password for the web console: xxxxx" />
             </div>
           </div>
           <div class="form-group">
             <label for="input-ngc-key" class="row control-label">API Key</label>
             <div class="row">
-              <input type="text" id="input-ngc-key" class="form-control" v-model="ngcKey" />
+              <input type="text" id="input-ngc-key" class="form-control" v-model="ngcKey" 
+                     placeholder="Generate your API Key at https://ngc.nvidia.com/setup/api-key" />
             </div>
           </div>
           <!-- <h5 id="rescale" class="form-signin-heading">

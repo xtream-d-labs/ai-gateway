@@ -4,7 +4,6 @@ services:
   api:
     image: scaleshift/api:%{version}
     environment:
-      - SS_API_ENDPOINT
       - SS_JUPYTER_MINIMUM_PORT=30000
       - SS_MUST_SIGN_IN=false
       - SS_LOG_LEVEL=debug
@@ -20,8 +19,6 @@ services:
 
   web:
     image: scaleshift/web:%{version}
-    environment:
-      - SS_API_ENDPOINT
     logging:
       driver: none
     restart: always

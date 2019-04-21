@@ -58,7 +58,7 @@ services:
         max-file: "1"
     ulimits:
       cpu:
-        soft: 10
-        hard: 20
+        soft: 20
+        hard: 40
     restart: always
     container_name: gulp

@@ -9,7 +9,6 @@ import (
 	"github.com/SermoDigital/jose/crypto"
 	"github.com/SermoDigital/jose/jws"
 	"github.com/dgraph-io/badger"
-	"github.com/rescale-labs/scaleshift/api/src/config"
 	"github.com/rescale-labs/scaleshift/api/src/db"
 	"github.com/rescale-labs/scaleshift/api/src/generated/models"
 	"github.com/rescale-labs/scaleshift/api/src/log"
@@ -102,7 +101,6 @@ func toString(value interface{}) string {
 func FindCredentials(username string) *Credentials {
 	creds := &Credentials{
 		Base: &models.Configuration{
-			DockerRegistry: config.Config.DockerRegistryEndpoint,
 			DockerUsername: username,
 		},
 	}

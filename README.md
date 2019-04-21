@@ -15,22 +15,19 @@ A tool which assists us in making deep learning models locally or on cloud.
 
 ### Download the docker-compose.yml to your working directory
 
-[docker-compose-8080.yml](https://s3-ap-northeast-1.amazonaws.com/scaleshift/docker-compose-8080.yml)
+```console
+curl -so docker-compose.yml https://s3-ap-northeast-1.amazonaws.com/scaleshift/docker-compose-8080.yml
+```
 
 ### Start services
 
-Set your host name as an environment variable `SS_API_ENDPOINT` and start the services!
-
 ```console
-export SS_API_ENDPOINT=http://localhost:8080
-docker-compose --file docker-compose-8080.yml up
+docker-compose up
 ```
 
 ### Access the web UI
 
-```console
-open http://localhost:8080
-```
+[http://localhost:8080](http://localhost:8080)
 
 ### You can use APIs directly as well
 

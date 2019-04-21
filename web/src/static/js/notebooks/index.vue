@@ -60,7 +60,8 @@ var vue = new Vue({
 
       API('Rescale').getCoreTypes({appVer:'cpu:cheap'}, function (err, _, res) {
         if (app.shouldExit(res, err) || (res && res.body && res.body.code == 401)) {
-          auth.exit();
+          alert('Something went wrong. Check your configurations!')
+          window.location.href = '/settings/';
           return;
         }
         var html = '';
@@ -276,7 +277,8 @@ var training = new Vue({
             return;
           }
           if (app.shouldExit(res, err)) {
-            auth.exit();
+            alert('Something went wrong. Check your configurations!')
+            window.location.href = '/settings/';
             return;
           }
           return;
@@ -375,7 +377,8 @@ $(document).ready(function () {
       }
       API('Rescale').getCoreTypes({appVer: cores}, function (err, _, res) {
         if (app.shouldExit(res, err) || (res && res.body && res.body.code == 401)) {
-          auth.exit();
+          alert('Something went wrong. Check your configurations!')
+          window.location.href = '/settings/';
           return;
         }
         var html = '';

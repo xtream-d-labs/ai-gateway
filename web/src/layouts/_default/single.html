@@ -11,7 +11,7 @@
   <meta http-equiv='Cache-Control' content='no-cache'>
   <meta http-equiv='X-XSS-Protection' content='1; mode=block'>
   <meta http-equiv='X-Content-Type-Options' content='nosniff'>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com/; script-src 'self' 'unsafe-eval'; connect-src 'self' {{ .Site.Params.apiHost }}; img-src 'self' https://mapr.com data:;font-src 'self' https://fonts.gstatic.com/ data:">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com/; script-src 'self' 'unsafe-eval'; connect-src 'self'; img-src 'self' https://mapr.com data:;font-src 'self' https://fonts.gstatic.com/ data:">
   <link rel="icon" type="image/png" href="{{ .Site.BaseURL }}img/favicon.png">
   <link rel="apple-touch-icon" href="{{ .Site.BaseURL }}img/logo.png" sizes="180x180">
   <link rel="stylesheet" type="text/css" href="{{ .Site.BaseURL }}css/lib/admin-lte/skins/_all-skins.min.css" />
@@ -92,6 +92,11 @@
           <li id="menu-ngc-repositories" class="treeview" style="display: none;">
             <a href="/ngc-repositories/">
               <i class="fas fa-cloud fa-fw"></i> <span>&nbsp;NGC Images</span>
+            </a>
+          </li>
+          <li id="menu-repositories" class="treeview" style="display: none;">
+            <a href="/repositories/">
+              <i class="fas fa-cloud fa-fw"></i> <span>&nbsp;Remote Images</span>
             </a>
           </li>
           <li id="menu-images" class="treeview">

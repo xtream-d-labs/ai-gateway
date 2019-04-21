@@ -129,6 +129,52 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  '/repositories':
+    get:
+      description: |
+        returns remote repositories
+      operationId: getRemoteRepositories
+      tags:
+        - repository
+      security:
+        - api-authorizer: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Repository'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/remote-images/{id}':
+    get:
+      description: |
+        returns remote images
+      operationId: getRemoteImages
+      tags:
+        - repository
+      security:
+        - api-authorizer: []
+      parameters:
+        - name: id
+          in: path
+          description: Docker image name
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Image'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   '/nvidia/repositories':
     get:
       description: |

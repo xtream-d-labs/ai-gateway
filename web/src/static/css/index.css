@@ -595,3 +595,5 @@ body {
     border-top-right-radius: 0; }
   .form-signin .errors {
     color: red; }
+    .form-signin .errors span {
+      display: none; }

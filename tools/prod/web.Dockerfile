@@ -11,8 +11,7 @@ RUN rm -rf dist/scss dist/*.xml dist/**/*.xml /usr/share/nginx/html/50x.html
 
 FROM swaggerapi/swagger-ui:v3.20.5 AS doc-gen
 
-FROM nginx:1.15.8-alpine
-ENV SS_API_ENDPOINT=http://localhost:9000
+FROM nginx:1.15.11-alpine
 COPY --from=doc-gen /usr/share/nginx/html /usr/share/nginx/html/doc/api
 COPY --from=build-app /work/dist /usr/share/nginx/html
 COPY openapi.yaml /usr/share/nginx/html/spec.yaml
