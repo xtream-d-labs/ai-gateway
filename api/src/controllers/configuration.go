@@ -20,6 +20,7 @@ import (
 	"github.com/rescale-labs/scaleshift/api/src/log"
 	"github.com/rescale-labs/scaleshift/api/src/reg/registry"
 	"github.com/rescale-labs/scaleshift/api/src/reg/repoutils"
+	"github.com/rescale-labs/scaleshift/api/src/rescale"
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/xerrors"
 )
@@ -50,8 +51,18 @@ func getConfigurations(params app.GetConfigurationsParams) middleware.Responder 
 			K8sConfig:          creds.Base.K8sConfig,
 		})
 	}
+	registry := ""
+	if config.Config.DockerRegistryEndpoint != repoutils.DefaultDockerRegistry {
+		registry = config.Config.DockerRegistryEndpoint
+	}
+	hostname := ""
+	if config.Config.DockerRegistryHostName != "docker.io" {
+		hostname = config.Config.DockerRegistryHostName
+	}
 	return app.NewGetConfigurationsOK().WithPayload(&models.Configuration{
 		MustSignedIn:       config.MustSignInToDockerRegistry(),
+		DockerRegistry:     registry,
+		DockerHostname:     hostname,
 		UsePrivateRegistry: "no",
 		UseNgc:             "no",
 		UseRescale:         "no",
@@ -111,6 +122,7 @@ func postConfigurations(params app.PostConfigurationsParams) middleware.Responde
 
 	// Rescale
 	creds.Base.RescalePlatform = params.Body.RescalePlatform
+	creds.Base.RescaleKey = ""
 	if params.Body.RescaleKey != hideChars(creds.Base.RescaleKey, 5) {
 		creds.Base.RescaleKey = params.Body.RescaleKey
 	}
@@ -181,25 +193,26 @@ func postConfigurations(params app.PostConfigurationsParams) middleware.Responde
 		return nil
 	})
 	// // Check if Kubernetes API returns 200
-	// eg.Go(func() error {
-	// 	return nil
-	// })
-	// // Check if Rescale API returns 200
-	// eg.Go(func() error {
-	// 	if swag.IsZero(creds.Base.RescaleKey) {
-	// 		return nil
-	// 	}
-	// 	rescale.SetEndpoint(creds.Base.RescalePlatform)
-	// 	rescale.EnableCache(false)
-	// 	coretypes, err := rescale.CoreTypes(creds.Base.RescaleKey, nil, nil)
-	// 	if err != nil {
-	// 		return xerrors.Errorf("[Rescale API Key] %s", err.Error())
-	// 	}
-	// 	if len(coretypes) == 0 {
-	// 		return xerrors.Errorf("[Rescale API Key] Invalid token.")
-	// 	}
-	// 	return nil
-	// })
+	eg.Go(func() error {
+		return nil
+	})
+	// Check if Rescale API returns 200
+	eg.Go(func() error {
+		if swag.IsZero(creds.Base.RescaleKey) {
+			return nil
+		}
+		rescale.SetEndpoint(creds.Base.RescalePlatform)
+		rescale.EnableCache(false)
+		coretypes, err := rescale.CoreTypes(creds.Base.RescaleKey, nil, nil)
+		if err != nil {
+			return xerrors.Errorf("[Rescale API Key] %s", err.Error())
+		}
+		if len(coretypes) == 0 {
+			return xerrors.Errorf("[Rescale API Key] Invalid token.")
+		}
+		rescale.EnableCache(true)
+		return nil
+	})
 
 	if err := eg.Wait(); err != nil {
 		code := http.StatusUnauthorized

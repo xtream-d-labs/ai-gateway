@@ -89,14 +89,19 @@
           <li class="header">Navigation</li>
 
           {{/* <!-- Menus --> */}}
-          <li id="menu-ngc-repositories" class="treeview" style="display: none;">
-            <a href="/ngc-repositories/">
-              <i class="fas fa-cloud fa-fw"></i> <span>&nbsp;NGC Images</span>
+          <li id="menu-repositories" class="treeview" style="display: none;">
+            <a href="#">
+              <i class="fas fa-cloud fa-fw"></i> <span>&nbsp;Remote Images</span>
+              <i class="fas fa-angle-left pull-right"></i>
             </a>
+            <ul class="treeview-menu">
+              <li id="menu-ngc-repo"><a href="/ngc-repositories/"><i class="fa fa-circle-o"></i> NVIDIA GPU Cloud</a></li>
+              <li id="menu-prv-repo"><a href="/repositories/"><i class="fa fa-circle-o"></i> Private Registry</a></li>
+            </ul>
           </li>
           <li id="menu-repositories" class="treeview" style="display: none;">
             <a href="/repositories/">
-              <i class="fas fa-cloud fa-fw"></i> <span>&nbsp;Remote Images</span>
+              <i class="fas fa-cloud fa-fw"></i> <span>&nbsp;</span>
             </a>
           </li>
           <li id="menu-images" class="treeview">
@@ -114,11 +119,11 @@
               <i class="fas fa-folder-open fa-fw"></i> <span>&nbsp;Workspaces</span>
             </a>
           </li>
-          {{/* <li id="menu-jobs" class="treeview" style="display: none;">
+          <li id="menu-jobs" class="treeview" style="display: none;">
             <a href="/jobs/">
               <i class="fas fa-tasks fa-fw"></i> <span>&nbsp;Training Tasks</span>
             </a>
-          </li> */}}
+          </li>
 
         </ul>
       </section>

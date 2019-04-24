@@ -42,6 +42,11 @@ type config struct { // nolint:maligned
 	KubernetesConfig       string   `envconfig:"KUBERNETES_CONFIG"`
 	RescaleEndpoint        string   `envconfig:"RESCALE_ENDPOINT" default:"https://platform.rescale.com"`
 	RescaleAPIToken        string   `envconfig:"RESCALE_API_TOKEN"`
+	RescaleSingularityVer  string   `envconfig:"RESCALE_SINGULARITY_VERSION" default:"3.0.1"` // now supports: 3.0.1, 2.6.0, 2.5.1
+	RescaleJobWallTime     int      `envconfig:"RESCALE_JOB_WALLTIME" default:"3600"`
+	MaxWorkers             int      `envconfig:"MAX_WORKERS" default:"1"`
+	MaxFetchers            int      `envconfig:"MAX_FETCHERS" default:"1"`
+	WorkerRetryLimit       int      `envconfig:"WORKER_RETRY_LIMIT" default:"1"`
 	AccessLog              bool     `envconfig:"ACCESS_LOG" default:"true"`
 	LogLevel               string   `envconfig:"LOG_LEVEL" default:"warn"`
 	LogFormat              string   `envconfig:"LOG_FORMAT" default:"default"`
@@ -52,13 +57,27 @@ type config struct { // nolint:maligned
 	DatabaseDir            string   `envconfig:"DATABASE_CNTR_DIR" default:"/tmp/badger"`
 	WorkspaceHostDir       string   `envconfig:"WORKSPACE_HOST_DIR"`
 	WorkspaceContainerDir  string   `envconfig:"WORKSPACE_CNTR_DIR" default:"/tmp/work"`
-	SingImg                string   `envconfig:"SINGULARITY_IMAGE" default:"scaleshift/singularity:2.6-d2s"`
+	SingImg                string   `envconfig:"SINGULARITY_IMAGE" default:"scaleshift/singularity:3.1"`
 	SingImgHostPath        string   `envconfig:"SINGULARITY_HOST_DIR"`
 	SingImgContainerDir    string   `envconfig:"SINGULARITY_CNTR_DIR" default:"/tmp/simg"`
 }
 
+// Init set initial values
+func (c *config) Init() {
+	c.DockerRegistryEndpoint = initDockerRegistryEndpoint
+	c.DockerRegistryHostName = initDockerRegistryHostName
+	c.RescaleEndpoint = initRescaleEndpoint
+	c.RescaleAPIToken = initRescaleAPIToken
+}
+
 // Config represents its configurations
-var Config *config
+var (
+	Config                     *config
+	initDockerRegistryEndpoint string
+	initDockerRegistryHostName string
+	initRescaleEndpoint        string
+	initRescaleAPIToken        string
+)
 
 func init() {
 	Config = &config{}
@@ -67,6 +86,10 @@ func init() {
 	if len(commit) > 0 && len(date) > 0 {
 		Config.APIVersion = fmt.Sprintf("%s-%s (built at %s)", version, commit, date)
 	}
+	initDockerRegistryEndpoint = Config.DockerRegistryEndpoint
+	initDockerRegistryHostName = Config.DockerRegistryHostName
+	initRescaleEndpoint = Config.RescaleEndpoint
+	initRescaleAPIToken = Config.RescaleAPIToken
 }
 
 // BuildDate returns the version of this app

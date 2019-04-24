@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-msgqueue/msgqueue"
 	"github.com/go-msgqueue/msgqueue/memqueue"
+	"github.com/rescale-labs/scaleshift/api/src/config"
 )
 
 var q *memqueue.Queue
@@ -14,9 +15,9 @@ func SetupQueue(handler interface{}, fallbackHandler interface{}) {
 	q = memqueue.NewQueue(&msgqueue.Options{
 		Handler:         handler,
 		FallbackHandler: fallbackHandler,
-		MaxWorkers:      1,
-		MaxFetchers:     1,
-		RetryLimit:      1,
+		MaxWorkers:      config.Config.MaxWorkers,
+		MaxFetchers:     config.Config.MaxFetchers,
+		RetryLimit:      config.Config.WorkerRetryLimit,
 	})
 }
 

@@ -9,6 +9,7 @@ services:
       - SS_RESCALE_ENDPOINT=https://platform.rescale.jp
       - SS_RESCALE_API_TOKEN
       - SS_LOG_LEVEL=debug
+      - SS_MAX_WORKERS=2
       - SS_MUST_SIGN_IN=false
       - SS_IMAGES_TOBE_IGNORED=scaleshift/,ss-jupyter/,supinf/,<none>
       - SS_WORKSPACE_HOST_DIR=${PWD}/tools/dev/tmp/work

@@ -165,7 +165,7 @@ $(document).ready(function () {
     window.location.href = '/images/';
     return;
   }
-  $('#menu-ngc-repositories').addClass('active');
+  $('#menu-repositories, #menu-ngc-repo').addClass('active');
   if (app.query('q')) {
     $('#query-words').val(app.query('q')).focus();
   }

@@ -20,32 +20,16 @@ func rescaleRoute(api *operations.ScaleShiftAPI) {
 	api.RescaleGetRescaleApplicationVersionHandler = rescale.GetRescaleApplicationVersionHandlerFunc(getApplicationVersion)
 }
 
-// curl -s -H "Authorization: Token xxx" http://localhost:9000/api/v1/coretypes/
-/**
- * CPU: http://localhost:9000/api/v1/coretypes/?app_ver=singularity%3A2.5.1
- *  - Emerald (emerald):      AWS c5 instances (Intel Xeon Platinum P-8124, Skylake)
- *  - Onyx (hpc-3):           AWS c4 instances (Intel Xeon E5-2666 v3, Haswell)
- *  - Nickel (hpc-plus):      AWS c3 instances (Intel Xeon E5-2680 v2, Ivy Bridge)
- *  - Melanite (melanite):    AWS m5 instances (Intel Xeon Platinum 8175, Skylake)
- *  - Titanium (titanium):    AWS m4 instances (Intel Xeon E5-2676 v3, Haswell)
- *  - Marble (standard-plus): AWS m3 instances (Intel Xeon E5-2670 v2, Ivy Bridge)
- *  - Topaz (topaz):          AWS x1 instances (Intel Xeon E7-8880 v3, Haswell)
- *  - Zinc (zinc):            AWS r4 instances (Intel Xeon E5-2686 v4, Broadwell)
- *  - Gold (hi-mem-hpc):      AWS r3 instances (Intel Xeon E5-2670 v2, Ivy Bridge)
- *  - Graphite (graphite):    AWS i3 instances (Intel Xeon E5-2686 v4, Broadwell)
- *  - Quartz (hi-io-plus):    AWS i2 instances (Intel Xeon E5-2670 v2, Ivy Bridge)
- *
- * GPU: http://localhost:9000/api/v1/coretypes/?app_ver=singularity%3Auser-included-cuda-8.0&min_gpus=1
- *  - Dolomite (dolomite):    AWS p3 instances (NVIDIA V100 w/ NVLink, Intel Xeon E5-2686 v4, Broadwell)
- *  - Obsidian (obsidian):    AWS p2 instances (NVIDIA K80, Intel Xeon E5-2676 v3, Haswell)
- */
+// curl -s -H "Authorization: Bearer xxx" "http://localhost:8080/api/v1/rescale/coretypes/"
+// curl -s -H "Authorization: Bearer xxx" "http://localhost:8080/api/v1/rescale/coretypes/?app_ver=singularity%3A2.5.1"
+// curl -s -H "Authorization: Bearer xxx" "http://localhost:8080/api/v1/rescale/coretypes/?app_ver=cpu:cheap"
 func getCoreTypes(params rescale.GetRescaleCoreTypesParams, principal *auth.Principal) middleware.Responder {
 	creds := auth.FindCredentials(principal.Username)
 	if swag.IsZero(creds.NgcSession) {
 		code := http.StatusForbidden
 		return rescale.NewGetRescaleCoreTypesDefault(code).WithPayload(newerror(code))
 	}
-	// Restrict some application
+	// Restrict core types by some application
 	var limitedCoreTypes []string
 	if params.AppVer != nil {
 		if strings.EqualFold(swag.StringValue(params.AppVer), "gpu:volta") { // nolint:gocritic
@@ -60,7 +44,7 @@ func getCoreTypes(params rescale.GetRescaleCoreTypesParams, principal *auth.Prin
 				code := http.StatusBadRequest
 				return rescale.NewGetRescaleCoreTypesDefault(code).WithPayload(newerror(code))
 			}
-			app, err := analyses(creds.Base.RescaleKey, appver[0])
+			app, err := api.Analyses(creds.Base.RescaleKey, appver[0])
 			if err != nil {
 				log.Error("analyses@getCoreTypes", err, nil)
 				code := http.StatusBadRequest
@@ -130,14 +114,14 @@ func contains(coretypes []string, coretype string) bool {
 	return false
 }
 
-// curl -s -H "Authorization: Token xxx" http://localhost:9000/api/v1/applications/singularity/
+// curl -s -H "Authorization: Bearer xxx" "http://localhost:8080/api/v1/rescale/applications/singularity/"
 func getApplication(params rescale.GetRescaleApplicationParams, principal *auth.Principal) middleware.Responder {
 	creds := auth.FindCredentials(principal.Username)
 	if swag.IsZero(creds.NgcSession) {
 		code := http.StatusForbidden
 		return rescale.NewGetRescaleApplicationDefault(code).WithPayload(newerror(code))
 	}
-	app, err := analyses(creds.Base.RescaleKey, params.Code)
+	app, err := api.Analyses(creds.Base.RescaleKey, api.ApplicationSingularity) // params.Code
 	if err != nil {
 		log.Error("analyses@getApplication", err, nil)
 		code := http.StatusBadRequest
@@ -162,14 +146,14 @@ func getApplication(params rescale.GetRescaleApplicationParams, principal *auth.
 	return rescale.NewGetRescaleApplicationOK().WithPayload(payload)
 }
 
-// curl -s -H "Authorization: Token xxx" http://localhost:9000/api/v1/applications/singularity/2.5.1/
+// curl -s -H "Authorization: Bearer xxx" "http://localhost:8080/api/v1/rescale/applications/singularity/2.5.1/"
 func getApplicationVersion(params rescale.GetRescaleApplicationVersionParams, principal *auth.Principal) middleware.Responder {
 	creds := auth.FindCredentials(principal.Username)
 	if swag.IsZero(creds.NgcSession) {
 		code := http.StatusForbidden
 		return rescale.NewGetRescaleApplicationVersionDefault(code).WithPayload(newerror(code))
 	}
-	app, err := analyses(creds.Base.RescaleKey, params.Code)
+	app, err := api.Analyses(creds.Base.RescaleKey, api.ApplicationSingularity) // params.Code
 	if err != nil {
 		log.Error("analyses@getApplicationVersion", err, nil)
 		code := http.StatusBadRequest
@@ -188,12 +172,4 @@ func getApplicationVersion(params rescale.GetRescaleApplicationVersionParams, pr
 	}
 	code := http.StatusNotFound
 	return rescale.NewGetRescaleApplicationVersionDefault(code).WithPayload(newerror(code))
-}
-
-func analyses(token, param string) (*api.Application, error) {
-	code := api.ApplicationSingularity
-	if strings.EqualFold(param, "singularity_mpi") {
-		code = api.ApplicationSingularityMPI
-	}
-	return api.Analyses(token, code)
 }

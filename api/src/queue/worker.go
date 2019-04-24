@@ -56,11 +56,11 @@ func SubmitBuildImageJob(imageName, imageID, workspace, wrappedImageID, builderN
 }
 
 // BuildSingularityImageJob puts a new job
-func BuildSingularityImageJob(ID, ngcConfig, rescaleConfig, builderName string) error {
+func BuildSingularityImageJob(ID, dockerCredential, rescaleConfig, builderName string) error {
 	bytes, err := json.Marshal(job{
 		Action: actionSingularity,
 		Arg1:   ID,
-		Arg2:   ngcConfig,
+		Arg2:   dockerCredential,
 		Arg3:   rescaleConfig,
 		Arg4:   builderName,
 	})
@@ -146,7 +146,7 @@ func worker(name string) (err error) {
 		})
 	case actionSingularity:
 		// Arg1: ID
-		// Arg2: NgcConfig
+		// Arg2: DockerCredential
 		// Arg3: RescaleConfig
 		// Arg4: BuildersName
 		simg, err := lib.BuildSingularityImage(j.Arg1, j.Arg2, j.Arg4)
@@ -188,30 +188,26 @@ func worker(name string) (err error) {
 			return err
 		}
 		// Create a new job
-		application := rescale.ApplicationSingularity
-		if strings.EqualFold(job.CoreType, "dolomite") {
-			application = rescale.ApplicationSingularityMPI
-		}
 		input := rescale.JobInput{
 			Name: strings.TrimRight(filepath.Base(j.Arg3), ".simg"),
 			JobAnalyses: []rescale.JobInputAnalyse{rescale.JobInputAnalyse{
-				Command: fmt.Sprintf("singularity run %s", meta.Name),
+				Command: fmt.Sprintf("singularity run %s\nrm -rf %s", meta.Name, meta.Name),
 				InputFiles: []rescale.JobInputFile{rescale.JobInputFile{
 					ID:         meta.ID,
 					Decompress: true,
 				}},
 				Analysis: rescale.JobAnalyse{
-					Code:    application,
-					Version: "2.5.1", // FIXME
+					Code:    rescale.ApplicationSingularity,
+					Version: config.Config.RescaleSingularityVer,
 				},
 				Hardware: rescale.JobHardware{
 					Type: "compute",
 					CoreType: rescale.JobCoreType{
 						Code: job.CoreType,
 					},
-					Slots:        1,   // FIXME
-					CoresPerSlot: 1,   // FIXME CoresPerSlot: fmt.Sprintf("%d", job.Cores),
-					WallTime:     750, // TODO
+					Slots:        1,
+					CoresPerSlot: int(job.Cores),
+					WallTime:     config.Config.RescaleJobWallTime,
 				},
 			}},
 			JobVariables:     []string{},

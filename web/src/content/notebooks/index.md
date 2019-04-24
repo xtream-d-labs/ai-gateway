@@ -81,8 +81,11 @@ js = "notebooks/index.js"
                 <div class="col-12" style="margin-bottom: 20px;">
                   <h5>Actions</h5>
                   <div style="margin: 20px 0 5px 0;">
-                    <!-- <a class="waves-effect waves-light btn blue darken-1"
+                    <a v-if="trainOnCloud" class="waves-effect waves-light btn blue darken-1"
                        tabindex="0" v-on:click="train">train on cloud</a>
+                    <span>&nbsp;</span>
+                    <!-- <a class="waves-effect waves-light btn blue darken-1"
+                       tabindex="0">Run more like this</a>
                     <span>&nbsp;</span> -->
                     <a class="waves-effect waves-light btn red lighten-2 act-stop" tabindex="0"
                        v-if="notebook.state != 'exited'" v-on:click="stop">stop</a>
@@ -115,54 +118,63 @@ js = "notebooks/index.js"
 </main>
 
 <div id="training-dialog" class="modal popup-dialog"
-    style="height: 525px;width: 60%;max-height: 85%;">
+    style="height: 585px;width: 60%;max-height: 85%;top: 1% !important;">
   <div class="modal-content">
-    <h5>Task definition</h5>
+    <h5>Confirmation</h5>
   </div>
-  <div class="modal-footer row" style="margin: 0;">
-    <form autocomplete="off" v-on:submit.prevent>
-      <div class="form-group row considerable">
-        <label class="col-sm-3 control-label">Job type</label>
-        <div class="col-sm-9 training-type">
-          <select>
-            <option value="0">Run your iPython notebook</option>
-            <option value="1">Run commmands</option>
-          </select>
+  <div class="modal-footer row">
+    <div class="col-12" style="margin: 15px 0px 7px 0;min-height: 50px;">
+      <form autocomplete="off" v-on:submit.prevent>
+        <div class="form-group row considerable">
+          <label class="col-sm-3 control-label">Job type</label>
+          <div class="col-sm-9 training-type">
+            <select>
+              <option value="0">Run your iPython notebook</option>
+              <option value="1">Run commmands</option>
+            </select>
+          </div>
         </div>
-      </div>
-      <div class="form-group row considerable">
-        <label class="col-sm-3 control-label">Notebook</label>
-        <div class="col-sm-9 training-notebook">
-          <select></select>
+        <div class="form-group row considerable">
+          <label class="col-sm-3 control-label">Notebook</label>
+          <div class="col-sm-9 training-notebook">
+            <select></select>
+          </div>
         </div>
-      </div>
-      <div class="form-group row">
-        <label class="col-sm-3 control-label">Commands</label>
-        <div class="col-sm-9">
-          <input type="text" class="form-control training-cmds" v-model="cmd"
-                 placeholder="python train.py --epoch 10 --gpu 1" />
+        <div class="form-group row">
+          <label class="col-sm-3 control-label">Commands</label>
+          <div class="col-sm-9">
+            <input type="text" class="form-control training-cmds" v-model="cmd"
+                  placeholder="python train.py --epoch 10 --gpu 1" />
+          </div>
         </div>
-      </div>
-      <div class="form-group row">
-        <label class="col-sm-3 control-label">Hardware</label>
-        <div class="col-sm-9 training-coretype">
-          <select>
-            <option value="emerald">CPU only</option>
-            <option value="dolomite">GPU (Tesla V100)</option>
-          </select>
+        <div class="form-group row">
+          <label class="col-sm-3 control-label">Hardware</label>
+          <div class="col-sm-9 training-coretype">
+            <select>
+              <option value="emerald">CPU only</option>
+              <option value="dolomite">GPU (Tesla V100)</option>
+            </select>
+          </div>
         </div>
-      </div>
-      <div class="form-group row">
-        <label class="col-sm-3 control-label">Cores</label>
-        <div class="col-sm-9 training-cores">
-          <select></select>
+        <div class="form-group row">
+          <label class="col-sm-3 control-label">Cores</label>
+          <div class="col-sm-9 training-cores">
+            <select></select>
+          </div>
         </div>
+        <div class="clear-both"></div>
+      </form>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <p style="margin-bottom: 0;">It takes 5 minutes at least to start a job on cloud.</p>
       </div>
-      <div class="clear-both"></div>
-    </form>
-    <div class="row" style="margin-top: 7px;">
+    </div>
+    <div class="clear-both"></div>
+    <div class="col-12">
       <a class="waves-effect waves-light btn cancel" tabindex="0" v-on:click="close">Cancel</a>
-      <a class="waves-effect waves-light btn submit" tabindex="0" v-on:click="submit">Start</a>
+      <a id="act-submit" class="waves-effect waves-light btn submit" tabindex="0" 
+         style="float: right;color: white !important;" v-on:click="submit">Start</a>
     </div>
   </div>
 </div>

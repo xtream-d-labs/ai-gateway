@@ -89,10 +89,8 @@ func CoreTypes(token string, page, pageSize *int64) ([]*CoreType, error) {
 
 // Application codes
 const (
-	ApplicationSingularity    = "user_included_singularity_container"
-	ApplicationSingularityMPI = "user_included_singularity_container_mpi"
-
-	coretypesCacheKey = "cached-coretypes"
+	ApplicationSingularity = "user_included_singularity_container"
+	coretypesCacheKey      = "cached-coretypes"
 )
 
 // nolint:misspell

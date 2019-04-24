@@ -56,7 +56,6 @@ var vue = new Vue({
     },
     error: function (message) {
       this.msgUsername = message ? message : 'The username or password is incorrect';
-      if (! message) this.password = '';
       $('#input-username').focus();
     },
     passwordError: function (message) {
@@ -126,6 +125,7 @@ $(document).ready(function () {
       vue.submit();
     }
   });
+  $(".form-signin .errors").fadeIn();
   $('#input-username').focus();
 });
 // </script>

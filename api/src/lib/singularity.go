@@ -94,9 +94,13 @@ func BuildSingularityImage(jobID, authConfig, builder string) (*string, error) {
 	name := fmt.Sprintf("build-singularity-image-%d", time.Now().Unix())
 	cmds := []string{"build", sImgName, sFileName}
 	envs := []string{"SINGULARITY_CACHEDIR=/home/.cache"}
-	// envs := []string{}
+
 	if strings.HasPrefix(job.DockerImage, config.Config.DockerRegistryHostName) {
 		envs = append(envs, fmt.Sprintf("SINGULARITY_DOCKER_USERNAME=%s", config.Config.DockerRegistryUserName))
+		envs = append(envs, fmt.Sprintf("SINGULARITY_DOCKER_PASSWORD=%s", authConfig))
+	}
+	if strings.HasPrefix(job.DockerImage, config.Config.NgcRegistryHostName) {
+		envs = append(envs, fmt.Sprintf("SINGULARITY_DOCKER_USERNAME=%s", config.Config.NgcRegistryUserName))
 		envs = append(envs, fmt.Sprintf("SINGULARITY_DOCKER_PASSWORD=%s", authConfig))
 	}
 	cfg := &container.Config{
@@ -138,7 +142,7 @@ func BuildSingularityImage(jobID, authConfig, builder string) (*string, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Debug(fmt.Sprintf("Run&Wait@buildSingularityImage: %s", swag.StringValue(logs)), nil, nil)
+	log.Debug(fmt.Sprintf("Run&Wait@buildSingularityImage: %s", truncateString(swag.StringValue(logs), 50)), nil, nil)
 	return swag.String(filepath.Join(dir, sImgName)), nil
 }
 
@@ -156,4 +160,15 @@ func pullSingularityImage(ctx context.Context) error {
 	defer reader.Close()
 	io.Copy(ioutil.Discard, reader) // wait for its done
 	return nil
+}
+
+func truncateString(str string, num int) string {
+	candidate := str
+	if len(str) > num {
+		if num > 3 {
+			num -= 3
+		}
+		candidate = str[0:num] + "..."
+	}
+	return candidate
 }

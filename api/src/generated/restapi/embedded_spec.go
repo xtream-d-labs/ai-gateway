@@ -819,8 +819,7 @@ func init() {
         "parameters": [
           {
             "enum": [
-              "singularity",
-              "singularity_mpi"
+              "singularity"
             ],
             "type": "string",
             "description": "application code",
@@ -860,8 +859,7 @@ func init() {
         "parameters": [
           {
             "enum": [
-              "singularity",
-              "singularity_mpi"
+              "singularity"
             ],
             "type": "string",
             "description": "Rescale application code",
@@ -2270,8 +2268,7 @@ func init() {
         "parameters": [
           {
             "enum": [
-              "singularity",
-              "singularity_mpi"
+              "singularity"
             ],
             "type": "string",
             "description": "application code",
@@ -2311,8 +2308,7 @@ func init() {
         "parameters": [
           {
             "enum": [
-              "singularity",
-              "singularity_mpi"
+              "singularity"
             ],
             "type": "string",
             "description": "Rescale application code",

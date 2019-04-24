@@ -66,6 +66,8 @@ func Wrap(handler http.Handler) http.Handler {
 					}
 				}
 			}
+			config.Config.Init()
+
 			if sess, err := auth.RetriveSession(r); err == nil && sess != nil {
 				creds := auth.FindCredentials(sess.DockerUsername)
 				if !swag.IsZero(creds.Base.DockerRegistry) {
@@ -73,6 +75,9 @@ func Wrap(handler http.Handler) http.Handler {
 				}
 				if !swag.IsZero(creds.Base.DockerHostname) {
 					config.Config.DockerRegistryHostName = creds.Base.DockerHostname
+				}
+				if !swag.IsZero(creds.Base.DockerUsername) {
+					config.Config.DockerRegistryUserName = creds.Base.DockerUsername
 				}
 				if !swag.IsZero(creds.Base.RescalePlatform) {
 					config.Config.RescaleEndpoint = creds.Base.RescalePlatform

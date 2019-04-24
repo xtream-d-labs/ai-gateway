@@ -50,7 +50,7 @@ func getJobs(params job.GetJobsParams) middleware.Responder {
 
 func postNewJob(params job.PostNewJobParams, principal *auth.Principal) middleware.Responder {
 	creds := auth.FindCredentials(principal.Username)
-	if swag.IsZero(creds.Base.NgcApikey) {
+	if swag.IsZero(creds.Base.K8sConfig) && swag.IsZero(creds.Base.RescaleKey) {
 		code := http.StatusForbidden
 		return job.NewPostNewJobDefault(code).WithPayload(newerror(code))
 	}
@@ -140,9 +140,17 @@ func postNewJob(params job.PostNewJobParams, principal *auth.Principal) middlewa
 		code := http.StatusInternalServerError
 		return job.NewPostNewJobDefault(code).WithPayload(newerror(code))
 	}
+	credential := ""
+	if strings.HasPrefix(image, config.Config.DockerRegistryHostName) {
+		config.Config.DockerRegistryUserName = creds.Base.DockerUsername
+		credential = creds.Base.DockerPassword
+	}
+	if strings.HasPrefix(image, config.Config.DockerRegistryHostName) {
+		credential = creds.Base.NgcApikey
+	}
 	if err := queue.BuildSingularityImageJob(
 		newjob.ID,
-		creds.Base.NgcApikey,
+		credential,
 		creds.Base.RescaleKey,
 		principal.Username,
 	); err != nil {

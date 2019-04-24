@@ -88,7 +88,7 @@ func (o *GetRescaleApplicationVersionParams) bindCode(rawData []string, hasKey b
 
 func (o *GetRescaleApplicationVersionParams) validateCode(formats strfmt.Registry) error {
 
-	if err := validate.Enum("code", "path", o.Code, []interface{}{"singularity", "singularity_mpi"}); err != nil {
+	if err := validate.Enum("code", "path", o.Code, []interface{}{"singularity"}); err != nil {
 		return err
 	}
 

@@ -67,7 +67,7 @@ js = "settings/index.js"
                      placeholder="Generate your API Key at https://ngc.nvidia.com/setup/api-key" />
             </div>
           </div>
-          <!-- <h5 id="rescale" class="form-signin-heading">
+          <h5 id="rescale" class="form-signin-heading">
             <a href="https://www.rescale.com/" target="_blank">Rescale</a>
           </h5>
           <hr/>
@@ -89,7 +89,7 @@ js = "settings/index.js"
             <div class="row">
               <input type="text" id="input-rescale-key" class="form-control" v-model="rescaleKey" />
             </div>
-          </div> -->
+          </div>
           <div class="btn btn-lg btn-primary btn-block" v-on:click="submit"
                style="margin: 30px 0 25px 0;">Save</div>
           <div class="clear-both"></div>

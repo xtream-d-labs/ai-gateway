@@ -27,14 +27,14 @@
              v-model="username" v-on:input="$v.username.$touch" v-on:change="usernameChanged"
              v-bind:class="{invalid: $v.username.$error, valid: $v.username.$dirty && !$v.username.$invalid}" />
       <p class="errors"><transition name="fade">
-        <span v-if="msgUsername != ''">{{`{{ msgUsername }}`}}</span>
+        <span v-if="msgUsername != ''" v-cloak>{{`{{ msgUsername }}`}}</span>
       </transition></p>
       <label for="input-password" class="sr-only">Password</label>
       <input type="password" id="input-password" class="form-control" placeholder="Password" required
              v-model="password" v-on:input="$v.password.$touch" v-on:change="passwordChanged"
              v-bind:class="{invalid: $v.password.$error, valid: $v.password.$dirty && !$v.password.$invalid}" />
       <p class="errors"><transition name="fade">
-        <span v-if="msgPassword != ''">{{`{{ msgPassword }}`}}</span>
+        <span v-if="msgPassword != ''" v-cloak>{{`{{ msgPassword }}`}}</span>
       </transition></p>
       <div id='act-signin' class="btn btn-lg btn-primary btn-block disabled" v-on:click="submit">Sign in</div>
       <div id="api-server-error" style="margin-top: 35px;display: none;">

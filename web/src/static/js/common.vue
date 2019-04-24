@@ -207,17 +207,22 @@ window.app = {
     }
   },
   refreshMenus: function (config) {
-    if (config.use_private_registry == "yes") {
+    if (config.useNGC || config.usePrivateRegistry) {
       $('#menu-repositories').fadeIn();
     } else {
       $('#menu-repositories').hide();
     }
-    if (config.use_ngc == "yes") {
-      $('#menu-ngc-repositories').fadeIn();
+    if (config.useNGC) {
+      $('#menu-ngc-repo').fadeIn();
     } else {
-      $('#menu-ngc-repositories').hide();
+      $('#menu-ngc-repo').hide();
     }
-    if (config.use_rescale == "yes" || config.use_k8s == "yes") {
+    if (config.usePrivateRegistry) {
+      $('#menu-prv-repo').fadeIn();
+    } else {
+      $('#menu-prv-repo').hide();
+    }
+    if (config.useRescale || config.useKubernetes) {
       $('#menu-jobs').fadeIn();
     } else {
       $('#menu-jobs').hide();
@@ -240,7 +245,7 @@ $(document).ready(function () {
   //   }
   // }
   app.refreshMenus(c);
-  if (session.username != undefined) {
+  if (session.username != undefined && session.username != '---') {
     $('.user-name').text(session.username);
     $('#signout').parent().show();
   }

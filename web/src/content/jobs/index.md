@@ -47,10 +47,12 @@ js = "jobs/index.js"
     <div class="row">
       <div class="col s12" style="margin-bottom: 15px;">
         <div id="data">
-
-          <ul class="collapsible" data-collapsible="accordion">
+          <ul class="collapsible" id="accordion">
             <li v-for="job in jobs" :key="job.id" :data-id="job.id" >
-              <div class="collapsible-header row">
+              <div class="row row-header" style="padding: 13px 30px 10px 15px;"
+                   :id="job.id" :data-target="'#body-'+job.id"
+                   data-toggle="collapse" aria-expanded="true"
+                   :aria-controls="'body-'+job.id">
                 <div class="col-1">
                   <i class="material-icons" style="float: right;"
                      v-if="job.status == 'preparing'">cached</i>
@@ -68,48 +70,49 @@ js = "jobs/index.js"
                       :class="job.classObject">{{ job.status }}</div>
                 </div>
               </div>
-              <div class="collapsible-body row">
-                <div class="col-12" style="margin-bottom: 15px;">
-                  <h6>Status</h6>
-                  <p style="font-size: 1.5rem;margin: 0 0 5px 6px;">{{ job.statusMore }}</p>
-                </div>
-                <div class="col-12" style="margin-bottom: 20px;">
-                  <h6>Image</h6>
-                  <p style="margin: 10px 0 0 7px;" v-html="job.imageHref"></p>
-                </div>
-                <div class="col-12" style="margin-bottom: 20px;">
-                  <h6>Commands</h6>
-                  <p style="font-size: 1.5rem;margin: 10px 0 0 7px;">{{ job.commands }}</p>
-                </div>
-                <div class="col-12" style="margin-bottom: 20px;">
-                  <h6>Actions</h6>
-                  <div style="margin: 20px 0 5px 7px;">
-                    <span v-if="job.status == 'preparing'">-</span>
-                    <a class="waves-effect waves-light btn red lighten-2 act-stop" tabindex="0"
-                       v-if="job.status == 'running'">stop</a>
-                    <a class="waves-effect waves-light btn red lighten-2 act-delete" tabindex="0"
-                       v-if="job.status == 'done'" v-on:click="del">delete</a>
+              <div :id="'body-'+job.id" class="row collapse row-body"
+                   :aria-labelledby="job.id" data-parent="#accordion">
+                <div class="col-12">
+                  <div class="row"><div class="col-12" style="margin-bottom: 15px;">
+                    <h6>Status</h6>
+                    <p style="font-size: 1.5rem;margin: 0 0 5px 6px;">{{ job.statusMore }}</p>
+                  </div></div>
+                  <div class="row"><div class="col-12" style="margin-bottom: 20px;">
+                    <h6>Image</h6>
+                    <p style="margin: 10px 0 0 7px;" v-html="job.imageHref"></p>
+                  </div></div>
+                  <div class="row"><div class="col-12" style="margin-bottom: 20px;">
+                    <h6>Commands</h6>
+                    <p style="font-size: 1.5rem;margin: 10px 0 0 7px;">{{ job.commands }}</p>
+                  </div></div>
+                  <div class="row"><div class="col-12" style="margin-bottom: 20px;">
+                    <h6>Actions</h6>
+                    <div style="margin: 20px 0 5px 7px;">
+                      <span v-if="job.status != 'done'">-</span>
+                      <!-- <a class="waves-effect waves-light btn red lighten-2 act-stop" tabindex="0"
+                        v-if="job.status == 'running'">stop</a> -->
+                      <a class="waves-effect waves-light btn red lighten-2 act-delete" tabindex="0"
+                        v-if="job.status == 'done'" v-on:click="del">delete</a>
+                    </div>
+                  </div></div>
+                  <div class="row"><div class="col-12" style="margin-bottom: 0px;">
+                    <h6>Properties</h6>
+                    <table class="table highlight">
+                      <tbody>
+                        <tr><td>task id:</td><td>{{ job.id }}</td></tr>
+                        <tr><td>mounted volumes:</td><td v-html="job.mounts"></td></tr>
+                        <tr><td>started time:</td><td>{{ job.started }}</td></tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
-                <div class="col-12" style="margin-bottom: 0px;">
-                  <h6>Properties</h6>
-                  <table class="table highlight">
-                    <tbody>
-                      <tr><td>task id:</td><td>{{ job.id }}</td></tr>
-                      <tr><td>mounted volumes:</td><td v-html="job.mounts"></td></tr>
-                      <tr><td>started time:</td><td>{{ job.started }}</td></tr>
-                    </tbody>
-                  </table>
-                </div>
                 <div class="clear-both"></div>
-              </div>
+              </div></div>
             </li>
           </ul>
-
         </div>
       </div>
     </div>
-
   </section>
 </main>
 

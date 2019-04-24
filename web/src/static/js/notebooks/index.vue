@@ -8,7 +8,8 @@ var conditions = {
 var vue = new Vue({
   el: '#data',
   data: {
-    notebooks: []
+    notebooks: [],
+    trainOnCloud: false
   },
   methods: {
     train: function (e) {
@@ -58,9 +59,9 @@ var vue = new Vue({
         loaded()
       });
 
-      API('Rescale').getCoreTypes({appVer:'cpu:cheap'}, function (err, _, res) {
+      API('Rescale').getRescaleCoreTypes({appVer:'cpu:cheap'}, function (err, _, res) {
         if (app.shouldExit(res, err) || (res && res.body && res.body.code == 401)) {
-          alert('Something went wrong. Check your configurations!')
+          alert('Something went wront. Check your configurations!')
           window.location.href = '/settings/';
           return;
         }
@@ -253,7 +254,7 @@ var training = new Vue({
         dialog.find('.training-cmds').focus();
         return;
       }
-      dialog.modal('close');
+      $('#act-submit').prop("disabled", true);
 
       var entrypoint = dialog.find('.training-notebook select').val();
       if (dialog.find(".training-type select").val() == '1') {
@@ -269,15 +270,13 @@ var training = new Vue({
       API('Job').postNewJob(body, function (err, _, res) {
         if (! $.isEmptyObject(err)) {
           if (res && res.body && res.body.code && (res.body.code == '400') && res.body.message) {
+            dialog.modal('close');
+            $('#act-submit').removeProp('disabled');
             M.toast({html: 'Could not start training with this notebook', displayLength: 3000});
             return;
           }
-          if (res && res.body && res.body.code && (res.body.code == '406') && res.body.message) {
-            M.toast({html: 'GPU is not allowed yet', displayLength: 3000});
-            return;
-          }
           if (app.shouldExit(res, err)) {
-            alert('Something went wrong. Check your configurations!')
+            alert('Something went wront. Check your configurations!')
             window.location.href = '/settings/';
             return;
           }
@@ -351,6 +350,9 @@ $(document).ready(function () {
   $('.collapsible').on('shown.bs.collapse', function (elem) {
     loadDetails($(elem.target).closest('li'));
   });
+  var c = config.get();
+  vue.trainOnCloud = c.useRescale || c.useKubernetes;
+
   load(function () {
     $('#query-words').keyup(function () {
       update();
@@ -375,9 +377,9 @@ $(document).ready(function () {
       if ($(this).val() == 'dolomite') {
         cores = 'gpu:volta';
       }
-      API('Rescale').getCoreTypes({appVer: cores}, function (err, _, res) {
+      API('Rescale').getRescaleCoreTypes({appVer: cores}, function (err, _, res) {
         if (app.shouldExit(res, err) || (res && res.body && res.body.code == 401)) {
-          alert('Something went wrong. Check your configurations!')
+          alert('Something went wront. Check your configurations!')
           window.location.href = '/settings/';
           return;
         }

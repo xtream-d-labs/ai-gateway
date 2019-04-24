@@ -651,7 +651,6 @@ paths:
           type: string
           enum:
             - singularity
-            - singularity_mpi
           required: true
       responses:
         '200':
@@ -678,7 +677,6 @@ paths:
           type: string
           enum:
             - singularity
-            - singularity_mpi
           required: true
         - name: version
           in: path
