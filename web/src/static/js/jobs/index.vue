@@ -55,8 +55,8 @@ var vue = new Vue({
         if (conditions.words != '' && formatted.length > 0) {
           setTimeout(function () {
             $('#data .collapsible .row-body').eq(0).collapse('show');
-            $('#query-words').blur();
-          }, 500);
+            $('#query-words').focus();
+          }, 750);
         }
       }
       $('#record-count').text(formatted.length);
@@ -71,12 +71,16 @@ var vue = new Vue({
 
 function statusValue(status) {
   switch (status) {
-  case 'singularity':
+  case 'building-job':
     return 'preparing';
+  case 'pushing-job':
+  case 'k8s-job':
   case 'rescale-send':
     return 'sending';
+  case 'k8s-job-start':
   case 'rescale-start':
     return 'running';
+  case 'k8s-job-end':
   case 'rescale-end':
     return 'done';
   }
@@ -85,12 +89,16 @@ function statusValue(status) {
 
 function statusMore(status) {
   switch (status) {
-  case 'singularity':
-    return 'Converting the docker image to singularity';
+  case 'building-job':
+    return 'Building a docker/singularity image for the job';
+  case 'pushing-job':
+  case 'k8s-job':
   case 'rescale-send':
     return 'Sending files to the cloud';
+  case 'k8s-job-start':
   case 'rescale-start':
-    return 'Running on the cloud';
+    return 'Running the job on the cloud';
+  case 'k8s-job-end':
   case 'rescale-end':
     return 'Done';
   }
@@ -99,12 +107,16 @@ function statusMore(status) {
 
 function statusOrder(status) {
   switch (status) {
-  case 'singularity':
+  case 'building-job':
     return 1;
+  case 'pushing-job':
+  case 'k8s-job':
   case 'rescale-send':
     return 2;
+  case 'k8s-job-start':
   case 'rescale-start':
     return 3;
+  case 'k8s-job-end':
   case 'rescale-end':
     return 4;
   }
@@ -113,13 +125,15 @@ function statusOrder(status) {
 
 function statusClass(state) {
   switch (state) {
-  case 'singularity':
+  case 'building-job':
     return {
         'label-info':    true,
         'label-warning': false,
         'label-success': false,
         'label-danger':  false
     };
+  case 'pushing-job':
+  case 'k8s-job':
   case 'rescale-send':
     return {
         'label-info':    false,
@@ -127,6 +141,7 @@ function statusClass(state) {
         'label-success': false,
         'label-danger':  false
     };
+  case 'k8s-job-start':
   case 'rescale-start':
     return {
         'label-info':    false,
@@ -134,6 +149,7 @@ function statusClass(state) {
         'label-success': true,
         'label-danger':  false
     };
+  case 'k8s-job-end':
   case 'rescale-end':
     return {
         'label-info':    false,

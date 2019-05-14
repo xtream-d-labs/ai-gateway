@@ -67,6 +67,14 @@ js = "settings/index.js"
                      placeholder="Generate your API Key at https://ngc.nvidia.com/setup/api-key" />
             </div>
           </div>
+          <h5 id="kubernetes" class="form-signin-heading">Kubernetes</h5>
+          <hr/>
+          <div class="form-group">
+            <label for="kubeconfig" class="row control-label">kubeconfig</label>
+            <div class="row">
+              <textarea id="kubeconfig" class="form-control" v-model="k8sConfig"></textarea>
+            </div>
+          </div>
           <h5 id="rescale" class="form-signin-heading">
             <a href="https://www.rescale.com/" target="_blank">Rescale</a>
           </h5>

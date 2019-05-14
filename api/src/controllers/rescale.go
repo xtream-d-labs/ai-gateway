@@ -25,7 +25,7 @@ func rescaleRoute(api *operations.ScaleShiftAPI) {
 // curl -s -H "Authorization: Bearer xxx" "http://localhost:8080/api/v1/rescale/coretypes/?app_ver=cpu:cheap"
 func getCoreTypes(params rescale.GetRescaleCoreTypesParams, principal *auth.Principal) middleware.Responder {
 	creds := auth.FindCredentials(principal.Username)
-	if swag.IsZero(creds.NgcSession) {
+	if swag.IsZero(creds.Base.RescaleKey) {
 		code := http.StatusForbidden
 		return rescale.NewGetRescaleCoreTypesDefault(code).WithPayload(newerror(code))
 	}
@@ -117,7 +117,7 @@ func contains(coretypes []string, coretype string) bool {
 // curl -s -H "Authorization: Bearer xxx" "http://localhost:8080/api/v1/rescale/applications/singularity/"
 func getApplication(params rescale.GetRescaleApplicationParams, principal *auth.Principal) middleware.Responder {
 	creds := auth.FindCredentials(principal.Username)
-	if swag.IsZero(creds.NgcSession) {
+	if swag.IsZero(creds.Base.RescaleKey) {
 		code := http.StatusForbidden
 		return rescale.NewGetRescaleApplicationDefault(code).WithPayload(newerror(code))
 	}
@@ -149,7 +149,7 @@ func getApplication(params rescale.GetRescaleApplicationParams, principal *auth.
 // curl -s -H "Authorization: Bearer xxx" "http://localhost:8080/api/v1/rescale/applications/singularity/2.5.1/"
 func getApplicationVersion(params rescale.GetRescaleApplicationVersionParams, principal *auth.Principal) middleware.Responder {
 	creds := auth.FindCredentials(principal.Username)
-	if swag.IsZero(creds.NgcSession) {
+	if swag.IsZero(creds.Base.RescaleKey) {
 		code := http.StatusForbidden
 		return rescale.NewGetRescaleApplicationVersionDefault(code).WithPayload(newerror(code))
 	}

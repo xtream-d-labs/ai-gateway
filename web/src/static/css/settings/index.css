@@ -577,6 +577,11 @@ form .btn.waves-effect.waves-light:hover, form .btn.waves-effect.waves-light:act
 h5 {
   margin: 45px 0 -7px 0; }
 
+#kubeconfig {
+  font-size: 0.8rem;
+  line-height: 0.9rem;
+  min-height: 230px; }
+
 ::-webkit-input-placeholder {
   color: #c9c9c9 !important;
   opacity: 1; }

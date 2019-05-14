@@ -40,6 +40,7 @@ type config struct { // nolint:maligned
 	JupyterMinimumPort     uint16   `envconfig:"JUPYTER_MINIMUM_PORT" default:"30000"`
 	KubernetesAPIEndpoint  string   `envconfig:"KUBERNETES_API_ENDPOINT"`
 	KubernetesConfig       string   `envconfig:"KUBERNETES_CONFIG"`
+	JobImageTagPrefix      string   `envconfig:"JOB_IMAGETAG_PREFIX" default:"ss-built"`
 	RescaleEndpoint        string   `envconfig:"RESCALE_ENDPOINT" default:"https://platform.rescale.com"`
 	RescaleAPIToken        string   `envconfig:"RESCALE_API_TOKEN"`
 	RescaleSingularityVer  string   `envconfig:"RESCALE_SINGULARITY_VERSION" default:"3.0.1"` // now supports: 3.0.1, 2.6.0, 2.5.1
@@ -53,7 +54,7 @@ type config struct { // nolint:maligned
 	AllowCORS              bool     `envconfig:"ALLOW_CORS" default:"true"`
 	SecuredTransport       bool     `envconfig:"SECURED_TRANSPORT" default:"false"`
 	ContentEncoding        bool     `envconfig:"CONTENT_ENCODING" default:"false"`
-	ImagesToBeIgnored      []string `envconfig:"IMAGES_TOBE_IGNORED" default:"scaleshift/,ss-jupyter/,amazon-ecs-,<none>"`
+	ImagesToBeIgnored      []string `envconfig:"IMAGES_TOBE_IGNORED" default:"scaleshift/,ss-jupyter/,:ss-built,amazon-ecs-,<none>"`
 	DatabaseDir            string   `envconfig:"DATABASE_CNTR_DIR" default:"/tmp/badger"`
 	WorkspaceHostDir       string   `envconfig:"WORKSPACE_HOST_DIR"`
 	WorkspaceContainerDir  string   `envconfig:"WORKSPACE_CNTR_DIR" default:"/tmp/work"`

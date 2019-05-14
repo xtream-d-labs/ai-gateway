@@ -1,0 +1,13 @@
+FROM %s
+
+LABEL maintainer %s
+
+ENV PYTHONPATH="%s:$PYTHONPATH" \
+    PATH="/workspace/bin:$PATH"
+
+RUN %s
+
+COPY . /workspace/
+WORKDIR /workspace
+
+ENTRYPOINT [%s]

@@ -292,10 +292,10 @@ func fildFiles(dir string) []string {
 		if info.IsDir() && strings.Contains(path, ".ipynb_checkpoints") {
 			return filepath.SkipDir
 		}
-		if info.IsDir() && strings.Contains(path, "bin") {
+		if info.IsDir() && strings.EqualFold(info.Name(), "bin") {
 			return filepath.SkipDir
 		}
-		if info.IsDir() && strings.Contains(path, "lib") {
+		if info.IsDir() && strings.EqualFold(info.Name(), "lib") {
 			return filepath.SkipDir
 		}
 		if info.IsDir() {

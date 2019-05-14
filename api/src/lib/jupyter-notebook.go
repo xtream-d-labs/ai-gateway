@@ -2,8 +2,11 @@ package lib
 
 import (
 	"archive/tar"
+	"bufio"
+	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -289,7 +292,7 @@ func makeJupyterNotebookBuildContext(pkg PackageManager, image, workdir, lib, se
 }
 
 func buildJupyterNotebookImage(ctx context.Context, cfg []byte, id, image, builder string) (*string, error) {
-	name := filepath.Join(config.Config.JupyterImageNamespace, image)
+	name := fmt.Sprintf("%s/%s", config.Config.JupyterImageNamespace, image)
 	options := types.ImageBuildOptions{
 		Tags: []string{name},
 		Labels: map[string]string{
@@ -304,7 +307,8 @@ func buildJupyterNotebookImage(ctx context.Context, cfg []byte, id, image, build
 		NoCache:     true,
 		ForceRemove: true,
 	}
-	if err := buildDockerImage(ctx, cfg, options); err != nil {
+	reader := bufio.NewReader(bytes.NewReader(cfg))
+	if err := buildDockerImage(ctx, io.Reader(reader), options); err != nil {
 		return nil, err
 	}
 	return swag.String(name), nil

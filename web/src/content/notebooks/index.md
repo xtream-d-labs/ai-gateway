@@ -9,7 +9,6 @@ js = "notebooks/index.js"
     <div class="row">
       <div class="col s12" style="min-height: 182px;">
         <h5 class="light grey-text text-darken-2">Notebooks</h5>
-
         <form>
           <div class="row hide-on-small-only">
             <div class="col m12" style="padding-right: 0;">
@@ -20,7 +19,6 @@ js = "notebooks/index.js"
             </div>
           </div>
           <div class="clear-both"></div>
-
           <div class="row">
             <div class="col s3">
               <div style="margin: 5px 0 0 2px;line-height: 3rem;">
@@ -47,7 +45,6 @@ js = "notebooks/index.js"
     <div class="row">
       <div class="col s12" style="margin-bottom: 15px;">
         <div id="data">
-
           <ul class="collapsible" id="accordion">
             <li v-for="notebook in notebooks" :key="notebook.id"
                 :data-id="notebook.id" :data-url="notebook.url">
@@ -109,22 +106,46 @@ js = "notebooks/index.js"
               </div>
             </li>
           </ul>
-
         </div>
       </div>
     </div>
-
   </section>
 </main>
 
 <div id="training-dialog" class="modal popup-dialog"
-    style="height: 585px;width: 60%;max-height: 85%;top: 1% !important;">
+    style="height: 655px;width: 60%;max-height: 100%;">
   <div class="modal-content">
-    <h5>Confirmation</h5>
+    <h5>Task Definition</h5>
   </div>
   <div class="modal-footer row">
+    <section class="container wait-icon" style="position: absolute;top: 40%;left: 0;display:none;">
+      <div style="margin: 30px auto 0 auto;width: 75px;">
+        <div class="preloader-wrapper big active">
+          <div class="spinner-layer spinner-green-only">
+            <div class="circle-clipper left">
+              <div class="circle"></div>
+            </div>
+            <div class="gap-patch">
+              <div class="circle"></div>
+            </div>
+            <div class="circle-clipper right">
+              <div class="circle"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
     <div class="col-12" style="margin: 15px 0px 7px 0;min-height: 50px;">
       <form autocomplete="off" v-on:submit.prevent>
+        <div class="form-group row">
+          <label class="col-sm-3 control-label">Platform</label>
+          <div class="col-sm-9 training-platform">
+            <select>
+              <option value="0">Kubernetes</option>
+              <option value="1">Rescale</option>
+            </select>
+          </div>
+        </div>
         <div class="form-group row considerable">
           <label class="col-sm-3 control-label">Job type</label>
           <div class="col-sm-9 training-type">
@@ -145,6 +166,20 @@ js = "notebooks/index.js"
           <div class="col-sm-9">
             <input type="text" class="form-control training-cmds" v-model="cmd"
                   placeholder="python train.py --epoch 10 --gpu 1" />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-sm-3 control-label">CPU millicores</label>
+          <div class="col-sm-9">
+            <input type="number" class="form-control training-cpus text-right"
+                   v-model="cpus" placeholder="1000" />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-sm-3 control-label">GPU</label>
+          <div class="col-sm-9">
+            <input type="number" class="form-control training-gpus text-right"
+                   v-model="gpus" placeholder="0" />
           </div>
         </div>
         <div class="form-group row">

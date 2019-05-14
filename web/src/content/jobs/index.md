@@ -9,7 +9,6 @@ js = "jobs/index.js"
     <div class="row">
       <div class="col s12" style="min-height: 182px;">
         <h5 class="light grey-text text-darken-2">Training Tasks</h5>
-
         <form>
           <div class="row hide-on-small-only">
             <div class="col m12" style="padding-right: 0;">
@@ -20,7 +19,6 @@ js = "jobs/index.js"
             </div>
           </div>
           <div class="clear-both"></div>
-
           <div class="row">
             <div class="col s3">
               <div style="margin: 5px 0 0 2px;line-height: 3rem;">
@@ -78,7 +76,7 @@ js = "jobs/index.js"
                     <p style="font-size: 1.5rem;margin: 0 0 5px 6px;">{{ job.statusMore }}</p>
                   </div></div>
                   <div class="row"><div class="col-12" style="margin-bottom: 20px;">
-                    <h6>Image</h6>
+                    <h6>Base Image</h6>
                     <p style="margin: 10px 0 0 7px;" v-html="job.imageHref"></p>
                   </div></div>
                   <div class="row"><div class="col-12" style="margin-bottom: 20px;">

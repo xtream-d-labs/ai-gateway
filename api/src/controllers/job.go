@@ -123,20 +123,28 @@ func postNewJob(params job.PostNewJobParams, principal *auth.Principal) middlewa
 		code := http.StatusBadRequest
 		return job.NewPostNewJobDefault(code).WithPayload(newerror(code))
 	}
+	platform := db.PlatformKubernetes
+	if params.Body.PlatformID == models.PostNewJobParamsBodyPlatformIDRescale {
+		platform = db.PlatformRescale
+	}
 	image, _, _ := lib.ContainerAttrs(container.Config.Labels)
 	newjob := &db.Job{
+		Platform:    platform,
 		ID:          uuid.New().String(),
-		Status:      db.Singularity,
+		Status:      db.BuildingJob,
 		DockerImage: image,
 		PythonFile:  ipynb,
 		Workspaces:  workspaces,
 		Commands:    commands,
+		CPU:         params.Body.CPU,
+		Memory:      params.Body.Mem,
+		GPU:         params.Body.Gpu,
 		CoreType:    params.Body.Coretype,
 		Cores:       params.Body.Cores,
 		Started:     time.Now(),
 	}
-	if err := db.SetSingularityJobMeta(newjob); err != nil {
-		log.Error("SetSingularityJobMeta@postNewJob", err, nil)
+	if err := db.SetJobMeta(newjob); err != nil {
+		log.Error("SetJobMeta@postNewJob", err, nil)
 		code := http.StatusInternalServerError
 		return job.NewPostNewJobDefault(code).WithPayload(newerror(code))
 	}
@@ -145,18 +153,31 @@ func postNewJob(params job.PostNewJobParams, principal *auth.Principal) middlewa
 		config.Config.DockerRegistryUserName = creds.Base.DockerUsername
 		credential = creds.Base.DockerPassword
 	}
-	if strings.HasPrefix(image, config.Config.DockerRegistryHostName) {
+	if strings.HasPrefix(image, config.Config.NgcRegistryHostName) {
 		credential = creds.Base.NgcApikey
 	}
-	if err := queue.BuildSingularityImageJob(
-		newjob.ID,
-		credential,
-		creds.Base.RescaleKey,
-		principal.Username,
-	); err != nil {
-		log.Error("BuildSingularityImageJob@postNewJob", err, nil)
-		code := http.StatusInternalServerError
-		return job.NewPostNewJobDefault(code).WithPayload(newerror(code))
+	switch params.Body.PlatformID {
+	case models.PostNewJobParamsBodyPlatformIDKubernetes:
+		if err := queue.BuildJobDockerImage(
+			newjob.ID,
+			credential,
+			principal.Username,
+		); err != nil {
+			log.Error("BuildDockerJobImage@postNewJob", err, nil)
+			code := http.StatusInternalServerError
+			return job.NewPostNewJobDefault(code).WithPayload(newerror(code))
+		}
+	case models.PostNewJobParamsBodyPlatformIDRescale:
+		if err := queue.BuildSingularityImageJob(
+			newjob.ID,
+			credential,
+			creds.Base.RescaleKey,
+			principal.Username,
+		); err != nil {
+			log.Error("BuildSingularityImageJob@postNewJob", err, nil)
+			code := http.StatusInternalServerError
+			return job.NewPostNewJobDefault(code).WithPayload(newerror(code))
+		}
 	}
 	return job.NewPostNewJobCreated().WithPayload(&models.PostNewJobCreatedBody{
 		ID: newjob.ID,

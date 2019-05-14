@@ -7,7 +7,7 @@ RUN curl --location --silent --show-error --out /gosu \
     https://github.com/tianon/gosu/releases/download/1.11/gosu-amd64
 RUN chmod +x /gosu
 
-FROM golang:1.12.3-alpine3.9 AS build-app
+FROM golang:1.12.5-alpine3.9 AS build-app
 ENV SINGULARITY_VERESION=v3.1.1
 RUN apk --no-cache add "build-base=0.5-r1" "linux-headers=4.18.13-r1" \
        "openssl-dev=1.1.1b-r1" "util-linux-dev=2.33-r0" "gawk=4.2.1-r0" \
