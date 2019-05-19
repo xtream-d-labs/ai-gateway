@@ -64,7 +64,7 @@ var vue = new Vue({
           setTimeout(function () {
             $('#data .collapsible .row-body').eq(0).collapse('show');
             $('#query-words').blur();
-          }, 500);
+          }, 750);
         }
       }
       $('#record-count').text(formatted.length);
@@ -127,7 +127,7 @@ $(document).ready(function () {
         $(el).prop('href', '/notebooks/?q=' + encodeURIComponent($(el).text()));
       });
       $('.jobs').each(function (_, el) {
-        $(el).prop('href', '/jobs/?q=' + encodeURIComponent($(el).text()));
+        $(el).prop('href', '/tasks/?q=' + encodeURIComponent($(el).text()));
       });
     }, 500);
     $('#data').fadeIn();

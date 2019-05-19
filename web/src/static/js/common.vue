@@ -223,9 +223,9 @@ window.app = {
       $('#menu-prv-repo').hide();
     }
     if (config.useRescale || config.useKubernetes) {
-      $('#menu-jobs').fadeIn();
+      $('#menu-tasks').fadeIn();
     } else {
-      $('#menu-jobs').hide();
+      $('#menu-tasks').hide();
     }
   }
 };

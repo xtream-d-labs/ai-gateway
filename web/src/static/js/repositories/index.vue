@@ -38,7 +38,7 @@ var vue = new Vue({
           setTimeout(function () {
             // $('#data .collapsible .row-body').eq(0).collapse('show');
             $('#query-words').blur();
-          }, 500);
+          }, 750);
         }
       }
       $('#record-count').text(filtered.length);

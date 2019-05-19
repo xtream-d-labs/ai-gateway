@@ -67,7 +67,7 @@ func BuildSingularityImage(jobID, authConfig, builder string) (*string, error) {
 	version := PyVersion(ctx, job.DockerImage, python)
 	lib := fmt.Sprintf("/workspace/lib/python%s/site-packages", version)
 
-	setup := "echo 'Unknown OS is detected.'"
+	setup := "echo 'Unknown OS.'"
 	switch pkg {
 	case Apt:
 		setup = "apt update && apt-get install -y bash"

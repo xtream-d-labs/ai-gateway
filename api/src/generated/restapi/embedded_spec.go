@@ -328,13 +328,36 @@ func init() {
                   "description": "Rescale CoreType as its infrastructure",
                   "type": "string"
                 },
+                "cpu": {
+                  "description": "Requesting millicores of CPU",
+                  "type": "integer",
+                  "format": "int64"
+                },
                 "entrypoint_file": {
                   "description": "The entrypoint file of the job",
                   "type": "string"
                 },
+                "gpu": {
+                  "description": "Requesting number of GPU",
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "mem": {
+                  "description": "Requesting bytes of memory",
+                  "type": "integer",
+                  "format": "int64"
+                },
                 "notebook_id": {
                   "description": "Notebook container ID",
                   "type": "string"
+                },
+                "platform_id": {
+                  "description": "Platform ID",
+                  "type": "string",
+                  "enum": [
+                    "kubernetes",
+                    "rescale"
+                  ]
                 }
               }
             }
@@ -3179,13 +3202,36 @@ func init() {
           "description": "Rescale CoreType as its infrastructure",
           "type": "string"
         },
+        "cpu": {
+          "description": "Requesting millicores of CPU",
+          "type": "integer",
+          "format": "int64"
+        },
         "entrypoint_file": {
           "description": "The entrypoint file of the job",
           "type": "string"
         },
+        "gpu": {
+          "description": "Requesting number of GPU",
+          "type": "integer",
+          "format": "int64"
+        },
+        "mem": {
+          "description": "Requesting bytes of memory",
+          "type": "integer",
+          "format": "int64"
+        },
         "notebook_id": {
           "description": "Notebook container ID",
           "type": "string"
+        },
+        "platform_id": {
+          "description": "Platform ID",
+          "type": "string",
+          "enum": [
+            "kubernetes",
+            "rescale"
+          ]
         }
       },
       "x-go-gen-location": "operations"

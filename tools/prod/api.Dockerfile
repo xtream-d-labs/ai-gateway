@@ -1,4 +1,4 @@
-FROM golang:1.12.3-alpine3.9 AS build-app
+FROM golang:1.12.5-alpine3.9 AS build-app
 RUN apk --no-cache add build-base
 COPY src /go/src/github.com/rescale-labs/scaleshift/api/src
 WORKDIR /go/src/github.com/rescale-labs/scaleshift/api/src

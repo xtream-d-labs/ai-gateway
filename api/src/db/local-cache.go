@@ -14,9 +14,14 @@ const (
 	StableImage   = "stable"
 	PullingImage  = "pulling"
 	BuildingImage = "building"
-	Singularity   = "singularity"
+	BuildingJob   = "building-job"
+	PushingJob    = "pushing-job"
+	KubernetesJob = "k8s-job"
+	K8sJobStart   = "k8s-job-start"
+	K8sJobEnd     = "k8s-job-end"
 	RescaleSend   = "rescale-send"
 	RescaleStart  = "rescale-start"
+	RescaleEnd    = "rescale-end"
 )
 
 // Image represents cached image information
@@ -26,14 +31,26 @@ type Image struct {
 	Started time.Time
 }
 
+// PlatformType defines in where the job will be run
+type PlatformType int
+
+const (
+	PlatformKubernetes PlatformType = iota
+	PlatformRescale
+)
+
 // Job represents cached job information
 type Job struct {
+	Platform    PlatformType
 	ID          string
 	Status      string
 	DockerImage string
 	PythonFile  string
 	Workspaces  []string
 	Commands    []string
+	CPU         int64
+	Memory      int64
+	GPU         int64
 	CoreType    string
 	Cores       int64
 	Started     time.Time
@@ -77,17 +94,28 @@ func RemoveBuildingImage(name string) error {
 	return removeImage(BuildingImageStoreKey, name)
 }
 
-// GetJobs returns jobs under BUILDING Singularity images / Rescale Job state
+// GetJobs returns jobs under BUILDING job images / Rescale status
 func GetJobs() ([]*Job, error) {
-	jobs, err := getJobs(SingularityStoreKey)
+	jobs, err := getJobs(BuildingJobStoreKey)
 	if err != nil {
 		return nil, err
 	}
-	additionals, err := getJobs(RescaleJobStoreKey)
+	additionals, err := getJobs(PushingJobStoreKey)
 	if err != nil {
 		return nil, err
 	}
-	return append(jobs, additionals...), nil
+	jobs = append(jobs, additionals...)
+	additionals, err = getJobs(KubernetesJobStoreKey)
+	if err != nil {
+		return nil, err
+	}
+	jobs = append(jobs, additionals...)
+	additionals, err = getJobs(RescaleJobStoreKey)
+	if err != nil {
+		return nil, err
+	}
+	jobs = append(jobs, additionals...)
+	return jobs, nil
 }
 
 // GetJob returns job specified
@@ -104,17 +132,17 @@ func GetJob(ID string) (*Job, error) {
 	return nil, fmt.Errorf("A specified job is not found")
 }
 
-// SetSingularityJobMeta add a task to BUILD Singularity image
-func SetSingularityJobMeta(job *Job) error {
-	if job.Status != Singularity {
-		return fmt.Errorf("%s is not Singularity job", job.ID)
+// SetJobMeta add a task to BUILD job images
+func SetJobMeta(job *Job) error {
+	if job.Status != BuildingJob {
+		return fmt.Errorf("%s is not proper status for building job images", job.ID)
 	}
-	return setJob(SingularityStoreKey, job)
+	return setJob(BuildingJobStoreKey, job)
 }
 
-// RemoveSingularityJobs removes job
-func RemoveSingularityJobs(ID string) error {
-	return removeJob(SingularityStoreKey, ID)
+// RemoveBuildingJobImagesJobs removes job
+func RemoveBuildingJobImagesJobs(ID string) error {
+	return removeJob(BuildingJobStoreKey, ID)
 }
 
 // UpdateJob update job status
@@ -146,6 +174,9 @@ func UpdateJob(ID, from, to, status string) error {
 		if err != nil {
 			return err
 		}
+		if target == nil {
+			return nil
+		}
 		if idInSlice(target.ID, jobs) {
 			return nil
 		}
@@ -167,7 +198,9 @@ func RemoveRescaleJob(ID string) error {
 const (
 	PullingImageStoreKey  = "pulling-images"
 	BuildingImageStoreKey = "building-images"
-	SingularityStoreKey   = "singularity"
+	BuildingJobStoreKey   = "building-job"
+	PushingJobStoreKey    = "pushing-job"
+	KubernetesJobStoreKey = "kubernetes-job"
 	RescaleJobStoreKey    = "rescale-job"
 )
 

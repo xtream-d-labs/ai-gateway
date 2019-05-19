@@ -1,5 +1,5 @@
-# Singularity v3.1
-# docker run --rm -it scaleshift/singularity:3.1
+# Singularity v3.2
+# docker run --rm -it scaleshift/singularity:3.2
 
 FROM alpine:3.9 AS build-gosu
 RUN apk --no-cache add "curl=7.64.0-r1"
@@ -7,8 +7,8 @@ RUN curl --location --silent --show-error --out /gosu \
     https://github.com/tianon/gosu/releases/download/1.11/gosu-amd64
 RUN chmod +x /gosu
 
-FROM golang:1.12.3-alpine3.9 AS build-app
-ENV SINGULARITY_VERESION=v3.1.1
+FROM golang:1.12.5-alpine3.9 AS build-app
+ENV SINGULARITY_VERESION=v3.2.0
 RUN apk --no-cache add "build-base=0.5-r1" "linux-headers=4.18.13-r1" \
        "openssl-dev=1.1.1b-r1" "util-linux-dev=2.33-r0" "gawk=4.2.1-r0" \
        "git=2.20.1-r0" \

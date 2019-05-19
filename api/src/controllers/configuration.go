@@ -23,6 +23,9 @@ import (
 	"github.com/rescale-labs/scaleshift/api/src/rescale"
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/xerrors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 func configRoute(api *operations.ScaleShiftAPI) {
@@ -105,25 +108,22 @@ func postConfigurations(params app.PostConfigurationsParams) middleware.Responde
 
 	// NGC
 	creds.Base.NgcEmail = params.Body.NgcEmail
-	password = params.Body.NgcPassword.String()
-	if password != hideChars(creds.Base.NgcPassword, 3) {
-		creds.Base.NgcPassword = password
+	ngcPassword := params.Body.NgcPassword.String()
+	if ngcPassword != hideChars(creds.Base.NgcPassword, 3) {
+		creds.Base.NgcPassword = ngcPassword
 	}
 	if params.Body.NgcApikey != hideChars(creds.Base.NgcApikey, 5) {
 		creds.Base.NgcApikey = params.Body.NgcApikey
 	}
-	creds.Base.UseNgc = isFilled(params.Body.NgcEmail.String(), password, params.Body.NgcApikey)
+	creds.Base.UseNgc = isFilled(params.Body.NgcEmail.String(), ngcPassword, params.Body.NgcApikey)
 
 	// Kubernetes
-	if params.Body.K8sConfig != "" {
-		creds.Base.K8sConfig = params.Body.K8sConfig
-		creds.Base.UseK8s = isFilled(params.Body.K8sConfig)
-	}
+	creds.Base.K8sConfig = params.Body.K8sConfig
+	creds.Base.UseK8s = isFilled(params.Body.K8sConfig, creds.Base.DockerUsername, password)
 
 	// Rescale
 	creds.Base.RescalePlatform = params.Body.RescalePlatform
-	creds.Base.RescaleKey = ""
-	if params.Body.RescaleKey != hideChars(creds.Base.RescaleKey, 5) {
+	if (params.Body.RescaleKey != hideChars(creds.Base.RescaleKey, 5)) || (params.Body.RescaleKey == "") {
 		creds.Base.RescaleKey = params.Body.RescaleKey
 	}
 	creds.Base.UseRescale = isFilled(creds.Base.RescaleKey)
@@ -192,8 +192,26 @@ func postConfigurations(params app.PostConfigurationsParams) middleware.Responde
 		}
 		return nil
 	})
-	// // Check if Kubernetes API returns 200
+	// Check if Kubernetes API returns 200
 	eg.Go(func() error {
+		if swag.IsZero(creds.Base.K8sConfig) {
+			return nil
+		}
+		config, err := clientcmd.RESTConfigFromKubeConfig([]byte(creds.Base.K8sConfig))
+		if err != nil {
+			return xerrors.Errorf("[Kubernetes API] %s", err.Error())
+		}
+		clientset, err := kubernetes.NewForConfig(config)
+		if err != nil {
+			return xerrors.Errorf("[Kubernetes API] %s", err.Error())
+		}
+		_, err = clientset.CoreV1().Namespaces().List(metav1.ListOptions{
+			Limit: 1,
+			Watch: false,
+		})
+		if err != nil {
+			return xerrors.Errorf("[Kubernetes API] %s", err.Error())
+		}
 		return nil
 	})
 	// Check if Rescale API returns 200

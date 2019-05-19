@@ -6,9 +6,13 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
+
 	strfmt "github.com/go-openapi/strfmt"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // PostNewJobParamsBody JobAttrs
@@ -24,15 +28,80 @@ type PostNewJobParamsBody struct {
 	// Rescale CoreType as its infrastructure
 	Coretype string `json:"coretype,omitempty"`
 
+	// Requesting millicores of CPU
+	CPU int64 `json:"cpu,omitempty"`
+
 	// The entrypoint file of the job
 	EntrypointFile string `json:"entrypoint_file,omitempty"`
 
+	// Requesting number of GPU
+	Gpu int64 `json:"gpu,omitempty"`
+
+	// Requesting bytes of memory
+	Mem int64 `json:"mem,omitempty"`
+
 	// Notebook container ID
 	NotebookID string `json:"notebook_id,omitempty"`
+
+	// Platform ID
+	// Enum: [kubernetes rescale]
+	PlatformID string `json:"platform_id,omitempty"`
 }
 
 // Validate validates this post new job params body
 func (m *PostNewJobParamsBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validatePlatformID(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+var postNewJobParamsBodyTypePlatformIDPropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["kubernetes","rescale"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		postNewJobParamsBodyTypePlatformIDPropEnum = append(postNewJobParamsBodyTypePlatformIDPropEnum, v)
+	}
+}
+
+const (
+
+	// PostNewJobParamsBodyPlatformIDKubernetes captures enum value "kubernetes"
+	PostNewJobParamsBodyPlatformIDKubernetes string = "kubernetes"
+
+	// PostNewJobParamsBodyPlatformIDRescale captures enum value "rescale"
+	PostNewJobParamsBodyPlatformIDRescale string = "rescale"
+)
+
+// prop value enum
+func (m *PostNewJobParamsBody) validatePlatformIDEnum(path, location string, value string) error {
+	if err := validate.Enum(path, location, value, postNewJobParamsBodyTypePlatformIDPropEnum); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *PostNewJobParamsBody) validatePlatformID(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.PlatformID) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validatePlatformIDEnum("platform_id", "body", m.PlatformID); err != nil {
+		return err
+	}
+
 	return nil
 }
 

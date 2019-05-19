@@ -9,7 +9,6 @@ js = "notebooks/index.js"
     <div class="row">
       <div class="col s12" style="min-height: 182px;">
         <h5 class="light grey-text text-darken-2">Notebooks</h5>
-
         <form>
           <div class="row hide-on-small-only">
             <div class="col m12" style="padding-right: 0;">
@@ -20,7 +19,6 @@ js = "notebooks/index.js"
             </div>
           </div>
           <div class="clear-both"></div>
-
           <div class="row">
             <div class="col s3">
               <div style="margin: 5px 0 0 2px;line-height: 3rem;">
@@ -47,7 +45,6 @@ js = "notebooks/index.js"
     <div class="row">
       <div class="col s12" style="margin-bottom: 15px;">
         <div id="data">
-
           <ul class="collapsible" id="accordion">
             <li v-for="notebook in notebooks" :key="notebook.id"
                 :data-id="notebook.id" :data-url="notebook.url">
@@ -72,59 +69,88 @@ js = "notebooks/index.js"
                    :id="'body-'+notebook.id" class="row collapse row-body"
                    :aria-labelledby="notebook.id"
                    data-parent="#accordion">
-                <div class="col-12" v-if="notebook.state != 'exited'"
-                     style="margin-bottom: 20px;">
-                  <h5>Endpoint</h5>
-                  <a href="#" target="_blank" class="endpoint"
-                     style="font-size: 1.5rem;">{{ notebook.url }}</a>
+                <div class="col-12" v-if="notebook.state != 'exited'">
+                  <div class="row"><div class="col-12" style="margin-bottom: 20px;">
+                    <h6>Endpoint</h6>
+                    <a href="#" target="_blank" class="endpoint"
+                      style="font-size: 1.5rem;">{{ notebook.url }}</a>
+                  </div></div>
                 </div>
-                <div class="col-12" style="margin-bottom: 20px;">
-                  <h5>Actions</h5>
-                  <div style="margin: 20px 0 5px 0;">
-                    <a v-if="trainOnCloud" class="waves-effect waves-light btn blue darken-1"
-                       tabindex="0" v-on:click="train">train on cloud</a>
-                    <span>&nbsp;</span>
-                    <!-- <a class="waves-effect waves-light btn blue darken-1"
-                       tabindex="0">Run more like this</a>
-                    <span>&nbsp;</span> -->
-                    <a class="waves-effect waves-light btn red lighten-2 act-stop" tabindex="0"
-                       v-if="notebook.state != 'exited'" v-on:click="stop">stop</a>
-                    <a class="waves-effect waves-light btn red lighten-2 act-delete"
-                       tabindex="0" v-if="notebook.state == 'exited'"
-                       v-on:click="del">delete</a>
-                  </div>
+                <div class="col-12">
+                  <div class="row"><div class="col-12" style="margin-bottom: 20px;">
+                    <h6>Actions</h6>
+                    <div style="margin: 20px 0 5px 0;">
+                      <a v-if="trainOnCloud" class="waves-effect waves-light btn blue darken-1"
+                        tabindex="0" v-on:click="train">train on cloud</a>
+                      <span>&nbsp;</span>
+                      <!-- <a class="waves-effect waves-light btn blue darken-1"
+                        tabindex="0">Run more like this</a>
+                      <span>&nbsp;</span> -->
+                      <a class="waves-effect waves-light btn red lighten-2 act-stop" tabindex="0"
+                        v-if="notebook.state != 'exited'" v-on:click="stop">stop</a>
+                      <a class="waves-effect waves-light btn red lighten-2 act-delete"
+                        tabindex="0" v-if="notebook.state == 'exited'"
+                        v-on:click="del">delete</a>
+                    </div>
+                  </div></div>
                 </div>
-                <div class="col-12" style="margin-bottom: 0px;">
-                  <h5>Properties</h5>
-                  <table class="table highlight">
-                    <tbody>
-                      <tr><td>container name:</td><td class="notebook-name"></td></tr>
-                      <tr><td>started time:</td><td class="notebook-started"></td></tr>
-                      <tr><td>ended time:</td><td class="notebook-ended"></td></tr>
-                      <tr><td>mounted volumes:</td><td class="notebook-volumes"></td></tr>
-                    </tbody>
-                  </table>
+                <div class="col-12">
+                  <div class="row"><div class="col-12" style="margin-bottom: 20px;">
+                    <h6>Properties</h6>
+                    <table class="table highlight">
+                      <tbody>
+                        <tr><td>container name:</td><td class="notebook-name"></td></tr>
+                        <tr><td>started time:</td><td class="notebook-started"></td></tr>
+                        <tr><td>ended time:</td><td class="notebook-ended"></td></tr>
+                        <tr><td>mounted volumes:</td><td class="notebook-volumes"></td></tr>
+                      </tbody>
+                    </table>
+                  </div></div>
                 </div>
                 <div class="clear-both"></div>
               </div>
             </li>
           </ul>
-
         </div>
       </div>
     </div>
-
   </section>
 </main>
 
 <div id="training-dialog" class="modal popup-dialog"
-    style="height: 585px;width: 60%;max-height: 85%;top: 1% !important;">
+    style="height: 655px;width: 60%;max-height: 100%;">
   <div class="modal-content">
-    <h5>Confirmation</h5>
+    <h5>Task Definition</h5>
   </div>
   <div class="modal-footer row">
+    <section class="container wait-icon" style="position: absolute;top: 40%;left: 0;display:none;">
+      <div style="margin: 30px auto 0 auto;width: 75px;">
+        <div class="preloader-wrapper big active">
+          <div class="spinner-layer spinner-green-only">
+            <div class="circle-clipper left">
+              <div class="circle"></div>
+            </div>
+            <div class="gap-patch">
+              <div class="circle"></div>
+            </div>
+            <div class="circle-clipper right">
+              <div class="circle"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
     <div class="col-12" style="margin: 15px 0px 7px 0;min-height: 50px;">
       <form autocomplete="off" v-on:submit.prevent>
+        <div class="form-group row">
+          <label class="col-sm-3 control-label">Platform</label>
+          <div class="col-sm-9 training-platform">
+            <select>
+              <option value="0">Kubernetes</option>
+              <option value="1">Rescale</option>
+            </select>
+          </div>
+        </div>
         <div class="form-group row considerable">
           <label class="col-sm-3 control-label">Job type</label>
           <div class="col-sm-9 training-type">
@@ -145,6 +171,20 @@ js = "notebooks/index.js"
           <div class="col-sm-9">
             <input type="text" class="form-control training-cmds" v-model="cmd"
                   placeholder="python train.py --epoch 10 --gpu 1" />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-sm-3 control-label">CPU</label>
+          <div class="col-sm-9">
+            <input type="number" class="form-control training-cpus text-right"
+                   v-model="cpus" placeholder="1" />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-sm-3 control-label">GPU</label>
+          <div class="col-sm-9">
+            <input type="number" class="form-control training-gpus text-right"
+                   v-model="gpus" placeholder="0" />
           </div>
         </div>
         <div class="form-group row">

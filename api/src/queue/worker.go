@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	docker "docker.io/go-docker"
 	"docker.io/go-docker/api/types"
@@ -20,6 +21,12 @@ import (
 	"github.com/rescale-labs/scaleshift/api/src/lib"
 	"github.com/rescale-labs/scaleshift/api/src/log"
 	"github.com/rescale-labs/scaleshift/api/src/rescale"
+	batchV1 "k8s.io/api/batch/v1"
+	coreV1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 func init() {
@@ -48,6 +55,50 @@ func SubmitBuildImageJob(imageName, imageID, workspace, wrappedImageID, builderN
 		Arg3:   workspace,
 		Arg4:   wrappedImageID,
 		Arg5:   builderName,
+	})
+	if err != nil {
+		return err
+	}
+	return db.Enqueue(string(bytes))
+}
+
+// BuildJobDockerImage puts a new job
+func BuildJobDockerImage(ID, dockerCredential, builderName, k8sConfig string) error {
+	bytes, err := json.Marshal(job{
+		Action: actionBuildJobImg,
+		Arg1:   ID,
+		Arg2:   dockerCredential,
+		Arg3:   builderName,
+		Arg4:   k8sConfig,
+	})
+	if err != nil {
+		return err
+	}
+	return db.Enqueue(string(bytes))
+}
+
+// PushJobDockerImage pushes a docker image
+func PushJobDockerImage(jobID, imageName, dockerCredential, k8sConfig string) error {
+	bytes, err := json.Marshal(job{
+		Action: actionPushJobImg,
+		Arg1:   jobID,
+		Arg2:   imageName,
+		Arg3:   dockerCredential,
+		Arg4:   k8sConfig,
+	})
+	if err != nil {
+		return err
+	}
+	return db.Enqueue(string(bytes))
+}
+
+// ApplyKubernetesJob puts a new job
+func ApplyKubernetesJob(jobID, imageName, k8sConfig string) error {
+	bytes, err := json.Marshal(job{
+		Action: actionApplyK8s,
+		Arg1:   jobID,
+		Arg2:   imageName,
+		Arg3:   k8sConfig,
 	})
 	if err != nil {
 		return err
@@ -89,6 +140,9 @@ type actionType int
 const (
 	actionPullImage = iota
 	actionWrapJupyter
+	actionBuildJobImg
+	actionPushJobImg
+	actionApplyK8s
 	actionSingularity
 	actionSendRescale
 )
@@ -133,16 +187,134 @@ func worker(name string) (err error) {
 			}
 		}
 		workdir := lib.DetectImageWorkDir(ctx, swag.StringValue(wrappedImage))
-		ID, err := lib.RunJupyterNotebook(ctx, j.Arg1, swag.StringValue(wrappedImage), j.Arg3, workdir)
-		if err != nil {
+		ID, e1 := lib.RunJupyterNotebook(ctx, j.Arg1, swag.StringValue(wrappedImage), j.Arg3, workdir)
+		if e1 != nil {
 			log.Error("Worker failed at RunJupyterNotebook", err, nil)
-			return err
+			return e1
 		}
 		if err = db.RemoveBuildingImage(j.Arg1); err != nil {
 			return err
 		}
 		log.Debug("Run JupyterNotebook!", nil, &log.Map{
 			"id": swag.StringValue(ID),
+		})
+	case actionBuildJobImg:
+		// Arg1: ID
+		// Arg2: DockerCredential
+		// Arg3: BuildersName
+		// Arg4: KubernetesConfig
+		name, e2 := lib.BuildJobImage(ctx, j.Arg1, j.Arg3)
+		if e2 != nil {
+			log.Error("Worker failed at BuildJobImage", err, nil)
+			return e2
+		}
+		err = db.UpdateJob(j.Arg1, db.BuildingJobStoreKey, db.PushingJobStoreKey, db.PushingJob)
+		if err != nil {
+			log.Error("Worker failed at UpdateJob@actionBuildJobImg", err, nil)
+			return err
+		}
+		err = PushJobDockerImage(j.Arg1, swag.StringValue(name), j.Arg2, j.Arg4)
+		if err != nil {
+			log.Error("Worker failed at PushJobDockerImage", err, nil)
+			return err
+		}
+		log.Debug("Built Job Image!", nil, &log.Map{
+			"id":   j.Arg1,
+			"name": swag.StringValue(name),
+		})
+	case actionPushJobImg:
+		// Arg1: JobID
+		// Arg2: ImageName
+		// Arg3: DockerCredential
+		// Arg4: KubernetesConfig
+		err = lib.PushJobImage(ctx, j.Arg2, j.Arg3)
+		if err != nil {
+			log.Error("Worker failed at PushJobImage", err, nil)
+			return err
+		}
+		err = lib.DeleteImage(ctx, j.Arg2)
+		if err != nil {
+			log.Error("Worker failed at DeleteImage", err, nil)
+			return err
+		}
+		err = db.UpdateJob(j.Arg1, db.PushingJobStoreKey, db.KubernetesJobStoreKey, db.KubernetesJob)
+		if err != nil {
+			log.Error("Worker failed at UpdateJob@actionPushJobImg", err, nil)
+			return err
+		}
+		err = ApplyKubernetesJob(j.Arg1, j.Arg2, j.Arg4)
+		if err != nil {
+			log.Error("Worker failed at ApplyKubernetesJob", err, nil)
+			return err
+		}
+		log.Debug("Pushed the Job Image!", nil, &log.Map{
+			"id":   j.Arg1,
+			"name": j.Arg2,
+		})
+	case actionApplyK8s:
+		// Arg1: JobID
+		// Arg2: ImageName
+		// Arg3: KubernetesConfig
+		job, e3 := db.GetJob(j.Arg1)
+		if e3 != nil {
+			log.Error("Worker failed at GetJob@actionApplyK8s", err, nil)
+			return e3
+		}
+		// Apply a k8s job
+		config, e4 := clientcmd.RESTConfigFromKubeConfig([]byte(j.Arg3))
+		if e4 != nil {
+			return e4
+		}
+		clientset, e5 := kubernetes.NewForConfig(config)
+		if e5 != nil {
+			return e5
+		}
+		pod := coreV1.PodTemplateSpec{
+			Spec: coreV1.PodSpec{
+				Containers: []coreV1.Container{
+					coreV1.Container{
+						Name:  "main",
+						Image: j.Arg2,
+						Resources: coreV1.ResourceRequirements{
+							Requests: coreV1.ResourceList{
+								"cpu": resource.MustParse(fmt.Sprintf("%d", job.CPU)),
+							},
+						},
+					},
+				},
+				RestartPolicy: coreV1.RestartPolicyNever,
+			},
+		}
+		if job.GPU > 0 {
+			// https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/
+			pod.Spec.Containers[0].Resources.Limits = coreV1.ResourceList{
+				"nvidia.com/gpu": resource.MustParse(fmt.Sprintf("%d", job.GPU)),
+			}
+		}
+		_, err = clientset.BatchV1().Jobs("default").Create(&batchV1.Job{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: fmt.Sprintf("job-%s", time.Now().Format("060102150405")),
+			},
+			Spec: batchV1.JobSpec{
+				Completions:  swag.Int32(1),
+				Parallelism:  swag.Int32(1),
+				BackoffLimit: swag.Int32(1),
+				Template:     pod,
+			},
+		})
+		if err != nil {
+			return err
+		}
+		// Change this job's status
+		err = db.UpdateJob(j.Arg1, db.KubernetesJobStoreKey, db.KubernetesJobStoreKey, db.K8sJobStart)
+		if err != nil {
+			log.Error("Worker failed at UpdateJob@actionApplyK8s", err, nil)
+			return err
+		}
+		log.Debug("Job submitted!", nil, &log.Map{
+			"id":   j.Arg1,
+			"name": j.Arg2,
+			"cmds": job.Commands,
 		})
 	case actionSingularity:
 		// Arg1: ID
@@ -154,7 +326,7 @@ func worker(name string) (err error) {
 			log.Error("Worker failed at BuildSingularityImage", err, nil)
 			return err
 		}
-		err = db.UpdateJob(j.Arg1, db.SingularityStoreKey, db.RescaleJobStoreKey, db.RescaleSend)
+		err = db.UpdateJob(j.Arg1, db.BuildingJobStoreKey, db.RescaleJobStoreKey, db.RescaleSend)
 		if err != nil {
 			log.Error("Worker failed at UpdateJob", err, nil)
 			return err
@@ -253,7 +425,7 @@ func fallback(name string) error {
 	case actionWrapJupyter:
 		return db.RemoveBuildingImage(j.Arg1)
 	case actionSingularity:
-		return db.RemoveSingularityJobs(j.Arg1)
+		return db.RemoveBuildingJobImagesJobs(j.Arg1)
 	case actionSendRescale:
 		return db.RemoveRescaleJob(j.Arg1)
 	}

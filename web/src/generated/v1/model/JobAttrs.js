@@ -52,6 +52,10 @@
 
 
 
+
+
+
+
   };
 
   /**
@@ -65,6 +69,9 @@
     if (data) {
       obj = obj || new exports();
 
+      if (data.hasOwnProperty('platform_id')) {
+        obj['platform_id'] = ApiClient.convertToType(data['platform_id'], 'String');
+      }
       if (data.hasOwnProperty('notebook_id')) {
         obj['notebook_id'] = ApiClient.convertToType(data['notebook_id'], 'String');
       }
@@ -73,6 +80,15 @@
       }
       if (data.hasOwnProperty('commands')) {
         obj['commands'] = ApiClient.convertToType(data['commands'], ['String']);
+      }
+      if (data.hasOwnProperty('cpu')) {
+        obj['cpu'] = ApiClient.convertToType(data['cpu'], 'Number');
+      }
+      if (data.hasOwnProperty('mem')) {
+        obj['mem'] = ApiClient.convertToType(data['mem'], 'Number');
+      }
+      if (data.hasOwnProperty('gpu')) {
+        obj['gpu'] = ApiClient.convertToType(data['gpu'], 'Number');
       }
       if (data.hasOwnProperty('coretype')) {
         obj['coretype'] = ApiClient.convertToType(data['coretype'], 'String');
@@ -84,6 +100,11 @@
     return obj;
   }
 
+  /**
+   * Platform ID
+   * @member {module:model/JobAttrs.PlatformIdEnum} platform_id
+   */
+  exports.prototype['platform_id'] = undefined;
   /**
    * Notebook container ID
    * @member {String} notebook_id
@@ -100,6 +121,21 @@
    */
   exports.prototype['commands'] = undefined;
   /**
+   * Requesting millicores of CPU
+   * @member {Number} cpu
+   */
+  exports.prototype['cpu'] = undefined;
+  /**
+   * Requesting bytes of memory
+   * @member {Number} mem
+   */
+  exports.prototype['mem'] = undefined;
+  /**
+   * Requesting number of GPU
+   * @member {Number} gpu
+   */
+  exports.prototype['gpu'] = undefined;
+  /**
    * Rescale CoreType as its infrastructure
    * @member {String} coretype
    */
@@ -110,6 +146,23 @@
    */
   exports.prototype['cores'] = undefined;
 
+
+  /**
+   * Allowed values for the <code>platform_id</code> property.
+   * @enum {String}
+   * @readonly
+   */
+  exports.PlatformIdEnum = {
+    /**
+     * value: "kubernetes"
+     * @const
+     */
+    "kubernetes": "kubernetes",
+    /**
+     * value: "rescale"
+     * @const
+     */
+    "rescale": "rescale"  };
 
 
   return exports;

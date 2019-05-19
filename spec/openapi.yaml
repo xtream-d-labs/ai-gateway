@@ -474,6 +474,12 @@ paths:
             title: JobAttrs
             type: object
             properties:
+              platform_id:
+                description: Platform ID
+                type: string
+                enum:
+                    - kubernetes
+                    - rescale
               notebook_id:
                 description: Notebook container ID
                 type: string
@@ -485,6 +491,18 @@ paths:
                 type: array
                 items:
                   type: string
+              cpu:
+                description: Requesting millicores of CPU
+                type: integer
+                format: int64
+              mem:
+                description: Requesting bytes of memory
+                type: integer
+                format: int64
+              gpu:
+                description: Requesting number of GPU
+                type: integer
+                format: int64
               coretype:
                 description: Rescale CoreType as its infrastructure
                 type: string

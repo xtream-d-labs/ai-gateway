@@ -104,15 +104,15 @@ func fields(details *Map) (*logrus.Entry, logrus.Fields) {
 	logger := logrus.StandardLogger()
 	switch strings.ToLower(config.Config.LogLevel) {
 	case "debug":
-		logger.SetLevel(logrus.DebugLevel)
+		logger.Level = logrus.DebugLevel
 	case "info":
-		logger.SetLevel(logrus.InfoLevel)
+		logger.Level = logrus.InfoLevel
 	case "warn":
-		logger.SetLevel(logrus.WarnLevel)
+		logger.Level = logrus.WarnLevel
 	case "error":
-		logger.SetLevel(logrus.ErrorLevel)
+		logger.Level = logrus.ErrorLevel
 	case "fatal":
-		logger.SetLevel(logrus.FatalLevel)
+		logger.Level = logrus.FatalLevel
 	}
 	if len(fields) == 0 {
 		if strings.EqualFold(config.Config.LogFormat, "json") {

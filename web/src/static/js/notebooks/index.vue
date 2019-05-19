@@ -17,11 +17,41 @@ var vue = new Vue({
       training.id = li.attr('data-id');
       training.name = li.find('.notebook-name').text();
       training.cmd = '';
+      training.cpus = 1;
+      training.gpus = 0;
       var dialog = $('#training-dialog');
       dialog.find('.form-group.considerable div').css({opacity: 0});
       dialog.find('.btn').addClass('disabled');
       dialog.find('.training-notebook select').html('');
       dialog.modal('open');
+
+      dialog.css({opacity: 0, display:'none'});
+      setTimeout(function () {
+        dialog.css({opacity: 0, display:'none'});
+      }, 50);
+      var c = config.get();
+      if (c.useRescale && c.useKubernetes) {
+        dialog.find('.training-platform').closest('.form-group').show();
+      } else {
+        dialog.find('.training-platform').closest('.form-group').hide();
+      }
+      if (c.useKubernetes) {
+        dialog.find(".training-platform select").val("0");
+        dialog.find('.training-cpus, .training-gpus').closest('.form-group').show();
+        dialog.find('.training-coretype, .training-cores').closest('.form-group').hide();
+      } else {
+        dialog.find('.training-cpus, .training-gpus').closest('.form-group').hide();
+        if (c.useRescale) {
+          dialog.find(".training-platform select").val("1");
+          dialog.find('.training-coretype, .training-cores').closest('.form-group').show();
+        } else {
+          dialog.find('.training-coretype, .training-cores').closest('.form-group').hide();
+        }
+      }
+      setTimeout(function () {
+        dialog.css({top:'0'});
+        dialog.fadeIn();
+      }, 500);
 
       var loadIpynbs = false, loadCoretypes = false;
 
@@ -61,8 +91,8 @@ var vue = new Vue({
 
       API('Rescale').getRescaleCoreTypes({appVer:'cpu:cheap'}, function (err, _, res) {
         if (app.shouldExit(res, err) || (res && res.body && res.body.code == 401)) {
-          alert('Something went wront. Check your configurations!')
-          window.location.href = '/settings/';
+          loadCoretypes = true;
+          loaded()
           return;
         }
         var html = '';
@@ -146,7 +176,7 @@ var vue = new Vue({
           setTimeout(function () {
             // $('#data .collapsible .row-body').eq(0).collapse('show');
             $('#query-words').blur();
-          }, 500);
+          }, 750);
         }
       }
       $('#record-count').text(formatted.length);
@@ -240,7 +270,10 @@ var training = new Vue({
   data: {
     id: '',
     name: '',
-    cmd: ''
+    cmd: '',
+    cpus: 1,
+    memory: 0,
+    gpus: 0
   },
   methods: {
     submit: function () {
@@ -254,16 +287,29 @@ var training = new Vue({
         dialog.find('.training-cmds').focus();
         return;
       }
-      $('#act-submit').prop("disabled", true);
+      $('#act-submit').addClass('disabled').prop("disabled", true);
+      dialog.find('.cancel').addClass('disabled').prop("disabled", true);
+      dialog.find('.modal-footer div.col-12').css({opacity:'0.4'});
+      dialog.find('section.wait-icon').show();
 
-      var entrypoint = dialog.find('.training-notebook select').val();
+      var c = config.get(),
+          platform = models.JobAttrs.PlatformIdEnum.kubernetes,
+          entrypoint = dialog.find('.training-notebook select').val();
+      if ((dialog.find(".training-platform select").val() == '1') ||
+          (c.useRescale && !c.useKubernetes)) {
+        platform = models.JobAttrs.PlatformIdEnum.rescale;
+      }
       if (dialog.find(".training-type select").val() == '1') {
         entrypoint = 'none';
       }
       var body = models.JobAttrs.constructFromObject({
+        'platform_id': platform,
         'notebook_id': this.id,
         'entrypoint_file': entrypoint,
         'commands': commands,
+        'cpu': this.cpus,
+        'mem': this.memory,
+        'gpu': this.gpus,
         'coretype': dialog.find(".training-coretype select").val(),
         'cores': parseInt(dialog.find(".training-cores select").val(), 10)
       });
@@ -271,7 +317,10 @@ var training = new Vue({
         if (! $.isEmptyObject(err)) {
           if (res && res.body && res.body.code && (res.body.code == '400') && res.body.message) {
             dialog.modal('close');
-            $('#act-submit').removeProp('disabled');
+            $('#act-submit').removeClass('disabled').removeProp('disabled');
+            dialog.find('.cancel').removeClass('disabled').removeProp("disabled", true);
+            dialog.find('.modal-footer div.col-12').css({opacity:'1.0'});
+            dialog.find('section.wait-icon').hide();
             M.toast({html: 'Could not start training with this notebook', displayLength: 3000});
             return;
           }
@@ -282,7 +331,7 @@ var training = new Vue({
           }
           return;
         }
-        location.href = '/jobs/?q=' + encodeURIComponent(res.body.id);
+        location.href = '/tasks/?q=' + encodeURIComponent(res.body.id);
       });
     },
     error: function (message) {
@@ -359,6 +408,16 @@ $(document).ready(function () {
     });
     $('#query-order-type').change(function () {
       update();
+    });
+    $("#training-dialog .training-platform select").on('change', function () {
+      var dialog = $('#training-dialog');
+      if ($(this).val() == '0') {
+        dialog.find('.training-cpus, .training-gpus').closest('.form-group').show();
+        dialog.find('.training-coretype, .training-cores').closest('.form-group').hide();
+      } else {
+        dialog.find('.training-cpus, .training-gpus').closest('.form-group').hide();
+        dialog.find('.training-coretype, .training-cores').closest('.form-group').show();
+      }
     });
     $("#training-dialog .training-type select").on('change', function () {
       var dialog = $('#training-dialog');

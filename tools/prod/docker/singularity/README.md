@@ -6,7 +6,7 @@ https://www.sylabs.io/singularity/
 
 ## Supported tags and respective `Dockerfile` links
 
-・3.1 ([singularity/Dockerfile](https://github.com/rescale-labs/scaleshift/blob/master/tools/prod/docker/singularity/Dockerfile))  
+・3.2 ([singularity/Dockerfile](https://github.com/rescale-labs/scaleshift/blob/master/tools/prod/docker/singularity/Dockerfile))  
 ・2.6-d2s ([doc2sin/Dockerfile](https://github.com/rescale-labs/scaleshift/blob/master/tools/prod/docker/doc2sin/Dockerfile))  
 
 ## Usage
@@ -20,9 +20,9 @@ docker run --rm --privileged -v $(pwd):/output \
     --name app.simg alpine:3.9
 ```
 
-singularity:3.1
+singularity:3.2
 
 ```console
 sudo docker run --rm -it --privileged -v $(pwd):/work \
-    scaleshift/singularity:3.1 exec app.simg echo hello
+    scaleshift/singularity:3.2 exec app.simg echo hello
 ```
