@@ -127,7 +127,7 @@ $(document).ready(function () {
         $(el).prop('href', '/notebooks/?q=' + encodeURIComponent($(el).text()));
       });
       $('.jobs').each(function (_, el) {
-        $(el).prop('href', '/jobs/?q=' + encodeURIComponent($(el).text()));
+        $(el).prop('href', '/tasks/?q=' + encodeURIComponent($(el).text()));
       });
     }, 500);
     $('#data').fadeIn();

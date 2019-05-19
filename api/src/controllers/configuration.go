@@ -194,6 +194,9 @@ func postConfigurations(params app.PostConfigurationsParams) middleware.Responde
 	})
 	// Check if Kubernetes API returns 200
 	eg.Go(func() error {
+		if swag.IsZero(creds.Base.K8sConfig) {
+			return nil
+		}
 		config, err := clientcmd.RESTConfigFromKubeConfig([]byte(creds.Base.K8sConfig))
 		if err != nil {
 			return xerrors.Errorf("[Kubernetes API] %s", err.Error())

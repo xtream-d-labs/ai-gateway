@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	docker "docker.io/go-docker"
 	"docker.io/go-docker/api/types"
@@ -20,6 +21,12 @@ import (
 	"github.com/rescale-labs/scaleshift/api/src/lib"
 	"github.com/rescale-labs/scaleshift/api/src/log"
 	"github.com/rescale-labs/scaleshift/api/src/rescale"
+	batchV1 "k8s.io/api/batch/v1"
+	coreV1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 func init() {
@@ -56,12 +63,13 @@ func SubmitBuildImageJob(imageName, imageID, workspace, wrappedImageID, builderN
 }
 
 // BuildJobDockerImage puts a new job
-func BuildJobDockerImage(ID, dockerCredential, builderName string) error {
+func BuildJobDockerImage(ID, dockerCredential, builderName, k8sConfig string) error {
 	bytes, err := json.Marshal(job{
 		Action: actionBuildJobImg,
 		Arg1:   ID,
 		Arg2:   dockerCredential,
 		Arg3:   builderName,
+		Arg4:   k8sConfig,
 	})
 	if err != nil {
 		return err
@@ -70,12 +78,13 @@ func BuildJobDockerImage(ID, dockerCredential, builderName string) error {
 }
 
 // PushJobDockerImage pushes a docker image
-func PushJobDockerImage(jobID, imageName, dockerCredential string) error {
+func PushJobDockerImage(jobID, imageName, dockerCredential, k8sConfig string) error {
 	bytes, err := json.Marshal(job{
 		Action: actionPushJobImg,
 		Arg1:   jobID,
 		Arg2:   imageName,
 		Arg3:   dockerCredential,
+		Arg4:   k8sConfig,
 	})
 	if err != nil {
 		return err
@@ -84,11 +93,12 @@ func PushJobDockerImage(jobID, imageName, dockerCredential string) error {
 }
 
 // ApplyKubernetesJob puts a new job
-func ApplyKubernetesJob(jobID, imageName string) error {
+func ApplyKubernetesJob(jobID, imageName, k8sConfig string) error {
 	bytes, err := json.Marshal(job{
 		Action: actionApplyK8s,
 		Arg1:   jobID,
 		Arg2:   imageName,
+		Arg3:   k8sConfig,
 	})
 	if err != nil {
 		return err
@@ -192,6 +202,7 @@ func worker(name string) (err error) {
 		// Arg1: ID
 		// Arg2: DockerCredential
 		// Arg3: BuildersName
+		// Arg4: KubernetesConfig
 		name, e2 := lib.BuildJobImage(ctx, j.Arg1, j.Arg3)
 		if e2 != nil {
 			log.Error("Worker failed at BuildJobImage", err, nil)
@@ -202,7 +213,7 @@ func worker(name string) (err error) {
 			log.Error("Worker failed at UpdateJob@actionBuildJobImg", err, nil)
 			return err
 		}
-		err = PushJobDockerImage(j.Arg1, swag.StringValue(name), j.Arg2)
+		err = PushJobDockerImage(j.Arg1, swag.StringValue(name), j.Arg2, j.Arg4)
 		if err != nil {
 			log.Error("Worker failed at PushJobDockerImage", err, nil)
 			return err
@@ -215,6 +226,7 @@ func worker(name string) (err error) {
 		// Arg1: JobID
 		// Arg2: ImageName
 		// Arg3: DockerCredential
+		// Arg4: KubernetesConfig
 		err = lib.PushJobImage(ctx, j.Arg2, j.Arg3)
 		if err != nil {
 			log.Error("Worker failed at PushJobImage", err, nil)
@@ -230,7 +242,7 @@ func worker(name string) (err error) {
 			log.Error("Worker failed at UpdateJob@actionPushJobImg", err, nil)
 			return err
 		}
-		err = ApplyKubernetesJob(j.Arg1, j.Arg2)
+		err = ApplyKubernetesJob(j.Arg1, j.Arg2, j.Arg4)
 		if err != nil {
 			log.Error("Worker failed at ApplyKubernetesJob", err, nil)
 			return err
@@ -242,13 +254,57 @@ func worker(name string) (err error) {
 	case actionApplyK8s:
 		// Arg1: JobID
 		// Arg2: ImageName
+		// Arg3: KubernetesConfig
 		job, e3 := db.GetJob(j.Arg1)
 		if e3 != nil {
 			log.Error("Worker failed at GetJob@actionApplyK8s", err, nil)
 			return e3
 		}
-		// TODO apply k8s job
-
+		// Apply a k8s job
+		config, e4 := clientcmd.RESTConfigFromKubeConfig([]byte(j.Arg3))
+		if e4 != nil {
+			return e4
+		}
+		clientset, e5 := kubernetes.NewForConfig(config)
+		if e5 != nil {
+			return e5
+		}
+		pod := coreV1.PodTemplateSpec{
+			Spec: coreV1.PodSpec{
+				Containers: []coreV1.Container{
+					coreV1.Container{
+						Name:  "main",
+						Image: j.Arg2,
+						Resources: coreV1.ResourceRequirements{
+							Requests: coreV1.ResourceList{
+								"cpu": resource.MustParse(fmt.Sprintf("%d", job.CPU)),
+							},
+						},
+					},
+				},
+				RestartPolicy: coreV1.RestartPolicyNever,
+			},
+		}
+		if job.GPU > 0 {
+			// https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/
+			pod.Spec.Containers[0].Resources.Limits = coreV1.ResourceList{
+				"nvidia.com/gpu": resource.MustParse(fmt.Sprintf("%d", job.GPU)),
+			}
+		}
+		_, err = clientset.BatchV1().Jobs("default").Create(&batchV1.Job{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: fmt.Sprintf("job-%s", time.Now().Format("060102150405")),
+			},
+			Spec: batchV1.JobSpec{
+				Completions:  swag.Int32(1),
+				Parallelism:  swag.Int32(1),
+				BackoffLimit: swag.Int32(1),
+				Template:     pod,
+			},
+		})
+		if err != nil {
+			return err
+		}
 		// Change this job's status
 		err = db.UpdateJob(j.Arg1, db.KubernetesJobStoreKey, db.KubernetesJobStoreKey, db.K8sJobStart)
 		if err != nil {

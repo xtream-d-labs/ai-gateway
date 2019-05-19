@@ -21,8 +21,8 @@ func rescaleRoute(api *operations.ScaleShiftAPI) {
 }
 
 // curl -s -H "Authorization: Bearer xxx" "http://localhost:8080/api/v1/rescale/coretypes/"
-// curl -s -H "Authorization: Bearer xxx" "http://localhost:8080/api/v1/rescale/coretypes/?app_ver=singularity%3A2.5.1"
 // curl -s -H "Authorization: Bearer xxx" "http://localhost:8080/api/v1/rescale/coretypes/?app_ver=cpu:cheap"
+// curl -s -H "Authorization: Bearer xxx" "http://localhost:8080/api/v1/rescale/coretypes/?app_ver=user_included_singularity_container:3.2.0"
 func getCoreTypes(params rescale.GetRescaleCoreTypesParams, principal *auth.Principal) middleware.Responder {
 	creds := auth.FindCredentials(principal.Username)
 	if swag.IsZero(creds.Base.RescaleKey) {

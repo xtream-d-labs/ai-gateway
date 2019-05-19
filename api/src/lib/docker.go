@@ -27,7 +27,7 @@ import (
 var (
 	jobDockerFile []byte
 	trimDockerTag = regexp.MustCompile(`:.*`)
-	trimDockerLib = regexp.MustCompile(`library`)
+	trimDockerLib = regexp.MustCompile(`library/`)
 )
 
 func init() {
@@ -225,8 +225,21 @@ func BuildJobImage(ctx context.Context, jobID, builder string) (*string, error) 
 	}
 
 	name := trimDockerTag.ReplaceAllString(job.DockerImage, "")
-	name = trimDockerLib.ReplaceAllString(name, builder)
-	name = fmt.Sprintf("%s:%s-%s", name, config.Config.JobImageTagPrefix, time.Now().Format("060102150405"))
+	name = trimDockerLib.ReplaceAllString(name, "")
+	if !strings.HasPrefix(name, config.Config.DockerRegistryHostName) {
+		name = fmt.Sprintf(
+			"%s/%s/%s",
+			config.Config.DockerRegistryHostName,
+			builder,
+			name,
+		)
+	}
+	name = fmt.Sprintf(
+		"%s:%s-%s",
+		name,
+		config.Config.JobImageTagPrefix,
+		time.Now().Format("060102150405"),
+	)
 	options := types.ImageBuildOptions{
 		Tags: []string{name},
 		Labels: map[string]string{

@@ -69,38 +69,43 @@ js = "notebooks/index.js"
                    :id="'body-'+notebook.id" class="row collapse row-body"
                    :aria-labelledby="notebook.id"
                    data-parent="#accordion">
-                <div class="col-12" v-if="notebook.state != 'exited'"
-                     style="margin-bottom: 20px;">
-                  <h5>Endpoint</h5>
-                  <a href="#" target="_blank" class="endpoint"
-                     style="font-size: 1.5rem;">{{ notebook.url }}</a>
+                <div class="col-12" v-if="notebook.state != 'exited'">
+                  <div class="row"><div class="col-12" style="margin-bottom: 20px;">
+                    <h6>Endpoint</h6>
+                    <a href="#" target="_blank" class="endpoint"
+                      style="font-size: 1.5rem;">{{ notebook.url }}</a>
+                  </div></div>
                 </div>
-                <div class="col-12" style="margin-bottom: 20px;">
-                  <h5>Actions</h5>
-                  <div style="margin: 20px 0 5px 0;">
-                    <a v-if="trainOnCloud" class="waves-effect waves-light btn blue darken-1"
-                       tabindex="0" v-on:click="train">train on cloud</a>
-                    <span>&nbsp;</span>
-                    <!-- <a class="waves-effect waves-light btn blue darken-1"
-                       tabindex="0">Run more like this</a>
-                    <span>&nbsp;</span> -->
-                    <a class="waves-effect waves-light btn red lighten-2 act-stop" tabindex="0"
-                       v-if="notebook.state != 'exited'" v-on:click="stop">stop</a>
-                    <a class="waves-effect waves-light btn red lighten-2 act-delete"
-                       tabindex="0" v-if="notebook.state == 'exited'"
-                       v-on:click="del">delete</a>
-                  </div>
+                <div class="col-12">
+                  <div class="row"><div class="col-12" style="margin-bottom: 20px;">
+                    <h6>Actions</h6>
+                    <div style="margin: 20px 0 5px 0;">
+                      <a v-if="trainOnCloud" class="waves-effect waves-light btn blue darken-1"
+                        tabindex="0" v-on:click="train">train on cloud</a>
+                      <span>&nbsp;</span>
+                      <!-- <a class="waves-effect waves-light btn blue darken-1"
+                        tabindex="0">Run more like this</a>
+                      <span>&nbsp;</span> -->
+                      <a class="waves-effect waves-light btn red lighten-2 act-stop" tabindex="0"
+                        v-if="notebook.state != 'exited'" v-on:click="stop">stop</a>
+                      <a class="waves-effect waves-light btn red lighten-2 act-delete"
+                        tabindex="0" v-if="notebook.state == 'exited'"
+                        v-on:click="del">delete</a>
+                    </div>
+                  </div></div>
                 </div>
-                <div class="col-12" style="margin-bottom: 0px;">
-                  <h5>Properties</h5>
-                  <table class="table highlight">
-                    <tbody>
-                      <tr><td>container name:</td><td class="notebook-name"></td></tr>
-                      <tr><td>started time:</td><td class="notebook-started"></td></tr>
-                      <tr><td>ended time:</td><td class="notebook-ended"></td></tr>
-                      <tr><td>mounted volumes:</td><td class="notebook-volumes"></td></tr>
-                    </tbody>
-                  </table>
+                <div class="col-12">
+                  <div class="row"><div class="col-12" style="margin-bottom: 20px;">
+                    <h6>Properties</h6>
+                    <table class="table highlight">
+                      <tbody>
+                        <tr><td>container name:</td><td class="notebook-name"></td></tr>
+                        <tr><td>started time:</td><td class="notebook-started"></td></tr>
+                        <tr><td>ended time:</td><td class="notebook-ended"></td></tr>
+                        <tr><td>mounted volumes:</td><td class="notebook-volumes"></td></tr>
+                      </tbody>
+                    </table>
+                  </div></div>
                 </div>
                 <div class="clear-both"></div>
               </div>
@@ -169,10 +174,10 @@ js = "notebooks/index.js"
           </div>
         </div>
         <div class="form-group row">
-          <label class="col-sm-3 control-label">CPU millicores</label>
+          <label class="col-sm-3 control-label">CPU</label>
           <div class="col-sm-9">
             <input type="number" class="form-control training-cpus text-right"
-                   v-model="cpus" placeholder="1000" />
+                   v-model="cpus" placeholder="1" />
           </div>
         </div>
         <div class="form-group row">

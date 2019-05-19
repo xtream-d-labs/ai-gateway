@@ -17,7 +17,7 @@ var vue = new Vue({
       training.id = li.attr('data-id');
       training.name = li.find('.notebook-name').text();
       training.cmd = '';
-      training.cpus = 1000;
+      training.cpus = 1;
       training.gpus = 0;
       var dialog = $('#training-dialog');
       dialog.find('.form-group.considerable div').css({opacity: 0});
@@ -30,17 +30,19 @@ var vue = new Vue({
         dialog.css({opacity: 0, display:'none'});
       }, 50);
       var c = config.get();
-      if (!c.useRescale || !c.useKubernetes) {
-        dialog.find('.training-platform').closest('.form-group').hide();
-      } else {
+      if (c.useRescale && c.useKubernetes) {
         dialog.find('.training-platform').closest('.form-group').show();
+      } else {
+        dialog.find('.training-platform').closest('.form-group').hide();
       }
       if (c.useKubernetes) {
+        dialog.find(".training-platform select").val("0");
         dialog.find('.training-cpus, .training-gpus').closest('.form-group').show();
         dialog.find('.training-coretype, .training-cores').closest('.form-group').hide();
       } else {
         dialog.find('.training-cpus, .training-gpus').closest('.form-group').hide();
         if (c.useRescale) {
+          dialog.find(".training-platform select").val("1");
           dialog.find('.training-coretype, .training-cores').closest('.form-group').show();
         } else {
           dialog.find('.training-coretype, .training-cores').closest('.form-group').hide();
@@ -269,7 +271,7 @@ var training = new Vue({
     id: '',
     name: '',
     cmd: '',
-    cpus: 1024,
+    cpus: 1,
     memory: 0,
     gpus: 0
   },
@@ -290,9 +292,11 @@ var training = new Vue({
       dialog.find('.modal-footer div.col-12').css({opacity:'0.4'});
       dialog.find('section.wait-icon').show();
 
-      var platform = models.JobAttrs.PlatformIdEnum.kubernetes,
+      var c = config.get(),
+          platform = models.JobAttrs.PlatformIdEnum.kubernetes,
           entrypoint = dialog.find('.training-notebook select').val();
-      if (dialog.find(".training-platform select").val() == '1') {
+      if ((dialog.find(".training-platform select").val() == '1') ||
+          (c.useRescale && !c.useKubernetes)) {
         platform = models.JobAttrs.PlatformIdEnum.rescale;
       }
       if (dialog.find(".training-type select").val() == '1') {
@@ -305,7 +309,7 @@ var training = new Vue({
         'commands': commands,
         'cpu': this.cpus,
         'mem': this.memory,
-        'gpu': this.cpus,
+        'gpu': this.gpus,
         'coretype': dialog.find(".training-coretype select").val(),
         'cores': parseInt(dialog.find(".training-cores select").val(), 10)
       });
@@ -327,7 +331,7 @@ var training = new Vue({
           }
           return;
         }
-        location.href = '/jobs/?q=' + encodeURIComponent(res.body.id);
+        location.href = '/tasks/?q=' + encodeURIComponent(res.body.id);
       });
     },
     error: function (message) {

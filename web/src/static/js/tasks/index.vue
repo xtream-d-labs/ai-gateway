@@ -216,7 +216,7 @@ function load(callback) {
 }
 
 $(document).ready(function () {
-  $('#menu-jobs').addClass('active');
+  $('#menu-tasks').addClass('active');
   if (app.query('q')) {
     $('#query-words').val(app.query('q')).focus();
   }

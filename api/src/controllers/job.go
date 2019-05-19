@@ -150,7 +150,6 @@ func postNewJob(params job.PostNewJobParams, principal *auth.Principal) middlewa
 	}
 	credential := ""
 	if strings.HasPrefix(image, config.Config.DockerRegistryHostName) {
-		config.Config.DockerRegistryUserName = creds.Base.DockerUsername
 		credential = creds.Base.DockerPassword
 	}
 	if strings.HasPrefix(image, config.Config.NgcRegistryHostName) {
@@ -158,10 +157,12 @@ func postNewJob(params job.PostNewJobParams, principal *auth.Principal) middlewa
 	}
 	switch params.Body.PlatformID {
 	case models.PostNewJobParamsBodyPlatformIDKubernetes:
+		config.Config.DockerRegistryUserName = creds.Base.DockerUsername
 		if err := queue.BuildJobDockerImage(
 			newjob.ID,
-			credential,
+			creds.Base.DockerPassword,
 			principal.Username,
+			creds.Base.K8sConfig,
 		); err != nil {
 			log.Error("BuildDockerJobImage@postNewJob", err, nil)
 			code := http.StatusInternalServerError

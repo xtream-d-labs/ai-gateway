@@ -40,14 +40,13 @@ type config struct { // nolint:maligned
 	JupyterMinimumPort     uint16   `envconfig:"JUPYTER_MINIMUM_PORT" default:"30000"`
 	KubernetesAPIEndpoint  string   `envconfig:"KUBERNETES_API_ENDPOINT"`
 	KubernetesConfig       string   `envconfig:"KUBERNETES_CONFIG"`
-	JobImageTagPrefix      string   `envconfig:"JOB_IMAGETAG_PREFIX" default:"ss-built"`
+	JobImageTagPrefix      string   `envconfig:"JOB_IMAGETAG_PREFIX" default:"ss"`
 	RescaleEndpoint        string   `envconfig:"RESCALE_ENDPOINT" default:"https://platform.rescale.com"`
 	RescaleAPIToken        string   `envconfig:"RESCALE_API_TOKEN"`
-	RescaleSingularityVer  string   `envconfig:"RESCALE_SINGULARITY_VERSION" default:"3.0.1"` // now supports: 3.0.1, 2.6.0, 2.5.1
+	RescaleSingularityVer  string   `envconfig:"RESCALE_SINGULARITY_VERSION" default:"3.2.0"` // now supports: 3.2.0
 	RescaleJobWallTime     int      `envconfig:"RESCALE_JOB_WALLTIME" default:"3600"`
-	MaxWorkers             int      `envconfig:"MAX_WORKERS" default:"1"`
-	MaxFetchers            int      `envconfig:"MAX_FETCHERS" default:"1"`
-	WorkerRetryLimit       int      `envconfig:"WORKER_RETRY_LIMIT" default:"1"`
+	MaxWorkers             int      `envconfig:"MAX_WORKERS" default:"0"`  // Maximum number of goroutines processing messages, default: 32 * number of CPUs
+	MaxFetchers            int      `envconfig:"MAX_FETCHERS" default:"0"` // Maximum number of goroutines fetching messages, default: 4 * number of CPUs
 	AccessLog              bool     `envconfig:"ACCESS_LOG" default:"true"`
 	LogLevel               string   `envconfig:"LOG_LEVEL" default:"warn"`
 	LogFormat              string   `envconfig:"LOG_FORMAT" default:"default"`
@@ -58,7 +57,7 @@ type config struct { // nolint:maligned
 	DatabaseDir            string   `envconfig:"DATABASE_CNTR_DIR" default:"/tmp/badger"`
 	WorkspaceHostDir       string   `envconfig:"WORKSPACE_HOST_DIR"`
 	WorkspaceContainerDir  string   `envconfig:"WORKSPACE_CNTR_DIR" default:"/tmp/work"`
-	SingImg                string   `envconfig:"SINGULARITY_IMAGE" default:"scaleshift/singularity:3.1"`
+	SingImg                string   `envconfig:"SINGULARITY_IMAGE" default:"scaleshift/singularity:3.2"`
 	SingImgHostPath        string   `envconfig:"SINGULARITY_HOST_DIR"`
 	SingImgContainerDir    string   `envconfig:"SINGULARITY_CNTR_DIR" default:"/tmp/simg"`
 }

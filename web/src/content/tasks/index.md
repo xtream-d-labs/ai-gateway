@@ -1,7 +1,7 @@
 +++
 title = "Training Tasks"
-css = "jobs/index.css"
-js = "jobs/index.js"
+css = "tasks/index.css"
+js = "tasks/index.js"
 +++
 
 <main>
@@ -52,13 +52,13 @@ js = "jobs/index.js"
                    data-toggle="collapse" aria-expanded="true"
                    :aria-controls="'body-'+job.id">
                 <div class="col-1">
-                  <i class="material-icons" style="float: right;"
+                  <i class="material-icons" style="float: right;width: 24px;"
                      v-if="job.status == 'preparing'">cached</i>
-                  <i class="material-icons" style="float: right;"
+                  <i class="material-icons" style="float: right;width: 24px;"
                      v-if="job.status == 'sending'">cloud_upload</i>
-                  <i class="material-icons" style="float: right;"
+                  <i class="material-icons" style="float: right;width: 24px;"
                      v-if="job.status == 'running'">fast_forward</i>
-                  <i class="material-icons" style="float: right;"
+                  <i class="material-icons" style="float: right;width: 24px;"
                      v-if="job.status == 'done'">done_outline</i>
                 </div>
                 <div class="col-6 cut-text">{{ job.image }}</div>
@@ -75,14 +75,20 @@ js = "jobs/index.js"
                     <h6>Status</h6>
                     <p style="font-size: 1.5rem;margin: 0 0 5px 6px;">{{ job.statusMore }}</p>
                   </div></div>
+                </div>
+                <div class="col-12">
                   <div class="row"><div class="col-12" style="margin-bottom: 20px;">
                     <h6>Base Image</h6>
                     <p style="margin: 10px 0 0 7px;" v-html="job.imageHref"></p>
                   </div></div>
+                </div>
+                <div class="col-12">
                   <div class="row"><div class="col-12" style="margin-bottom: 20px;">
                     <h6>Commands</h6>
                     <p style="font-size: 1.5rem;margin: 10px 0 0 7px;">{{ job.commands }}</p>
                   </div></div>
+                </div>
+                <div class="col-12">
                   <div class="row"><div class="col-12" style="margin-bottom: 20px;">
                     <h6>Actions</h6>
                     <div style="margin: 20px 0 5px 7px;">
@@ -93,6 +99,8 @@ js = "jobs/index.js"
                         v-if="job.status == 'done'" v-on:click="del">delete</a>
                     </div>
                   </div></div>
+                </div>
+                <div class="col-12">
                   <div class="row"><div class="col-12" style="margin-bottom: 0px;">
                     <h6>Properties</h6>
                     <table class="table highlight">

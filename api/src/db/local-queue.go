@@ -17,7 +17,7 @@ func SetupQueue(handler interface{}, fallbackHandler interface{}) {
 		FallbackHandler: fallbackHandler,
 		MaxWorkers:      config.Config.MaxWorkers,
 		MaxFetchers:     config.Config.MaxFetchers,
-		RetryLimit:      config.Config.WorkerRetryLimit,
+		RetryLimit:      1,
 	})
 }
 
