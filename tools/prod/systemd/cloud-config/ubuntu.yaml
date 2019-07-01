@@ -37,7 +37,7 @@ runcmd:
   - add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
   - apt-get update
   - apt-get install -y docker-ce
-  - curl -L https://github.com/docker/compose/releases/download/1.24.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/1.24.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
   - chmod +x /usr/local/bin/docker-compose
   - usermod -aG docker ubuntu
   - systemctl enable docker
@@ -46,6 +46,7 @@ runcmd:
   - curl -L https://s3-ap-northeast-1.amazonaws.com/scaleshift/docker-compose.yml -o /home/ubuntu/docker-compose.yml
   - systemctl enable scaleshift
   - systemctl start scaleshift
-  - docker pull tensorflow/tensorflow:1.13.1-py3
-  - docker pull mxnet/python:1.4.0_cpu_py3
-  - docker pull chainer/chainer:v5.4.0-intel-python3
+  - docker pull scaleshift/singularity:2.6-d2s
+  - docker pull tensorflow/tensorflow:1.14.0-py3
+  - docker pull mxnet/python:1.4.1_cpu_py3
+  - docker pull chainer/chainer:v6.1.0-intel-python3

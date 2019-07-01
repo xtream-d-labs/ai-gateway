@@ -238,7 +238,7 @@ Resources:
                   WantedBy=multi-user.target
 
             runcmd:
-              - curl -L https://github.com/docker/compose/releases/download/1.24.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+              - curl -L https://github.com/docker/compose/releases/download/1.24.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
               - chmod +x /usr/local/bin/docker-compose
               - usermod -aG docker ec2-user
               - systemctl enable docker
@@ -247,9 +247,10 @@ Resources:
               - curl -L https://s3-ap-northeast-1.amazonaws.com/scaleshift/docker-compose.yml -o /home/ec2-user/docker-compose.yml
               - systemctl enable scaleshift
               - systemctl start scaleshift
-              - docker pull tensorflow/tensorflow:1.13.1-py3
-              - docker pull mxnet/python:1.4.0_cpu_py3
-              - docker pull chainer/chainer:v5.4.0-intel-python3
+              - docker pull scaleshift/singularity:2.6-d2s
+              - docker pull tensorflow/tensorflow:1.14.0-py3
+              - docker pull mxnet/python:1.4.1_cpu_py3
+              - docker pull chainer/chainer:v6.1.0-intel-python3
               - /opt/aws/bin/cfn-init -v --region ${AWS::Region} --stack ${AWS::StackName} --resource Config
               - /opt/aws/bin/cfn-signal -e $? --region ${AWS::Region} --stack ${AWS::StackName} --resource ASG
     Metadata:
