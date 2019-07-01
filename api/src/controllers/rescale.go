@@ -29,6 +29,8 @@ func getCoreTypes(params rescale.GetRescaleCoreTypesParams, principal *auth.Prin
 		code := http.StatusForbidden
 		return rescale.NewGetRescaleCoreTypesDefault(code).WithPayload(newerror(code))
 	}
+	ctx := params.HTTPRequest.Context()
+
 	// Restrict core types by some application
 	var limitedCoreTypes []string
 	if params.AppVer != nil {
@@ -44,7 +46,7 @@ func getCoreTypes(params rescale.GetRescaleCoreTypesParams, principal *auth.Prin
 				code := http.StatusBadRequest
 				return rescale.NewGetRescaleCoreTypesDefault(code).WithPayload(newerror(code))
 			}
-			app, err := api.Analyses(creds.Base.RescaleKey, appver[0])
+			app, err := api.Analyses(ctx, creds.Base.RescaleKey, appver[0])
 			if err != nil {
 				log.Error("analyses@getCoreTypes", err, nil)
 				code := http.StatusBadRequest
@@ -59,7 +61,7 @@ func getCoreTypes(params rescale.GetRescaleCoreTypesParams, principal *auth.Prin
 		}
 	}
 	// Retrieve Rescale core types
-	cores, err := api.CoreTypes(creds.Base.RescaleKey, nil, nil)
+	cores, err := api.CoreTypes(ctx, creds.Base.RescaleKey, nil, nil)
 	if err != nil {
 		log.Error("CoreTypes@getCoreTypes", err, nil)
 		code := http.StatusBadRequest
@@ -121,7 +123,9 @@ func getApplication(params rescale.GetRescaleApplicationParams, principal *auth.
 		code := http.StatusForbidden
 		return rescale.NewGetRescaleApplicationDefault(code).WithPayload(newerror(code))
 	}
-	app, err := api.Analyses(creds.Base.RescaleKey, api.ApplicationSingularity) // params.Code
+	ctx := params.HTTPRequest.Context()
+
+	app, err := api.Analyses(ctx, creds.Base.RescaleKey, api.ApplicationSingularity) // params.Code
 	if err != nil {
 		log.Error("analyses@getApplication", err, nil)
 		code := http.StatusBadRequest
@@ -153,7 +157,9 @@ func getApplicationVersion(params rescale.GetRescaleApplicationVersionParams, pr
 		code := http.StatusForbidden
 		return rescale.NewGetRescaleApplicationVersionDefault(code).WithPayload(newerror(code))
 	}
-	app, err := api.Analyses(creds.Base.RescaleKey, api.ApplicationSingularity) // params.Code
+	ctx := params.HTTPRequest.Context()
+
+	app, err := api.Analyses(ctx, creds.Base.RescaleKey, api.ApplicationSingularity) // params.Code
 	if err != nil {
 		log.Error("analyses@getApplicationVersion", err, nil)
 		code := http.StatusBadRequest

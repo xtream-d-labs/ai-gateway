@@ -6,8 +6,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 	"sort"
 	"time"
 
@@ -16,6 +20,7 @@ import (
 	"github.com/rescale-labs/scaleshift/api/src/config"
 	"github.com/rescale-labs/scaleshift/api/src/db"
 	"github.com/rescale-labs/scaleshift/api/src/log"
+	"golang.org/x/net/context/ctxhttp"
 )
 
 var (
@@ -39,7 +44,7 @@ func EnableCache(enabled bool) {
 }
 
 // CoreTypes returns supported core types
-func CoreTypes(token string, page, pageSize *int64) ([]*CoreType, error) {
+func CoreTypes(ctx context.Context, token string, page, pageSize *int64) ([]*CoreType, error) {
 	if useCache {
 		if bytes, e := db.GetValueSimple(coretypesCacheKey); e == nil {
 			result := []*CoreType{}
@@ -49,8 +54,6 @@ func CoreTypes(token string, page, pageSize *int64) ([]*CoreType, error) {
 			}
 		}
 	}
-	ctx := context.Background()
-
 	// send http request
 	query := url.Values{}
 	if page == nil {
@@ -65,7 +68,11 @@ func CoreTypes(token string, page, pageSize *int64) ([]*CoreType, error) {
 	headers := http.Header{}
 	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
 
-	resp, err := send(ctx, "GET", fmt.Sprintf("%s/coretypes/", v3), query, nil, headers)
+	resp, err := send(
+		ctx,
+		http.MethodGet,
+		fmt.Sprintf("%s/coretypes/", v3),
+		query, nil, headers, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -95,16 +102,17 @@ const (
 
 // nolint:misspell
 // Analyses returns supported applications
-func Analyses(token, code string) (*Application, error) {
-	ctx := context.Background()
-
-	// send http request
+func Analyses(ctx context.Context, token, code string) (*Application, error) {
 	query := url.Values{}
 	query.Set("code", code)
 
 	headers := http.Header{}
 	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
-	resp, err := send(ctx, "GET", fmt.Sprintf("%s/analyses/", v3), query, nil, headers)
+	resp, err := send(
+		ctx,
+		http.MethodGet,
+		fmt.Sprintf("%s/analyses/", v3),
+		query, nil, headers, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -120,43 +128,91 @@ func Analyses(token, code string) (*Application, error) {
 }
 
 // Upload uploads specified files
-func Upload(token string, body io.Reader, contentType string) (*UploadedFile, error) {
-	ctx := context.Background()
-
-	headers := http.Header{}
-	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
-	headers.Add("Content-Type", contentType)
-	resp, err := send(ctx, "POST", fmt.Sprintf("%s/files/contents/", v3), nil, body, headers)
+func Upload(ctx context.Context, token, path string) (*UploadedFile, error) {
+	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
-	// parse http response body
-	obj := &UploadedFile{}
-	if err := json.Unmarshal(resp, obj); err != nil {
+	defer f.Close()
+
+	stat, err := f.Stat()
+	if err != nil {
 		return nil, err
+	}
+	out, in := io.Pipe()
+	writer := multipart.NewWriter(in)
+
+	done := make(chan error)
+	var resp *http.Response
+	go func() {
+		req, e := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/files/contents/", v3), out)
+		if e != nil {
+			done <- e
+			return
+		}
+		req.ContentLength = contentLength(filepath.Base(path)) + stat.Size()
+		req.Header.Set("Authorization", fmt.Sprintf("Token %s", token))
+		req.Header.Set("Content-Type", writer.FormDataContentType())
+		resp, err = ctxhttp.Do(ctx, http.DefaultClient, req)
+		done <- err
+	}()
+
+	part, err := writer.CreateFormFile("file", filepath.Base(path))
+	if err != nil {
+		return nil, err
+	}
+	if _, err = io.Copy(part, f); err != nil {
+		log.Debug("1. Bin copy error", err, nil)
+		return nil, err
+	}
+	// writer & in should be closed in order to notify http client to close the connection
+	if err = writer.Close(); err != nil {
+		log.Debug("at writer.Close", err, nil)
+	}
+	if err = in.Close(); err != nil {
+		log.Debug("at pIn.Close", err, nil)
+	}
+	// Wait for the HTTP request done
+	if err = <-done; err != nil {
+		log.Debug("4. HTTP Req error", err, nil)
+		return nil, err
+	}
+	// Format the result
+	obj := &UploadedFile{}
+	if body, err := ioutil.ReadAll(resp.Body); err == nil {
+		if err = json.Unmarshal(body, obj); err != nil {
+			log.Debug("5. Unmarshal", err, nil)
+			return nil, err
+		}
 	}
 	return obj, nil
 }
 
-// CreateJob creates a new job
-func CreateJob(token string, input JobInput) (*string, error) {
-	ctx := context.Background()
+func contentLength(path string) int64 {
+	var body bytes.Buffer
+	writer := multipart.NewWriter(&body)
+	defer writer.Close()
+	if _, err := writer.CreateFormFile("file", path); err != nil {
+		return 0
+	}
+	boundary := bytes.NewBufferString(fmt.Sprintf("\r\n--%s--\r\n", writer.Boundary()))
+	return int64(body.Len()) + int64(boundary.Len())
+}
 
+// CreateJob creates a new job
+func CreateJob(ctx context.Context, token string, input JobInput) (*string, error) {
 	raw, _ := json.Marshal(input)
-	log.Debug("Rescale submit a job", nil, &log.Map{
-		"body": string(raw),
-	})
 	body := bytes.NewBuffer(raw)
 
 	headers := http.Header{}
 	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
 	headers.Add("Content-Type", "application/json")
-	resp, err := send(ctx, "POST", fmt.Sprintf("%s/jobs/", v3), nil, body, headers)
+	resp, err := send(ctx, http.MethodPost, fmt.Sprintf("%s/jobs/", v3), nil, body, headers, 0)
 	if err != nil {
 		return nil, err
 	}
 	// parse http response body
-	obj := &JobStatus{}
+	obj := &Job{}
 	if err := json.Unmarshal(resp, obj); err != nil {
 		return nil, err
 	}
@@ -164,15 +220,79 @@ func CreateJob(token string, input JobInput) (*string, error) {
 }
 
 // Submit submits a job
-func Submit(token, ID string) (*string, error) {
-	ctx := context.Background()
-
+func Submit(ctx context.Context, token, jobID string) (*string, error) {
 	headers := http.Header{}
 	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
-	resp, err := send(ctx, "POST", fmt.Sprintf("%s/jobs/%s/submit/", v3, ID), nil, nil, headers)
+	resp, err := send(
+		ctx,
+		http.MethodPost,
+		fmt.Sprintf("%s/jobs/%s/submit/", v3, jobID),
+		nil, nil, headers, 0)
 	if err != nil {
 		return nil, err
 	}
-	log.Info(string(resp), nil, nil)
-	return nil, nil
+	log.Debug("Rescale Submit", nil, &log.Map{
+		"body": string(resp),
+	})
+	return swag.String(string(resp)), nil
+}
+
+// Status retrieve the job status
+func Status(ctx context.Context, token, jobID string) (*JobStatus, error) {
+	headers := http.Header{}
+	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
+	resp, err := send(
+		ctx,
+		http.MethodGet,
+		fmt.Sprintf("%s/jobs/%s/statuses/", v3, jobID),
+		nil, nil, headers, 0)
+	if err != nil {
+		return nil, err
+	}
+	// parse http response body
+	obj := &JobStatuses{}
+	if err := json.Unmarshal(resp, obj); err != nil {
+		return nil, err
+	}
+	if len(obj.Results) == 0 {
+		return nil, fmt.Errorf("Cannot find the specified job")
+	}
+	obj.Sort()
+	return obj.Results[0], nil
+}
+
+// Stop the specified job
+func Stop(ctx context.Context, token, jobID string) (*string, error) {
+	headers := http.Header{}
+	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
+	resp, err := send(
+		ctx,
+		http.MethodPost,
+		fmt.Sprintf("%s/jobs/%s/stop/", v3, jobID),
+		nil, nil, headers, 0)
+	if err != nil {
+		return nil, err
+	}
+	log.Debug("Rescale Stop", nil, &log.Map{
+		"body": string(resp),
+	})
+	return swag.String(string(resp)), nil
+}
+
+// Delete the specified job
+func Delete(ctx context.Context, token, jobID string) (*string, error) {
+	headers := http.Header{}
+	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
+	resp, err := send(
+		ctx,
+		http.MethodDelete,
+		fmt.Sprintf("%s/jobs/%s/", v3, jobID),
+		nil, nil, headers, 0)
+	if err != nil {
+		return nil, err
+	}
+	log.Debug("Rescale Delete", nil, &log.Map{
+		"body": string(resp),
+	})
+	return swag.String(string(resp)), nil
 }

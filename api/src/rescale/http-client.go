@@ -17,9 +17,9 @@ import (
 	"golang.org/x/net/context/ctxhttp"
 )
 
-func send(ctx context.Context, method, path string, query url.Values, body io.Reader, headers http.Header) ([]byte, error) {
+func send(ctx context.Context, method, path string, query url.Values, body io.Reader, headers http.Header, contentLength int64) ([]byte, error) {
 	cli := &http.Client{}
-	req, err := build(cli, method, apipath(path, query), body, headers)
+	req, err := build(cli, method, apipath(path, query), body, headers, contentLength)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func apipath(path string, query url.Values) string {
 	return u.String()
 }
 
-func build(cli *http.Client, method, path string, body io.Reader, headers http.Header) (*http.Request, error) {
+func build(cli *http.Client, method, path string, body io.Reader, headers http.Header, contentLength int64) (*http.Request, error) {
 	expectedPayload := (method == http.MethodPost || method == http.MethodPut)
 	if expectedPayload && body == nil {
 		body = bytes.NewReader([]byte{})
@@ -55,6 +55,9 @@ func build(cli *http.Client, method, path string, body io.Reader, headers http.H
 	}
 	if expectedPayload && swag.IsZero(req.Header.Get("Content-Type")) {
 		req.Header.Set("Content-Type", "text/plain")
+	}
+	if contentLength > 0 {
+		req.ContentLength = contentLength
 	}
 	return req, nil
 }

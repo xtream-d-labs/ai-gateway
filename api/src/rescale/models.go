@@ -1,5 +1,10 @@
 package rescale
 
+import (
+	"sort"
+	"time"
+)
+
 // CoreType represents Rescale Compute environments
 type CoreType struct {
 	Code            string  `json:"code"`
@@ -107,8 +112,54 @@ type JobCoreType struct {
 	Code string `json:"code"`
 }
 
+// Job defines the fields of a Rescale job
+type Job struct {
+	ID               string            `json:"id"`
+	Name             string            `json:"name"`
+	JobAnalyses      []JobInputAnalyse `json:"jobanalyses"`
+	JobVariables     []string          `json:"jobvariables"`
+	IsLowPriority    bool              `json:"isLowPriority"`
+	IsTemplateDryRun bool              `json:"isTemplateDryRun"`
+}
+
+// JobStatusValue represent job status
+type JobStatusValue string
+
+const (
+	JobStatusUnknown   JobStatusValue = "Unknown"
+	JobStatusPending   JobStatusValue = "Pending"
+	JobStatusQueued    JobStatusValue = "Queued"
+	JobStatusStarted   JobStatusValue = "Started"
+	JobStatusValidated JobStatusValue = "Validated"
+	JobStatusExecuting JobStatusValue = "Executing"
+	JobStatusCompleted JobStatusValue = "Completed"
+	JobStatusStopping  JobStatusValue = "Stopping"
+	JobStatusWait4Cls  JobStatusValue = "Waiting for Cluster"
+	JobStatusForceStop JobStatusValue = "Force Stop"
+	JobStatusWaitQueue JobStatusValue = "Waiting for Queue"
+)
+
 // JobStatus defines the status of a Rescale job
 type JobStatus struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID           string         `json:"id"`
+	JobID        string         `json:"jobId"`
+	Status       JobStatusValue `json:"status"`
+	StatusReason *string        `json:"statusReason"`
+	StatusDate   *time.Time     `json:"statusDate"`
+}
+
+// JobStatuses defines the status of a Rescale job
+type JobStatuses struct {
+	Count   int          `json:"count"`
+	Results []*JobStatus `json:"results"`
+}
+
+func (job *JobStatuses) Sort() {
+	sort.Slice(job.Results, func(i, j int) bool {
+		if job.Results[i].StatusDate == nil || job.Results[j].StatusDate == nil {
+			return false
+		}
+		tj := *job.Results[j].StatusDate
+		return tj.Before(*job.Results[i].StatusDate)
+	})
 }

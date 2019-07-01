@@ -146,6 +146,44 @@ func BuildSingularityImage(jobID, authConfig, builder string) (*string, error) {
 	return swag.String(filepath.Join(dir, sImgName)), nil
 }
 
+// ConvertToSingularityImage converts a docker image to a singularity image
+func ConvertToSingularityImage(ID, name string) (*string, error) {
+	ctx := context.Background()
+	pullDoc2SingularityImage(ctx)
+
+	sImgName := fmt.Sprintf("%s-%d.simg", sImgNm.ReplaceAllString(name, "-"), time.Now().Unix())
+	cmds := []string{"--name", sImgName, name}
+	cfg := &container.Config{
+		Image: config.Config.DocToSinImg,
+		Cmd:   strslice.StrSlice(cmds),
+	}
+	dir := filepath.Join(config.Config.SingImgContainerDir, ID)
+	if err := os.MkdirAll(dir, 0755); err != nil { // nolint
+		return nil, err
+	}
+	mounts := []mount.Mount{
+		mount.Mount{
+			Type:   mount.TypeBind,
+			Source: filepath.Join(config.Config.SingImgHostPath, ID),
+			Target: "/output",
+		},
+		mount.Mount{
+			Type:   mount.TypeBind,
+			Source: "/var/run/docker.sock",
+			Target: "/var/run/docker.sock",
+		},
+	}
+	host := &container.HostConfig{
+		Privileged: true,
+		Mounts:     mounts,
+	}
+	name = fmt.Sprintf("build-singularity-image-%d", time.Now().Unix())
+	if _, err := RunAndWaitDockerContainer(ctx, name, cfg, host, nil); err != nil {
+		return nil, err
+	}
+	return swag.String(filepath.Join(dir, sImgName)), nil
+}
+
 func pullSingularityImage(ctx context.Context) error {
 	cli, err := docker.NewEnvClient()
 	if err != nil {
@@ -154,6 +192,22 @@ func pullSingularityImage(ctx context.Context) error {
 	defer cli.Close()
 
 	reader, err := cli.ImagePull(ctx, config.Config.SingImg, types.ImagePullOptions{})
+	if err != nil {
+		return err
+	}
+	defer reader.Close()
+	io.Copy(ioutil.Discard, reader) // wait for its done
+	return nil
+}
+
+func pullDoc2SingularityImage(ctx context.Context) error {
+	cli, err := docker.NewEnvClient()
+	if err != nil {
+		return err
+	}
+	defer cli.Close()
+
+	reader, err := cli.ImagePull(ctx, config.Config.DocToSinImg, types.ImagePullOptions{})
 	if err != nil {
 		return err
 	}

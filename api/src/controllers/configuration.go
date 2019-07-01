@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"context"
 	"encoding/base64"
 	"fmt"
 	"net/http"
@@ -129,6 +128,7 @@ func postConfigurations(params app.PostConfigurationsParams) middleware.Responde
 	creds.Base.UseRescale = isFilled(creds.Base.RescaleKey)
 
 	eg := errgroup.Group{}
+	ctx := params.HTTPRequest.Context()
 
 	// Check if you can access to docker registry
 	eg.Go(func() error {
@@ -179,7 +179,7 @@ func postConfigurations(params app.PostConfigurationsParams) middleware.Responde
 		}
 		defer cli.Close()
 
-		res, e4 := cli.RegistryLogin(context.Background(), types.AuthConfig{
+		res, e4 := cli.RegistryLogin(ctx, types.AuthConfig{
 			ServerAddress: config.Config.NgcRegistryHostName,
 			Username:      config.Config.NgcRegistryUserName,
 			Password:      creds.Base.NgcApikey,
@@ -221,7 +221,7 @@ func postConfigurations(params app.PostConfigurationsParams) middleware.Responde
 		}
 		rescale.SetEndpoint(creds.Base.RescalePlatform)
 		rescale.EnableCache(false)
-		coretypes, err := rescale.CoreTypes(creds.Base.RescaleKey, nil, nil)
+		coretypes, err := rescale.CoreTypes(ctx, creds.Base.RescaleKey, nil, nil)
 		if err != nil {
 			return xerrors.Errorf("[Rescale API Key] %s", err.Error())
 		}

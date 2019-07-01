@@ -58,6 +58,7 @@ type config struct { // nolint:maligned
 	WorkspaceHostDir       string   `envconfig:"WORKSPACE_HOST_DIR"`
 	WorkspaceContainerDir  string   `envconfig:"WORKSPACE_CNTR_DIR" default:"/tmp/work"`
 	SingImg                string   `envconfig:"SINGULARITY_IMAGE" default:"scaleshift/singularity:3.2"`
+	DocToSinImg            string   `envconfig:"SINGULARITY_IMAGE" default:"scaleshift/singularity:2.6-d2s"`
 	SingImgHostPath        string   `envconfig:"SINGULARITY_HOST_DIR"`
 	SingImgContainerDir    string   `envconfig:"SINGULARITY_CNTR_DIR" default:"/tmp/simg"`
 }
