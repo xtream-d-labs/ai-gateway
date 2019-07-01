@@ -9,7 +9,6 @@ js = "images/index.js"
     <div class="row">
       <div class="col s12" style="min-height: 182px;">
         <h5 class="light grey-text text-darken-2">Local Images</h5>
-
         <div style="position: absolute;top: 60px;right: 45px;z-index: 1001;">
           <div style="margin: -5px 7px 0 0;text-align: right;">
             <a id="act-pull" href="#">Download a new image</a>
@@ -25,7 +24,6 @@ js = "images/index.js"
             </div>
           </div>
           <div class="clear-both"></div>
-
           <div class="row">
             <div class="col s3">
               <div style="margin: 5px 0 0 2px;line-height: 3rem;">
@@ -44,7 +42,6 @@ js = "images/index.js"
               </div>
             </div>
           </div>
-
         </form>
       </div>
     </div>
@@ -54,9 +51,8 @@ js = "images/index.js"
     <div class="row">
       <div class="col s12" style="margin-bottom: 15px;">
         <div id="data">
-
           <ul class="collapsible" data-collapsible="accordion">
-            <li v-for="image in images" :key="image.id" :data-id="image.id" >
+            <li v-for="image in images" :key="image.id + '-' + image.tag" :data-id="image.id" >
               <div class="collapsible-header row" style="padding: 13px 0 10px 0;">
                 <div class="col-5 image-tags">
                   <i class="material-icons">layers</i>
@@ -71,11 +67,9 @@ js = "images/index.js"
               </div>
             </li>
           </ul>
-
         </div>
       </div>
     </div>
-
   </section>
 </main>
 
@@ -88,7 +82,7 @@ js = "images/index.js"
       <form class="input-field" autocomplete="off" v-on:submit.prevent>
         <p>You can use any docker images which contains Python & pip.</p>
         <input type="text" class="form-control" required style="font-size: 1.7rem;"
-               placeholder="tensorflow/tensorflow:1.13.1-py3"
+               placeholder="tensorflow/tensorflow:1.14.0-py3"
                v-model="name" v-on:input="$v.name.$touch" v-on:change="nameChanged"
                v-bind:class="{invalid: $v.name.$error, valid: $v.name.$dirty && !$v.name.$invalid}" />
         <p class="errors"><transition name="fade">

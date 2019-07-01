@@ -7,21 +7,29 @@ import (
 	"time"
 
 	"github.com/dgraph-io/badger"
+	"github.com/go-openapi/swag"
+	"github.com/rescale-labs/scaleshift/api/src/generated/models"
 )
 
 // Image state
 const (
-	StableImage   = "stable"
-	PullingImage  = "pulling"
-	BuildingImage = "building"
-	BuildingJob   = "building-job"
-	PushingJob    = "pushing-job"
-	KubernetesJob = "k8s-job"
-	K8sJobStart   = "k8s-job-start"
-	K8sJobEnd     = "k8s-job-end"
-	RescaleSend   = "rescale-send"
-	RescaleStart  = "rescale-start"
-	RescaleEnd    = "rescale-end"
+	StableImage    = "stable"   // Normal docker images
+	PullingImage   = "pulling"  // Pull a specified image
+	BuildingImage  = "building" // Build a Jupyter notebook image
+	BuildingJob    = "building-job"
+	PushingJob     = "pushing-job"
+	KubernetesJob  = "k8s-job"
+	K8sJobStart    = "k8s-job-start"
+	K8sJobPending  = "k8s-job-pending"
+	K8sJobRunning  = "k8s-job-runnning"
+	K8sSucceeded   = "k8s-job-succeeded"
+	K8sFailed      = "k8s-job-failed"
+	RescaleSend    = "rescale-send"
+	RescaleStart   = "rescale-start"
+	RescaleRunning = "rescale-runnning"
+	RescaleSucceed = "rescale-succeeded"
+	RescaleFailed  = "rescale-failed"
+	StatusUnknown  = "unknown"
 )
 
 // Image represents cached image information
@@ -39,6 +47,13 @@ const (
 	PlatformRescale
 )
 
+func (p PlatformType) String() string {
+	if p == PlatformKubernetes {
+		return models.JobPlatformKubernetes
+	}
+	return models.JobPlatformRescale
+}
+
 // Job represents cached job information
 type Job struct {
 	Platform    PlatformType
@@ -54,6 +69,7 @@ type Job struct {
 	CoreType    string
 	Cores       int64
 	Started     time.Time
+	TargetID    string // Job ID of the target platform
 }
 
 // GetPullingImages are images under PULLING state
@@ -145,8 +161,18 @@ func RemoveBuildingJobImagesJobs(ID string) error {
 	return removeJob(BuildingJobStoreKey, ID)
 }
 
+// RemovePushingJobImageJobs removes job
+func RemovePushingJobImageJobs(ID string) error {
+	return removeJob(PushingJobStoreKey, ID)
+}
+
 // UpdateJob update job status
 func UpdateJob(ID, from, to, status string) error {
+	return UpdateJobDetail(ID, from, to, status, nil)
+}
+
+// UpdateJobDetail update job status and targetID
+func UpdateJobDetail(ID, from, to, status string, targetID *string) error {
 	return SetValue(func(txn *badger.Txn) error {
 		jobs, err := getCachedJobs(txn, from)
 		if err != nil {
@@ -158,6 +184,9 @@ func UpdateJob(ID, from, to, status string) error {
 			if strings.EqualFold(ID, job.ID) {
 				target = job
 				target.Status = status
+				if targetID != nil {
+					target.TargetID = swag.StringValue(targetID)
+				}
 			} else {
 				remains = append(remains, job)
 			}
@@ -189,9 +218,15 @@ func UpdateJob(ID, from, to, status string) error {
 	})
 }
 
-// RemoveRescaleJob removes a job you specified
-func RemoveRescaleJob(ID string) error {
-	return removeJob(RescaleJobStoreKey, ID)
+// RemoveJob removes a job you specified
+func RemoveJob(ID string) error {
+	if err := removeJob(KubernetesJobStoreKey, ID); err != nil {
+		return err
+	}
+	if err := removeJob(RescaleJobStoreKey, ID); err != nil {
+		return err
+	}
+	return nil
 }
 
 // Cache keys

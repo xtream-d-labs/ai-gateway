@@ -92,11 +92,10 @@ js = "tasks/index.js"
                   <div class="row"><div class="col-12" style="margin-bottom: 20px;">
                     <h6>Actions</h6>
                     <div style="margin: 20px 0 5px 7px;">
-                      <span v-if="job.status != 'done'">-</span>
-                      <!-- <a class="waves-effect waves-light btn red lighten-2 act-stop" tabindex="0"
-                        v-if="job.status == 'running'">stop</a> -->
+                      <a class="waves-effect waves-light btn red lighten-2 act-stop" tabindex="0"
+                        v-if="job.status == 'running'" v-on:click="stop">stop</a>
                       <a class="waves-effect waves-light btn red lighten-2 act-delete" tabindex="0"
-                        v-if="job.status == 'done'" v-on:click="del">delete</a>
+                        v-if="job.status != 'running'" v-on:click="del">delete</a>
                     </div>
                   </div></div>
                 </div>
@@ -105,9 +104,11 @@ js = "tasks/index.js"
                     <h6>Properties</h6>
                     <table class="table highlight">
                       <tbody>
-                        <tr><td>task id:</td><td>{{ job.id }}</td></tr>
-                        <tr><td>mounted volumes:</td><td v-html="job.mounts"></td></tr>
-                        <tr><td>started time:</td><td>{{ job.started }}</td></tr>
+                        <tr><td>Platform:</td><td>{{ job.platform }}</td></tr>
+                        <tr><td>Task id:</td><td>{{ job.id }}</td></tr>
+                        <tr><td>Copied volumes:</td><td v-html="job.mounts"></td></tr>
+                        <tr><td>Started time:</td><td>{{ job.started }}</td></tr>
+                        <tr><td>Ended time:</td><td>{{ job.ended }}</td></tr>
                       </tbody>
                     </table>
                   </div>

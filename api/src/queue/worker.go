@@ -1,32 +1,23 @@
 package queue
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
-	"mime/multipart"
-	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	docker "docker.io/go-docker"
 	"docker.io/go-docker/api/types"
 	"github.com/go-openapi/swag"
 	"github.com/rescale-labs/scaleshift/api/src/config"
 	"github.com/rescale-labs/scaleshift/api/src/db"
+	"github.com/rescale-labs/scaleshift/api/src/kubernetes"
 	"github.com/rescale-labs/scaleshift/api/src/lib"
 	"github.com/rescale-labs/scaleshift/api/src/log"
 	"github.com/rescale-labs/scaleshift/api/src/rescale"
-	batchV1 "k8s.io/api/batch/v1"
-	coreV1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 func init() {
@@ -189,7 +180,7 @@ func worker(name string) (err error) {
 		workdir := lib.DetectImageWorkDir(ctx, swag.StringValue(wrappedImage))
 		ID, e1 := lib.RunJupyterNotebook(ctx, j.Arg1, swag.StringValue(wrappedImage), j.Arg3, workdir)
 		if e1 != nil {
-			log.Error("Worker failed at RunJupyterNotebook", err, nil)
+			log.Error("Worker failed at RunJupyterNotebook", e1, nil)
 			return e1
 		}
 		if err = db.RemoveBuildingImage(j.Arg1); err != nil {
@@ -205,7 +196,7 @@ func worker(name string) (err error) {
 		// Arg4: KubernetesConfig
 		name, e2 := lib.BuildJobImage(ctx, j.Arg1, j.Arg3)
 		if e2 != nil {
-			log.Error("Worker failed at BuildJobImage", err, nil)
+			log.Error("Worker failed at BuildJobImage", e2, nil)
 			return e2
 		}
 		err = db.UpdateJob(j.Arg1, db.BuildingJobStoreKey, db.PushingJobStoreKey, db.PushingJob)
@@ -257,51 +248,10 @@ func worker(name string) (err error) {
 		// Arg3: KubernetesConfig
 		job, e3 := db.GetJob(j.Arg1)
 		if e3 != nil {
-			log.Error("Worker failed at GetJob@actionApplyK8s", err, nil)
+			log.Error("Worker failed at GetJob@actionApplyK8s", e3, nil)
 			return e3
 		}
-		// Apply a k8s job
-		config, e4 := clientcmd.RESTConfigFromKubeConfig([]byte(j.Arg3))
-		if e4 != nil {
-			return e4
-		}
-		clientset, e5 := kubernetes.NewForConfig(config)
-		if e5 != nil {
-			return e5
-		}
-		pod := coreV1.PodTemplateSpec{
-			Spec: coreV1.PodSpec{
-				Containers: []coreV1.Container{
-					coreV1.Container{
-						Name:  "main",
-						Image: j.Arg2,
-						Resources: coreV1.ResourceRequirements{
-							Requests: coreV1.ResourceList{
-								"cpu": resource.MustParse(fmt.Sprintf("%d", job.CPU)),
-							},
-						},
-					},
-				},
-				RestartPolicy: coreV1.RestartPolicyNever,
-			},
-		}
-		if job.GPU > 0 {
-			// https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/
-			pod.Spec.Containers[0].Resources.Limits = coreV1.ResourceList{
-				"nvidia.com/gpu": resource.MustParse(fmt.Sprintf("%d", job.GPU)),
-			}
-		}
-		_, err = clientset.BatchV1().Jobs("default").Create(&batchV1.Job{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: fmt.Sprintf("job-%s", time.Now().Format("060102150405")),
-			},
-			Spec: batchV1.JobSpec{
-				Completions:  swag.Int32(1),
-				Parallelism:  swag.Int32(1),
-				BackoffLimit: swag.Int32(1),
-				Template:     pod,
-			},
-		})
+		err = kubernetes.CreateJob(j.Arg3, j.Arg1, "default", j.Arg2, job.CPU, job.GPU)
 		if err != nil {
 			return err
 		}
@@ -321,10 +271,15 @@ func worker(name string) (err error) {
 		// Arg2: DockerCredential
 		// Arg3: RescaleConfig
 		// Arg4: BuildersName
-		simg, err := lib.BuildSingularityImage(j.Arg1, j.Arg2, j.Arg4)
-		if err != nil {
-			log.Error("Worker failed at BuildSingularityImage", err, nil)
-			return err
+		name, e4 := lib.BuildJobImage(ctx, j.Arg1, j.Arg4)
+		if e4 != nil {
+			log.Error("Worker failed at BuildJobImage", e4, nil)
+			return e4
+		}
+		simg, e5 := lib.ConvertToSingularityImage(j.Arg1, swag.StringValue(name))
+		if e5 != nil {
+			log.Error("Worker failed at BuildSingularityImage", e5, nil)
+			return e5
 		}
 		err = db.UpdateJob(j.Arg1, db.BuildingJobStoreKey, db.RescaleJobStoreKey, db.RescaleSend)
 		if err != nil {
@@ -349,12 +304,7 @@ func worker(name string) (err error) {
 			return err
 		}
 		// Upload the singularity image
-		body, contentType, err := loadSingularityFile(j.Arg3)
-		if err != nil {
-			log.Error("Worker failed at loadSingularityFile@SendRescaleJob", err, nil)
-			return err
-		}
-		meta, err := rescale.Upload(j.Arg2, body, contentType)
+		meta, err := rescale.Upload(ctx, j.Arg2, j.Arg3)
 		if err != nil {
 			log.Error("Worker failed at Upload@SendRescaleJob", err, nil)
 			return err
@@ -386,24 +336,25 @@ func worker(name string) (err error) {
 			IsLowPriority:    false,
 			IsTemplateDryRun: false,
 		}
-		jobID, err := rescale.CreateJob(j.Arg2, input)
+		jobID, err := rescale.CreateJob(ctx, j.Arg2, input)
 		if err != nil {
 			log.Error("Worker failed at CreateJob@SendRescaleJob", err, nil)
 			return err
 		}
 		// Submit the job
-		_, err = rescale.Submit(j.Arg2, swag.StringValue(jobID))
+		_, err = rescale.Submit(ctx, j.Arg2, swag.StringValue(jobID))
 		if err != nil {
 			log.Error("Worker failed at Submit@SendRescaleJob", err, nil)
 			return err
 		}
 		// Change this job's status
-		err = db.UpdateJob(j.Arg1, db.RescaleJobStoreKey, db.RescaleJobStoreKey, db.RescaleStart)
+		err = db.UpdateJobDetail(j.Arg1, db.RescaleJobStoreKey, db.RescaleJobStoreKey, db.RescaleStart, jobID)
 		if err != nil {
 			log.Error("Worker failed at UpdateJob@SendRescaleJob", err, nil)
 			return err
 		}
 		log.Debug("Job submitted!", nil, &log.Map{
+			"ID":   jobID,
 			"file": meta.ID,
 			"cmds": job.Commands,
 			"core": job.CoreType,
@@ -424,10 +375,16 @@ func fallback(name string) error {
 		return db.RemovePullingImage(j.Arg1)
 	case actionWrapJupyter:
 		return db.RemoveBuildingImage(j.Arg1)
+	case actionBuildJobImg:
+		return db.RemoveBuildingJobImagesJobs(j.Arg1)
+	case actionPushJobImg:
+		return db.RemovePushingJobImageJobs(j.Arg1)
+	case actionApplyK8s:
+		return db.RemoveJob(j.Arg1)
 	case actionSingularity:
 		return db.RemoveBuildingJobImagesJobs(j.Arg1)
 	case actionSendRescale:
-		return db.RemoveRescaleJob(j.Arg1)
+		return db.RemoveJob(j.Arg1)
 	}
 	return nil
 }
@@ -460,26 +417,4 @@ func pullImage(ctx context.Context, imageName, authConfig string) error {
 		return err
 	}
 	return db.RemovePullingImage(imageName)
-}
-
-func loadSingularityFile(path string) (*bytes.Buffer, string, error) {
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile("file", filepath.Base(path))
-	if err != nil {
-		return nil, "", err
-	}
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, "", err
-	}
-	defer file.Close()
-
-	if _, err = io.Copy(part, file); err != nil {
-		return nil, "", err
-	}
-	if err = writer.Close(); err != nil {
-		return nil, "", err
-	}
-	return body, writer.FormDataContentType(), nil
 }

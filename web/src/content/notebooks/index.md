@@ -99,10 +99,10 @@ js = "notebooks/index.js"
                     <h6>Properties</h6>
                     <table class="table highlight">
                       <tbody>
-                        <tr><td>container name:</td><td class="notebook-name"></td></tr>
-                        <tr><td>started time:</td><td class="notebook-started"></td></tr>
-                        <tr><td>ended time:</td><td class="notebook-ended"></td></tr>
-                        <tr><td>mounted volumes:</td><td class="notebook-volumes"></td></tr>
+                        <tr><td>Container name:</td><td class="notebook-name"></td></tr>
+                        <tr><td>Started time:</td><td class="notebook-started"></td></tr>
+                        <tr><td>Ended time:</td><td class="notebook-ended"></td></tr>
+                        <tr><td>Mounted volumes:</td><td class="notebook-volumes"></td></tr>
                       </tbody>
                     </table>
                   </div></div>

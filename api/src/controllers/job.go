@@ -19,9 +19,11 @@ import (
 	"github.com/rescale-labs/scaleshift/api/src/generated/models"
 	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations"
 	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations/job"
+	"github.com/rescale-labs/scaleshift/api/src/kubernetes"
 	"github.com/rescale-labs/scaleshift/api/src/lib"
 	"github.com/rescale-labs/scaleshift/api/src/log"
 	"github.com/rescale-labs/scaleshift/api/src/queue"
+	"github.com/rescale-labs/scaleshift/api/src/rescale"
 )
 
 func jobRoute(api *operations.ScaleShiftAPI) {
@@ -37,14 +39,51 @@ func getJobs(params job.GetJobsParams, principal *auth.Principal) middleware.Res
 
 	payload := []*models.Job{}
 	if jobs, err := db.GetJobs(); err == nil {
-		for _, job := range jobs {
+		for _, j := range jobs {
+			status := swag.String(j.Status)
+			var ended time.Time
+
+			switch j.Status {
+			case db.K8sJobStart:
+				status, err = kubernetes.PodStatus(creds.Base.K8sConfig, j.TargetID, "default")
+				if err != nil {
+					log.Debug("Kubernetes Status", err, nil)
+					status = swag.String(db.StatusUnknown)
+				}
+			case db.RescaleStart:
+				candidate, e := rescale.Status(ctx, creds.Base.RescaleKey, j.TargetID)
+				if e != nil {
+					log.Debug("Rescale Status", e, nil)
+					status = swag.String(db.StatusUnknown)
+				}
+				switch candidate.Status {
+				case rescale.JobStatusPending, rescale.JobStatusQueued,
+					rescale.JobStatusWait4Cls, rescale.JobStatusWaitQueue:
+					status = swag.String(db.RescaleStart)
+				case rescale.JobStatusStarted, rescale.JobStatusValidated,
+					rescale.JobStatusExecuting:
+					status = swag.String(db.RescaleRunning)
+				case rescale.JobStatusCompleted:
+					status = swag.String(db.RescaleSucceed)
+					if candidate.StatusDate != nil {
+						ended = *candidate.StatusDate
+					}
+				case rescale.JobStatusStopping, rescale.JobStatusForceStop:
+					status = swag.String(db.RescaleFailed)
+					if candidate.StatusDate != nil {
+						ended = *candidate.StatusDate
+					}
+				}
+			}
 			payload = append(payload, &models.Job{
-				ID:       swag.String(job.ID),
-				Status:   job.Status,
-				Image:    job.DockerImage,
-				Mounts:   job.Workspaces,
-				Commands: job.Commands,
-				Started:  strfmt.DateTime(job.Started),
+				ID:       swag.String(j.ID),
+				Platform: j.Platform.String(),
+				Status:   swag.StringValue(status),
+				Image:    j.DockerImage,
+				Mounts:   j.Workspaces,
+				Commands: j.Commands,
+				Started:  strfmt.DateTime(j.Started),
+				Ended:    strfmt.DateTime(ended),
 			})
 		}
 	}
@@ -189,9 +228,26 @@ func postNewJob(params job.PostNewJobParams, principal *auth.Principal) middlewa
 }
 
 func modifyJob(params job.ModifyJobParams, principal *auth.Principal) middleware.Responder {
+	ctx := params.HTTPRequest.Context()
+
+	j, err := db.GetJob(params.ID)
+	if err != nil {
+		log.Error("GetJob@modifyJob", err, nil)
+		code := http.StatusBadRequest
+		return job.NewModifyJobDefault(code).WithPayload(newerror(code))
+	}
 	switch params.Body.Status { // nolint:gocritic
 	case models.ModifyJobParamsBodyStatusStopped:
-		// TODO implement
+		switch j.Status {
+		case db.K8sJobStart:
+			// There is no proper method
+		case db.RescaleStart:
+			if _, e := rescale.Stop(ctx, config.Config.RescaleAPIToken, j.TargetID); e != nil {
+				log.Error("StopJob@modifyJob", e, nil)
+				code := http.StatusBadRequest
+				return job.NewModifyJobDefault(code).WithPayload(newerror(code))
+			}
+		}
 	}
 	return job.NewModifyJobOK()
 }
@@ -203,9 +259,20 @@ func deleteJob(params job.DeleteJobParams, principal *auth.Principal) middleware
 		code := http.StatusBadRequest
 		return job.NewDeleteJobDefault(code).WithPayload(newerror(code))
 	}
-	err = db.RemoveRescaleJob(j.ID)
+	switch j.Status {
+	case db.K8sJobStart:
+		// TODO
+		// if e := kubernetes.DeleteJob(config.Config.KubernetesConfig, j.ID, "default"); e != nil {
+		// 	log.Error("DeleteJob@deleteJob", e, nil)
+		// 	code := http.StatusBadRequest
+		// 	return job.NewModifyJobDefault(code).WithPayload(newerror(code))
+		// }
+	case db.RescaleStart:
+		// TODO
+	}
+	err = db.RemoveJob(j.ID)
 	if err != nil {
-		log.Error("RemoveRescaleJob@deleteJob", err, nil)
+		log.Error("RemoveJob@deleteJob", err, nil)
 		code := http.StatusInternalServerError
 		return job.NewDeleteJobDefault(code).WithPayload(newerror(code))
 	}
