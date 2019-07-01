@@ -74,6 +74,13 @@ returns training jobs on cloud
 ### Example
 ```javascript
 var ScaleShift = require('scale_shift');
+var defaultClient = ScaleShift.ApiClient.instance;
+
+// Configure API key authorization: api-authorizer
+var api-authorizer = defaultClient.authentications['api-authorizer'];
+api-authorizer.apiKey = 'YOUR API KEY';
+// Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
+//api-authorizer.apiKeyPrefix = 'Token';
 
 var apiInstance = new ScaleShift.JobApi();
 
@@ -96,7 +103,7 @@ This endpoint does not need any parameter.
 
 ### Authorization
 
-No authorization required
+[api-authorizer](../README.md#api-authorizer)
 
 ### HTTP request headers
 

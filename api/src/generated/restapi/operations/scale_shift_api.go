@@ -70,7 +70,7 @@ func NewScaleShiftAPI(spec *loads.Document) *ScaleShiftAPI {
 		ImageGetImagesHandler: image.GetImagesHandlerFunc(func(params image.GetImagesParams) middleware.Responder {
 			return middleware.NotImplemented("operation ImageGetImages has not yet been implemented")
 		}),
-		JobGetJobsHandler: job.GetJobsHandlerFunc(func(params job.GetJobsParams) middleware.Responder {
+		JobGetJobsHandler: job.GetJobsHandlerFunc(func(params job.GetJobsParams, principal *auth.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation JobGetJobs has not yet been implemented")
 		}),
 		RepositoryGetNgcImagesHandler: repository.GetNgcImagesHandlerFunc(func(params repository.GetNgcImagesParams, principal *auth.Principal) middleware.Responder {

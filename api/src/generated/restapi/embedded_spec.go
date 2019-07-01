@@ -269,6 +269,11 @@ func init() {
     },
     "/jobs": {
       "get": {
+        "security": [
+          {
+            "api-authorizer": []
+          }
+        ],
         "description": "returns training jobs on cloud\n",
         "tags": [
           "job"
@@ -1300,6 +1305,11 @@ func init() {
             "type": "string"
           }
         },
+        "ended": {
+          "description": "ended unix timestamp",
+          "type": "string",
+          "format": "date-time"
+        },
         "id": {
           "description": "Job ID",
           "type": "string"
@@ -1314,6 +1324,14 @@ func init() {
           "items": {
             "type": "string"
           }
+        },
+        "platform": {
+          "description": "platform",
+          "type": "string",
+          "enum": [
+            "kubernetes",
+            "rescale"
+          ]
         },
         "started": {
           "description": "started unix timestamp",
@@ -1810,6 +1828,11 @@ func init() {
     },
     "/jobs": {
       "get": {
+        "security": [
+          {
+            "api-authorizer": []
+          }
+        ],
         "description": "returns training jobs on cloud\n",
         "tags": [
           "job"
@@ -2724,6 +2747,11 @@ func init() {
             "type": "string"
           }
         },
+        "ended": {
+          "description": "ended unix timestamp",
+          "type": "string",
+          "format": "date-time"
+        },
         "id": {
           "description": "Job ID",
           "type": "string"
@@ -2738,6 +2766,14 @@ func init() {
           "items": {
             "type": "string"
           }
+        },
+        "platform": {
+          "description": "platform",
+          "type": "string",
+          "enum": [
+            "kubernetes",
+            "rescale"
+          ]
         },
         "started": {
           "description": "started unix timestamp",

@@ -447,6 +447,8 @@ paths:
       operationId: getJobs
       tags:
         - job
+      security:
+        - api-authorizer: []
       responses:
         '200':
           description: OK
@@ -968,6 +970,12 @@ definitions:
       id:
         description: Job ID
         type: string
+      platform:
+        description: platform
+        type: string
+        enum:
+          - kubernetes
+          - rescale
       status:
         description: the status of the job
         type: string
@@ -986,6 +994,10 @@ definitions:
           type: string
       started:
         description: started unix timestamp
+        type: string
+        format: date-time
+      ended:
+        description: ended unix timestamp
         type: string
         format: date-time
   Workspace:

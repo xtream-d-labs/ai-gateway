@@ -121,7 +121,7 @@
       var formParams = {
       };
 
-      var authNames = [];
+      var authNames = ['api-authorizer'];
       var contentTypes = ['application/json'];
       var accepts = ['application/json'];
       var returnType = [Job];

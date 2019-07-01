@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
+
 	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/go-openapi/errors"
@@ -20,6 +22,10 @@ type Job struct {
 	// the container labels
 	Commands []string `json:"commands"`
 
+	// ended unix timestamp
+	// Format: date-time
+	Ended strfmt.DateTime `json:"ended,omitempty"`
+
 	// Job ID
 	// Required: true
 	ID *string `json:"id"`
@@ -29,6 +35,10 @@ type Job struct {
 
 	// the container labels
 	Mounts []string `json:"mounts"`
+
+	// platform
+	// Enum: [kubernetes rescale]
+	Platform string `json:"platform,omitempty"`
 
 	// started unix timestamp
 	// Format: date-time
@@ -42,7 +52,15 @@ type Job struct {
 func (m *Job) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateEnded(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateID(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePlatform(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -56,9 +74,65 @@ func (m *Job) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Job) validateEnded(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Ended) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("ended", "body", "date-time", m.Ended.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *Job) validateID(formats strfmt.Registry) error {
 
 	if err := validate.Required("id", "body", m.ID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var jobTypePlatformPropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["kubernetes","rescale"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		jobTypePlatformPropEnum = append(jobTypePlatformPropEnum, v)
+	}
+}
+
+const (
+
+	// JobPlatformKubernetes captures enum value "kubernetes"
+	JobPlatformKubernetes string = "kubernetes"
+
+	// JobPlatformRescale captures enum value "rescale"
+	JobPlatformRescale string = "rescale"
+)
+
+// prop value enum
+func (m *Job) validatePlatformEnum(path, location string, value string) error {
+	if err := validate.Enum(path, location, value, jobTypePlatformPropEnum); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Job) validatePlatform(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Platform) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validatePlatformEnum("platform", "body", m.Platform); err != nil {
 		return err
 	}
 

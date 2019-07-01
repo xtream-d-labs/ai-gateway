@@ -55,6 +55,8 @@
 
 
 
+
+
   };
 
   /**
@@ -71,6 +73,9 @@
       if (data.hasOwnProperty('id')) {
         obj['id'] = ApiClient.convertToType(data['id'], 'String');
       }
+      if (data.hasOwnProperty('platform')) {
+        obj['platform'] = ApiClient.convertToType(data['platform'], 'String');
+      }
       if (data.hasOwnProperty('status')) {
         obj['status'] = ApiClient.convertToType(data['status'], 'String');
       }
@@ -86,6 +91,9 @@
       if (data.hasOwnProperty('started')) {
         obj['started'] = ApiClient.convertToType(data['started'], 'Date');
       }
+      if (data.hasOwnProperty('ended')) {
+        obj['ended'] = ApiClient.convertToType(data['ended'], 'Date');
+      }
     }
     return obj;
   }
@@ -95,6 +103,11 @@
    * @member {String} id
    */
   exports.prototype['id'] = undefined;
+  /**
+   * platform
+   * @member {module:model/Job.PlatformEnum} platform
+   */
+  exports.prototype['platform'] = undefined;
   /**
    * the status of the job
    * @member {String} status
@@ -120,7 +133,29 @@
    * @member {Date} started
    */
   exports.prototype['started'] = undefined;
+  /**
+   * ended unix timestamp
+   * @member {Date} ended
+   */
+  exports.prototype['ended'] = undefined;
 
+
+  /**
+   * Allowed values for the <code>platform</code> property.
+   * @enum {String}
+   * @readonly
+   */
+  exports.PlatformEnum = {
+    /**
+     * value: "kubernetes"
+     * @const
+     */
+    "kubernetes": "kubernetes",
+    /**
+     * value: "rescale"
+     * @const
+     */
+    "rescale": "rescale"  };
 
 
   return exports;

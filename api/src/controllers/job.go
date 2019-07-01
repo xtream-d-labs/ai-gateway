@@ -31,7 +31,10 @@ func jobRoute(api *operations.ScaleShiftAPI) {
 	api.JobDeleteJobHandler = job.DeleteJobHandlerFunc(deleteJob)
 }
 
-func getJobs(params job.GetJobsParams) middleware.Responder {
+func getJobs(params job.GetJobsParams, principal *auth.Principal) middleware.Responder {
+	creds := auth.FindCredentials(principal.Username)
+	ctx := params.HTTPRequest.Context()
+
 	payload := []*models.Job{}
 	if jobs, err := db.GetJobs(); err == nil {
 		for _, job := range jobs {
