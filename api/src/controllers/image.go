@@ -100,7 +100,7 @@ func postNewImage(params image.PostNewImageParams) middleware.Responder {
 	var cfg *types.AuthConfig
 	name := swag.StringValue(params.Body.Image)
 	if strings.HasPrefix(name, config.Config.DockerRegistryHostName) {
-		if sess, err := auth.RetriveSession(params.HTTPRequest); err == nil && sess != nil {
+		if sess, err := auth.RetrieveSession(params.HTTPRequest); err == nil && sess != nil {
 			creds := auth.FindCredentials(sess.DockerUsername)
 			cfg = &types.AuthConfig{
 				ServerAddress: config.Config.DockerRegistryHostName,
@@ -113,7 +113,7 @@ func postNewImage(params image.PostNewImageParams) middleware.Responder {
 		}
 	}
 	if strings.HasPrefix(name, config.Config.NgcRegistryHostName) {
-		if sess, err := auth.RetriveSession(params.HTTPRequest); err == nil && sess != nil {
+		if sess, err := auth.RetrieveSession(params.HTTPRequest); err == nil && sess != nil {
 			creds := auth.FindCredentials(sess.DockerUsername)
 			cfg = &types.AuthConfig{
 				ServerAddress: config.Config.NgcRegistryHostName,

@@ -136,7 +136,7 @@ func postNewNotebook(params notebook.PostNewNotebookParams) middleware.Responder
 		return notebook.NewPostNewNotebookDefault(code).WithPayload(newerror(code))
 	}
 	builder := "unknown"
-	if sess, err := auth.RetriveSession(params.HTTPRequest); err == nil && sess != nil {
+	if sess, err := auth.RetrieveSession(params.HTTPRequest); err == nil && sess != nil {
 		builder = sess.DockerUsername
 	}
 	if err := queue.SubmitBuildImageJob(name, id, workspace, wrappedImageID, builder); err != nil {

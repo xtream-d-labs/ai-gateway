@@ -68,7 +68,7 @@ func Wrap(handler http.Handler) http.Handler {
 			}
 			config.Config.Init()
 
-			if sess, err := auth.RetriveSession(r); err == nil && sess != nil {
+			if sess, err := auth.RetrieveSession(r); err == nil && sess != nil {
 				creds := auth.FindCredentials(sess.DockerUsername)
 				if !swag.IsZero(creds.Base.DockerRegistry) {
 					config.Config.DockerRegistryEndpoint = creds.Base.DockerRegistry

@@ -47,13 +47,13 @@ func (s *Session) ToJWT() (string, error) {
 	return jwt, e
 }
 
-// RetriveSession retrives the session itself from a HTTP request
-func RetriveSession(req *http.Request) (*Session, error) {
-	return RetriveOptionalSession(req, true)
+// RetrieveSession retrieves the session itself from a HTTP request
+func RetrieveSession(req *http.Request) (*Session, error) {
+	return retrieveOptionalSession(req, true)
 }
 
-// RetriveOptionalSession retrives the session itself from a HTTP request
-func RetriveOptionalSession(req *http.Request, checkValidationError bool) (*Session, error) {
+// retrieveOptionalSession retrieves the session itself from a HTTP request
+func retrieveOptionalSession(req *http.Request, checkValidationError bool) (*Session, error) {
 	data, jwtFound, err := retrieveDataFromJWT(req)
 
 	// JWT does not exist in the HTTP request

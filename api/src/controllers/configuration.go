@@ -34,7 +34,7 @@ func configRoute(api *operations.ScaleShiftAPI) {
 }
 
 func getConfigurations(params app.GetConfigurationsParams) middleware.Responder {
-	if sess, err := auth.RetriveSession(params.HTTPRequest); err == nil && sess != nil {
+	if sess, err := auth.RetrieveSession(params.HTTPRequest); err == nil && sess != nil {
 		creds := auth.FindCredentials(sess.DockerUsername)
 		return app.NewGetConfigurationsOK().WithPayload(&models.Configuration{
 			MustSignedIn:       config.MustSignInToDockerRegistry(),
@@ -83,7 +83,7 @@ func hideChars(value string, num int) string {
 
 func postConfigurations(params app.PostConfigurationsParams) middleware.Responder {
 	creds := auth.FindCredentials(params.Body.DockerUsername)
-	if sess, err := auth.RetriveSession(params.HTTPRequest); err == nil && sess != nil {
+	if sess, err := auth.RetrieveSession(params.HTTPRequest); err == nil && sess != nil {
 		creds = auth.FindCredentials(sess.DockerUsername)
 	}
 	creds.Base.MustSignedIn = config.MustSignInToDockerRegistry()
