@@ -44,6 +44,18 @@ func getImages(params image.GetImagesParams) middleware.Responder {
 		tags := []string{}
 		for _, tag := range image.RepoTags {
 			appendable := true
+			tobeSkippedImages := []string{
+				"scaleshift/",
+				config.Config.JupyterImageNamespace,
+				":ss-built",
+				"amazon-ecs-",
+				"<none>",
+			}
+			for _, ignore := range tobeSkippedImages {
+				if strings.Contains(strings.ToLower(tag), strings.ToLower(ignore)) {
+					appendable = false
+				}
+			}
 			for _, ignore := range config.Config.ImagesToBeIgnored {
 				if strings.Contains(strings.ToLower(tag), strings.ToLower(ignore)) {
 					appendable = false
