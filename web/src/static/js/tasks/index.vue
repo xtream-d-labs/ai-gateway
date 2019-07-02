@@ -49,6 +49,7 @@ var vue = new Vue({
           mounts:      mounts,
           status:      statusValue(job.status),
           statusMore:  statusMore(job.status),
+          link:        job.external_link ? job.external_link : '',
           started:     app.date.format(new Date(job.started)),
           ended:       ended,
           classObject: statusClass(job.status)
@@ -111,9 +112,9 @@ function statusMore(status) {
   case 'k8s-job':
   case 'rescale-send':
     return 'Sending files to the cloud';
+  case 'k8s-job-start':
   case 'k8s-job-pending':
     return 'The job is still pending';
-  case 'k8s-job-start':
   case 'k8s-job-runnning':
   case 'rescale-start':
   case 'rescale-runnning':
@@ -138,9 +139,9 @@ function statusOrder(status) {
     return 2;
   case 'k8s-job-start':
   case 'k8s-job-pending':
-  case 'rescale-start':
     return 3;
   case 'k8s-job-runnning':
+  case 'rescale-start':
   case 'rescale-runnning':
     return 4;
   case 'k8s-job-succeeded':
@@ -164,16 +165,16 @@ function statusClass(state) {
   case 'pushing-job':
   case 'k8s-job':
   case 'rescale-send':
-  case 'k8s-job-start':
-  case 'k8s-job-pending':
-  case 'rescale-start':
     return {
         'label-info':    false,
         'label-warning': true,
         'label-success': false,
         'label-danger':  false
     };
+  case 'k8s-job-start':
+  case 'k8s-job-pending':
   case 'k8s-job-runnning':
+  case 'rescale-start':
   case 'rescale-runnning':
     return {
         'label-info':    false,

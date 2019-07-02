@@ -57,6 +57,7 @@
 
 
 
+
   };
 
   /**
@@ -93,6 +94,9 @@
       }
       if (data.hasOwnProperty('ended')) {
         obj['ended'] = ApiClient.convertToType(data['ended'], 'Date');
+      }
+      if (data.hasOwnProperty('external_link')) {
+        obj['external_link'] = ApiClient.convertToType(data['external_link'], 'String');
       }
     }
     return obj;
@@ -138,6 +142,11 @@
    * @member {Date} ended
    */
   exports.prototype['ended'] = undefined;
+  /**
+   * A link to an external status page
+   * @member {String} external_link
+   */
+  exports.prototype['external_link'] = undefined;
 
 
   /**

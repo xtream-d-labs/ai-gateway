@@ -105,6 +105,9 @@ js = "tasks/index.js"
                     <table class="table highlight">
                       <tbody>
                         <tr><td>Platform:</td><td>{{ job.platform }}</td></tr>
+                        <tr v-if="job.link != ''"><td></td><td>
+                          <a v-bind:href='job.link' target="_blank">{{ job.link }}</a>
+                        </td></tr>
                         <tr><td>Task id:</td><td>{{ job.id }}</td></tr>
                         <tr><td>Copied volumes:</td><td v-html="job.mounts"></td></tr>
                         <tr><td>Started time:</td><td>{{ job.started }}</td></tr>
@@ -129,13 +132,13 @@ js = "tasks/index.js"
   </div>
   <div class="modal-footer row">
     <div class="col-12" style="margin: 15px 0 20px 0;">
-      <span>Is it okay to <span style="color:red;">{{ action }}</span> the following job?</span><br>
+      <span>Is it okay to <span style="color:red;">{{ action }}</span> the following task?</span><br>
       <strong style="font-weight: bold;font-size: 1.5rem;">{{ id }}</strong>
     </div>
     <div class="col-12">
       <a class="waves-effect waves-light btn cancel" tabindex="0" v-on:click="close">Cancel</a>
       <a class="waves-effect waves-light btn blue darken-1 delete" tabindex="0"
-         style="color: white !important;" v-on:click="exec">OK</a>
+         style="float: right;color: white !important;" v-on:click="exec">{{ action }}</a>
     </div>
   </div>
 </div>

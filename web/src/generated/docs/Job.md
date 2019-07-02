@@ -11,6 +11,7 @@ Name | Type | Description | Notes
 **commands** | **[String]** | the container labels | [optional] 
 **started** | **Date** | started unix timestamp | [optional] 
 **ended** | **Date** | ended unix timestamp | [optional] 
+**externalLink** | **String** | A link to an external status page | [optional] 
 
 
 <a name="PlatformEnum"></a>

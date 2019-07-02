@@ -1310,6 +1310,10 @@ func init() {
           "type": "string",
           "format": "date-time"
         },
+        "external_link": {
+          "description": "A link to an external status page",
+          "type": "string"
+        },
         "id": {
           "description": "Job ID",
           "type": "string"
@@ -2751,6 +2755,10 @@ func init() {
           "description": "ended unix timestamp",
           "type": "string",
           "format": "date-time"
+        },
+        "external_link": {
+          "description": "A link to an external status page",
+          "type": "string"
         },
         "id": {
           "description": "Job ID",

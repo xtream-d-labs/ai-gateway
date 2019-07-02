@@ -26,6 +26,9 @@ type Job struct {
 	// Format: date-time
 	Ended strfmt.DateTime `json:"ended,omitempty"`
 
+	// A link to an external status page
+	ExternalLink string `json:"external_link,omitempty"`
+
 	// Job ID
 	// Required: true
 	ID *string `json:"id"`

@@ -1000,6 +1000,9 @@ definitions:
         description: ended unix timestamp
         type: string
         format: date-time
+      external_link:
+        description: A link to an external status page
+        type: string
   Workspace:
     description: User's workspace
     required:

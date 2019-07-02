@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -41,6 +42,7 @@ func getJobs(params job.GetJobsParams, principal *auth.Principal) middleware.Res
 	if jobs, err := db.GetJobs(); err == nil {
 		for _, j := range jobs {
 			status := swag.String(j.Status)
+			var externalLink string
 			var ended time.Time
 
 			switch j.Status {
@@ -52,10 +54,13 @@ func getJobs(params job.GetJobsParams, principal *auth.Principal) middleware.Res
 				}
 			case db.RescaleStart:
 				candidate, e := rescale.Status(ctx, creds.Base.RescaleKey, j.TargetID)
-				if e != nil {
-					log.Debug("Rescale Status", e, nil)
-					status = swag.String(db.StatusUnknown)
+				if candidate == nil || e != nil {
+					break
 				}
+				externalLink = fmt.Sprintf(
+					"%s/jobs/%s/status/",
+					config.Config.RescaleEndpoint,
+					j.TargetID)
 				switch candidate.Status {
 				case rescale.JobStatusPending, rescale.JobStatusQueued,
 					rescale.JobStatusWait4Cls, rescale.JobStatusWaitQueue:
@@ -76,14 +81,15 @@ func getJobs(params job.GetJobsParams, principal *auth.Principal) middleware.Res
 				}
 			}
 			payload = append(payload, &models.Job{
-				ID:       swag.String(j.ID),
-				Platform: j.Platform.String(),
-				Status:   swag.StringValue(status),
-				Image:    j.DockerImage,
-				Mounts:   j.Workspaces,
-				Commands: j.Commands,
-				Started:  strfmt.DateTime(j.Started),
-				Ended:    strfmt.DateTime(ended),
+				ID:           swag.String(j.ID),
+				Platform:     j.Platform.String(),
+				Status:       swag.StringValue(status),
+				Image:        j.DockerImage,
+				Mounts:       j.Workspaces,
+				Commands:     j.Commands,
+				ExternalLink: externalLink,
+				Started:      strfmt.DateTime(j.Started),
+				Ended:        strfmt.DateTime(ended),
 			})
 		}
 	}
