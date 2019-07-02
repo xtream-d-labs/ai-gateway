@@ -176,7 +176,7 @@ func removeDockerContainer(ctx context.Context, cli *docker.Client, ID string) e
 }
 
 // BuildJobImage builds a docker image for the job
-func BuildJobImage(ctx context.Context, jobID, builder string) (*string, error) {
+func BuildJobImage(ctx context.Context, jobID, builder string, fqdnToPush bool) (*string, error) {
 	job, err := db.GetJob(jobID)
 	if err != nil {
 		return nil, err
@@ -226,13 +226,15 @@ func BuildJobImage(ctx context.Context, jobID, builder string) (*string, error) 
 
 	name := trimDockerTag.ReplaceAllString(job.DockerImage, "")
 	name = trimDockerLib.ReplaceAllString(name, "")
-	if !strings.HasPrefix(name, config.Config.DockerRegistryHostName) {
-		name = fmt.Sprintf(
-			"%s/%s/%s",
-			config.Config.DockerRegistryHostName,
-			builder,
-			name,
-		)
+	if fqdnToPush {
+		if !strings.HasPrefix(name, config.Config.DockerRegistryHostName) {
+			name = fmt.Sprintf(
+				"%s/%s/%s",
+				config.Config.DockerRegistryHostName,
+				builder,
+				name,
+			)
+		}
 	}
 	name = fmt.Sprintf(
 		"%s:%s-%s",

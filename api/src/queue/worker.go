@@ -45,7 +45,7 @@ func SubmitBuildImageJob(imageName, imageID, workspace, wrappedImageID, builderN
 		Arg2:   imageID,
 		Arg3:   workspace,
 		Arg4:   wrappedImageID,
-		Arg5:   builderName,
+		Arg5:   buildersName(builderName),
 	})
 	if err != nil {
 		return err
@@ -59,7 +59,7 @@ func BuildJobDockerImage(ID, dockerCredential, builderName, k8sConfig string) er
 		Action: actionBuildJobImg,
 		Arg1:   ID,
 		Arg2:   dockerCredential,
-		Arg3:   builderName,
+		Arg3:   buildersName(builderName),
 		Arg4:   k8sConfig,
 	})
 	if err != nil {
@@ -104,7 +104,7 @@ func BuildSingularityImageJob(ID, dockerCredential, rescaleConfig, builderName s
 		Arg1:   ID,
 		Arg2:   dockerCredential,
 		Arg3:   rescaleConfig,
-		Arg4:   builderName,
+		Arg4:   buildersName(builderName),
 	})
 	if err != nil {
 		return err
@@ -124,6 +124,13 @@ func SubmitToRescaleJob(ID, rescaleConfig, simg string) error {
 		return err
 	}
 	return db.Enqueue(string(bytes))
+}
+
+func buildersName(candidate string) string {
+	if candidate == "" {
+		return "unknown"
+	}
+	return candidate
 }
 
 type actionType int
@@ -194,7 +201,7 @@ func worker(name string) (err error) {
 		// Arg2: DockerCredential
 		// Arg3: BuildersName
 		// Arg4: KubernetesConfig
-		name, e2 := lib.BuildJobImage(ctx, j.Arg1, j.Arg3)
+		name, e2 := lib.BuildJobImage(ctx, j.Arg1, j.Arg3, true)
 		if e2 != nil {
 			log.Error("Worker failed at BuildJobImage", e2, nil)
 			return e2
@@ -204,8 +211,7 @@ func worker(name string) (err error) {
 			log.Error("Worker failed at UpdateJob@actionBuildJobImg", err, nil)
 			return err
 		}
-		err = PushJobDockerImage(j.Arg1, swag.StringValue(name), j.Arg2, j.Arg4)
-		if err != nil {
+		if err = PushJobDockerImage(j.Arg1, swag.StringValue(name), j.Arg2, j.Arg4); err != nil {
 			log.Error("Worker failed at PushJobDockerImage", err, nil)
 			return err
 		}
@@ -218,13 +224,11 @@ func worker(name string) (err error) {
 		// Arg2: ImageName
 		// Arg3: DockerCredential
 		// Arg4: KubernetesConfig
-		err = lib.PushJobImage(ctx, j.Arg2, j.Arg3)
-		if err != nil {
+		if err = lib.PushJobImage(ctx, j.Arg2, j.Arg3); err != nil {
 			log.Error("Worker failed at PushJobImage", err, nil)
 			return err
 		}
-		err = lib.DeleteImage(ctx, j.Arg2)
-		if err != nil {
+		if err = lib.DeleteImage(ctx, j.Arg2); err != nil {
 			log.Error("Worker failed at DeleteImage", err, nil)
 			return err
 		}
@@ -233,8 +237,7 @@ func worker(name string) (err error) {
 			log.Error("Worker failed at UpdateJob@actionPushJobImg", err, nil)
 			return err
 		}
-		err = ApplyKubernetesJob(j.Arg1, j.Arg2, j.Arg4)
-		if err != nil {
+		if err = ApplyKubernetesJob(j.Arg1, j.Arg2, j.Arg4); err != nil {
 			log.Error("Worker failed at ApplyKubernetesJob", err, nil)
 			return err
 		}
@@ -271,7 +274,7 @@ func worker(name string) (err error) {
 		// Arg2: DockerCredential
 		// Arg3: RescaleConfig
 		// Arg4: BuildersName
-		name, e4 := lib.BuildJobImage(ctx, j.Arg1, j.Arg4)
+		name, e4 := lib.BuildJobImage(ctx, j.Arg1, j.Arg4, false)
 		if e4 != nil {
 			log.Error("Worker failed at BuildJobImage", e4, nil)
 			return e4
@@ -281,19 +284,21 @@ func worker(name string) (err error) {
 			log.Error("Worker failed at BuildSingularityImage", e5, nil)
 			return e5
 		}
+		if err = lib.DeleteImage(ctx, swag.StringValue(name)); err != nil {
+			log.Error("Worker failed at DeleteImage", err, nil)
+			return err
+		}
 		err = db.UpdateJob(j.Arg1, db.BuildingJobStoreKey, db.RescaleJobStoreKey, db.RescaleSend)
 		if err != nil {
 			log.Error("Worker failed at UpdateJob", err, nil)
 			return err
 		}
-		err = SubmitToRescaleJob(j.Arg1, j.Arg3, swag.StringValue(simg))
-		if err != nil {
+		if err = SubmitToRescaleJob(j.Arg1, j.Arg3, swag.StringValue(simg)); err != nil {
 			log.Error("Worker failed at SubmitToRescaleJob", err, nil)
 			return err
 		}
-		log.Debug("Built Singularity Image!", nil, &log.Map{
-			"simg": swag.StringValue(simg),
-		})
+		log.Debug("Built Singularity Image!", nil, nil)
+
 	case actionSendRescale:
 		// Arg1: ID
 		// Arg2: RescaleConfig
@@ -342,8 +347,7 @@ func worker(name string) (err error) {
 			return err
 		}
 		// Submit the job
-		_, err = rescale.Submit(ctx, j.Arg2, swag.StringValue(jobID))
-		if err != nil {
+		if err = rescale.Submit(ctx, j.Arg2, swag.StringValue(jobID)); err != nil {
 			log.Error("Worker failed at Submit@SendRescaleJob", err, nil)
 			return err
 		}

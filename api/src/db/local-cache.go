@@ -220,6 +220,12 @@ func UpdateJobDetail(ID, from, to, status string, targetID *string) error {
 
 // RemoveJob removes a job you specified
 func RemoveJob(ID string) error {
+	if err := removeJob(BuildingJobStoreKey, ID); err != nil {
+		return err
+	}
+	if err := removeJob(PushingJobStoreKey, ID); err != nil {
+		return err
+	}
 	if err := removeJob(KubernetesJobStoreKey, ID); err != nil {
 		return err
 	}

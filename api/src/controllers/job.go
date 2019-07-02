@@ -248,10 +248,11 @@ func modifyJob(params job.ModifyJobParams, principal *auth.Principal) middleware
 		case db.K8sJobStart:
 			// There is no proper method
 		case db.RescaleStart:
-			if _, e := rescale.Stop(ctx, config.Config.RescaleAPIToken, j.TargetID); e != nil {
-				log.Error("StopJob@modifyJob", e, nil)
-				code := http.StatusBadRequest
-				return job.NewModifyJobDefault(code).WithPayload(newerror(code))
+			if e := rescale.Stop(ctx, config.Config.RescaleAPIToken, j.TargetID); e != nil {
+				log.Error("StopRescaleJob@modifyJob", e, nil)
+			}
+			if e := db.UpdateJob(j.ID, db.RescaleJobStoreKey, db.RescaleJobStoreKey, db.RescaleFailed); e != nil {
+				log.Error("UpdateJob@modifyJob", e, nil)
 			}
 		}
 	}
@@ -259,6 +260,8 @@ func modifyJob(params job.ModifyJobParams, principal *auth.Principal) middleware
 }
 
 func deleteJob(params job.DeleteJobParams, principal *auth.Principal) middleware.Responder {
+	ctx := params.HTTPRequest.Context()
+
 	j, err := db.GetJob(params.ID)
 	if err != nil {
 		log.Error("GetJob@deleteJob", err, nil)
@@ -273,8 +276,10 @@ func deleteJob(params job.DeleteJobParams, principal *auth.Principal) middleware
 		// 	code := http.StatusBadRequest
 		// 	return job.NewModifyJobDefault(code).WithPayload(newerror(code))
 		// }
-	case db.RescaleStart:
-		// TODO
+	case db.RescaleStart, db.RescaleRunning, db.RescaleSucceed, db.RescaleFailed:
+		if e := rescale.Delete(ctx, config.Config.RescaleAPIToken, j.TargetID); e != nil {
+			log.Error("DeleteRescaleJob@deleteJob", e, nil)
+		}
 	}
 	err = db.RemoveJob(j.ID)
 	if err != nil {

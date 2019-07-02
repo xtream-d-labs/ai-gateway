@@ -220,21 +220,18 @@ func CreateJob(ctx context.Context, token string, input JobInput) (*string, erro
 }
 
 // Submit submits a job
-func Submit(ctx context.Context, token, jobID string) (*string, error) {
+func Submit(ctx context.Context, token, jobID string) error {
 	headers := http.Header{}
 	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
-	resp, err := send(
+	_, err := send(
 		ctx,
 		http.MethodPost,
 		fmt.Sprintf("%s/jobs/%s/submit/", v3, jobID),
 		nil, nil, headers, 0)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	log.Debug("Rescale Submit", nil, &log.Map{
-		"body": string(resp),
-	})
-	return swag.String(string(resp)), nil
+	return nil
 }
 
 // Status retrieve the job status
@@ -262,37 +259,31 @@ func Status(ctx context.Context, token, jobID string) (*JobStatus, error) {
 }
 
 // Stop the specified job
-func Stop(ctx context.Context, token, jobID string) (*string, error) {
+func Stop(ctx context.Context, token, jobID string) error {
 	headers := http.Header{}
 	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
-	resp, err := send(
+	_, err := send(
 		ctx,
 		http.MethodPost,
 		fmt.Sprintf("%s/jobs/%s/stop/", v3, jobID),
 		nil, nil, headers, 0)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	log.Debug("Rescale Stop", nil, &log.Map{
-		"body": string(resp),
-	})
-	return swag.String(string(resp)), nil
+	return nil
 }
 
 // Delete the specified job
-func Delete(ctx context.Context, token, jobID string) (*string, error) {
+func Delete(ctx context.Context, token, jobID string) error {
 	headers := http.Header{}
 	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
-	resp, err := send(
+	_, err := send(
 		ctx,
 		http.MethodDelete,
 		fmt.Sprintf("%s/jobs/%s/", v3, jobID),
 		nil, nil, headers, 0)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	log.Debug("Rescale Delete", nil, &log.Map{
-		"body": string(resp),
-	})
-	return swag.String(string(resp)), nil
+	return nil
 }
