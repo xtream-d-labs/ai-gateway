@@ -55,43 +55,36 @@ func CreateJob(kubeConfig, jobID, namespace, imageName string, cpu, gpu int64) e
 	return e
 }
 
-// DeleteJob deletes the specified job
-func DeleteJob(kubeConfig, jobID, namespace string) error {
+// JobStatus returns status of the specified job
+func JobStatus(kubeConfig, jobID, namespace string) (*batchV1.JobStatus, error) {
 	clientset, e := client(kubeConfig)
 	if e != nil {
-		return e
+		return nil, e
 	}
 	name := fmt.Sprintf("job-%s", jobID)
-	if e = clientset.CoreV1().Pods(namespace).Delete(name, &metav1.DeleteOptions{
-		GracePeriodSeconds: swag.Int64(0),
-	}); e != nil {
-		return e
+	job, e := clientset.BatchV1().Jobs(namespace).Get(name, metav1.GetOptions{})
+	if e != nil {
+		return nil, e
 	}
-	return nil
+	return &job.Status, nil
 }
 
 // PodStatus returns status of the specified pod
-func PodStatus(kubeConfig, jobID, namespace string) (*string, error) {
+func PodStatus(kubeConfig, jobID, namespace string) (*coreV1.Pod, error) {
 	clientset, e := client(kubeConfig)
 	if e != nil {
 		return nil, e
 	}
-	name := fmt.Sprintf("job-%s", jobID)
-	pod, e := clientset.CoreV1().Pods(namespace).Get(name, metav1.GetOptions{})
+	pods, e := clientset.CoreV1().Pods(namespace).List(metav1.ListOptions{
+		LabelSelector: fmt.Sprintf("job-name=job-%s", jobID),
+	})
 	if e != nil {
 		return nil, e
 	}
-	switch pod.Status.Phase {
-	case coreV1.PodPending:
-		return swag.String(db.K8sJobPending), nil
-	case coreV1.PodRunning:
-		return swag.String(db.K8sJobRunning), nil
-	case coreV1.PodSucceeded:
-		return swag.String(db.K8sSucceeded), nil
-	case coreV1.PodFailed:
-		return swag.String(db.K8sFailed), nil
+	if len(pods.Items) == 0 {
+		return nil, fmt.Errorf("Not found")
 	}
-	return swag.String(db.StatusUnknown), nil
+	return &pods.Items[0], nil
 }
 
 // Logs retrieve the pod log
@@ -101,21 +94,25 @@ func Logs(kubeConfig, jobID, namespace string) (*string, error) {
 		return nil, e
 	}
 	name := fmt.Sprintf("job-%s", jobID)
-	pod, e := clientset.CoreV1().Pods(namespace).Get(name, metav1.GetOptions{})
-	if e != nil {
+	if _, e = clientset.CoreV1().Pods(namespace).Get(name, metav1.GetOptions{}); e != nil {
 		return nil, e
 	}
-	switch pod.Status.Phase {
-	case coreV1.PodPending:
-		return swag.String(db.K8sJobPending), nil
-	case coreV1.PodRunning:
-		return swag.String(db.K8sJobRunning), nil
-	case coreV1.PodSucceeded:
-		return swag.String(db.K8sSucceeded), nil
-	case coreV1.PodFailed:
-		return swag.String(db.K8sFailed), nil
-	}
 	return swag.String(db.StatusUnknown), nil
+}
+
+// DeleteJob deletes the specified job
+func DeleteJob(kubeConfig, jobID, namespace string) error {
+	clientset, e := client(kubeConfig)
+	if e != nil {
+		return e
+	}
+	name := fmt.Sprintf("job-%s", jobID)
+	if e = clientset.BatchV1().Jobs(namespace).Delete(name, &metav1.DeleteOptions{
+		GracePeriodSeconds: swag.Int64(0),
+	}); e != nil {
+		return e
+	}
+	return nil
 }
 
 func client(kubeConfig string) (*kubernetes.Clientset, error) {

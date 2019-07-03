@@ -25,6 +25,7 @@ import (
 	"github.com/rescale-labs/scaleshift/api/src/log"
 	"github.com/rescale-labs/scaleshift/api/src/queue"
 	"github.com/rescale-labs/scaleshift/api/src/rescale"
+	coreV1 "k8s.io/api/core/v1"
 )
 
 func jobRoute(api *operations.ScaleShiftAPI) {
@@ -47,21 +48,32 @@ func getJobs(params job.GetJobsParams, principal *auth.Principal) middleware.Res
 
 			switch j.Status {
 			case db.K8sJobStart:
-				status, err = kubernetes.PodStatus(creds.Base.K8sConfig, j.TargetID, "default")
-				if err != nil {
-					log.Debug("Kubernetes Status", err, nil)
+				k8sStatus, e := kubernetes.PodStatus(creds.Base.K8sConfig, j.ID, "default")
+				if k8sStatus == nil || e != nil {
+					break
+				}
+				switch k8sStatus.Status.Phase {
+				case coreV1.PodPending:
+					status = swag.String(db.K8sJobPending)
+				case coreV1.PodRunning:
+					status = swag.String(db.K8sJobRunning)
+				case coreV1.PodSucceeded:
+					status = swag.String(db.K8sSucceeded)
+				case coreV1.PodFailed:
+					status = swag.String(db.K8sFailed)
+				case coreV1.PodUnknown:
 					status = swag.String(db.StatusUnknown)
 				}
 			case db.RescaleStart:
-				candidate, e := rescale.Status(ctx, creds.Base.RescaleKey, j.TargetID)
-				if candidate == nil || e != nil {
+				rStatus, e := rescale.Status(ctx, creds.Base.RescaleKey, j.TargetID)
+				if rStatus == nil || e != nil {
 					break
 				}
 				externalLink = fmt.Sprintf(
 					"%s/jobs/%s/status/",
 					config.Config.RescaleEndpoint,
 					j.TargetID)
-				switch candidate.Status {
+				switch rStatus.Status {
 				case rescale.JobStatusPending, rescale.JobStatusQueued,
 					rescale.JobStatusWait4Cls, rescale.JobStatusWaitQueue:
 					status = swag.String(db.RescaleStart)
@@ -70,13 +82,13 @@ func getJobs(params job.GetJobsParams, principal *auth.Principal) middleware.Res
 					status = swag.String(db.RescaleRunning)
 				case rescale.JobStatusCompleted:
 					status = swag.String(db.RescaleSucceed)
-					if candidate.StatusDate != nil {
-						ended = *candidate.StatusDate
+					if rStatus.StatusDate != nil {
+						ended = *rStatus.StatusDate
 					}
 				case rescale.JobStatusStopping, rescale.JobStatusForceStop:
 					status = swag.String(db.RescaleFailed)
-					if candidate.StatusDate != nil {
-						ended = *candidate.StatusDate
+					if rStatus.StatusDate != nil {
+						ended = *rStatus.StatusDate
 					}
 				}
 			}
@@ -234,6 +246,7 @@ func postNewJob(params job.PostNewJobParams, principal *auth.Principal) middlewa
 }
 
 func modifyJob(params job.ModifyJobParams, principal *auth.Principal) middleware.Responder {
+	creds := auth.FindCredentials(principal.Username)
 	ctx := params.HTTPRequest.Context()
 
 	j, err := db.GetJob(params.ID)
@@ -248,7 +261,11 @@ func modifyJob(params job.ModifyJobParams, principal *auth.Principal) middleware
 		case db.K8sJobStart:
 			// There is no proper method
 		case db.RescaleStart:
-			if e := rescale.Stop(ctx, config.Config.RescaleAPIToken, j.TargetID); e != nil {
+			if swag.IsZero(creds.Base.RescaleKey) {
+				code := http.StatusForbidden
+				return job.NewModifyJobDefault(code).WithPayload(newerror(code))
+			}
+			if e := rescale.Stop(ctx, creds.Base.RescaleKey, j.TargetID); e != nil {
 				log.Error("StopRescaleJob@modifyJob", e, nil)
 			}
 			if e := db.UpdateJob(j.ID, db.RescaleJobStoreKey, db.RescaleJobStoreKey, db.RescaleFailed); e != nil {
@@ -260,6 +277,7 @@ func modifyJob(params job.ModifyJobParams, principal *auth.Principal) middleware
 }
 
 func deleteJob(params job.DeleteJobParams, principal *auth.Principal) middleware.Responder {
+	creds := auth.FindCredentials(principal.Username)
 	ctx := params.HTTPRequest.Context()
 
 	j, err := db.GetJob(params.ID)
@@ -269,15 +287,20 @@ func deleteJob(params job.DeleteJobParams, principal *auth.Principal) middleware
 		return job.NewDeleteJobDefault(code).WithPayload(newerror(code))
 	}
 	switch j.Status {
-	case db.K8sJobStart:
-		// TODO
-		// if e := kubernetes.DeleteJob(config.Config.KubernetesConfig, j.ID, "default"); e != nil {
-		// 	log.Error("DeleteJob@deleteJob", e, nil)
-		// 	code := http.StatusBadRequest
-		// 	return job.NewModifyJobDefault(code).WithPayload(newerror(code))
-		// }
+	case db.K8sJobStart, db.K8sJobPending, db.K8sJobRunning, db.K8sSucceeded, db.K8sFailed:
+		if swag.IsZero(creds.Base.K8sConfig) {
+			code := http.StatusForbidden
+			return job.NewDeleteJobDefault(code).WithPayload(newerror(code))
+		}
+		if e := kubernetes.DeleteJob(creds.Base.K8sConfig, j.ID, "default"); e != nil {
+			log.Error("DeleteKubernetesJob@deleteJob", e, nil)
+		}
 	case db.RescaleStart, db.RescaleRunning, db.RescaleSucceed, db.RescaleFailed:
-		if e := rescale.Delete(ctx, config.Config.RescaleAPIToken, j.TargetID); e != nil {
+		if swag.IsZero(creds.Base.RescaleKey) {
+			code := http.StatusForbidden
+			return job.NewDeleteJobDefault(code).WithPayload(newerror(code))
+		}
+		if e := rescale.Delete(ctx, creds.Base.RescaleKey, j.TargetID); e != nil {
 			log.Error("DeleteRescaleJob@deleteJob", e, nil)
 		}
 	}

@@ -92,10 +92,16 @@ js = "tasks/index.js"
                   <div class="row"><div class="col-12" style="margin-bottom: 20px;">
                     <h6>Actions</h6>
                     <div style="margin: 20px 0 5px 7px;">
+                      <!-- <a class="waves-effect waves-light btn blue darken-1" tabindex="0"
+                        v-if="job.status == 'done'"
+                        v-on:click="result">result</a>
+                      <span>&nbsp;</span> -->
                       <a class="waves-effect waves-light btn red lighten-2 act-stop" tabindex="0"
-                        v-if="job.status == 'running'" v-on:click="stop">stop</a>
+                        v-if="job.platform == 'rescale' && job.status == 'running'"
+                        v-on:click="stop">stop</a>
                       <a class="waves-effect waves-light btn red lighten-2 act-delete" tabindex="0"
-                        v-if="job.status != 'running'" v-on:click="del">delete</a>
+                        v-if="job.platform != 'rescale' || job.status != 'running'"
+                        v-on:click="del">delete</a>
                     </div>
                   </div></div>
                 </div>

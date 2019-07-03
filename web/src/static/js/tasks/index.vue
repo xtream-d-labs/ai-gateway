@@ -68,6 +68,9 @@ var vue = new Vue({
       }
       $('#record-count').text(formatted.length);
     },
+    result: function () {
+      // TODO
+    },
     stop: function (e) {
       confirmation.action = 'STOP';
       confirmation.id = app.trim($(e.target).closest('li').attr('data-id'));
@@ -266,7 +269,7 @@ function load(callback) {
 }
 
 $(document).ready(function () {
-  $('#menu-tasks').addClass('active');
+  $('#menu-tasks, #menu-training-tasks').addClass('active');
   if (app.query('q')) {
     $('#query-words').val(app.query('q')).focus();
   }
