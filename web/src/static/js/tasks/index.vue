@@ -68,8 +68,8 @@ var vue = new Vue({
       }
       $('#record-count').text(formatted.length);
     },
-    result: function () {
-      // TODO
+    result: function (e) {
+      window.location.href = '/results/?id='+app.trim($(e.target).closest('li').attr('data-id'));
     },
     stop: function (e) {
       confirmation.action = 'STOP';
@@ -269,7 +269,7 @@ function load(callback) {
 }
 
 $(document).ready(function () {
-  $('#menu-tasks, #menu-training-tasks').addClass('active');
+  $('#menu-tasks').addClass('active');
   if (app.query('q')) {
     $('#query-words').val(app.query('q')).focus();
   }

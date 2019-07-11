@@ -70,6 +70,15 @@ func NewScaleShiftAPI(spec *loads.Document) *ScaleShiftAPI {
 		ImageGetImagesHandler: image.GetImagesHandlerFunc(func(params image.GetImagesParams) middleware.Responder {
 			return middleware.NotImplemented("operation ImageGetImages has not yet been implemented")
 		}),
+		JobGetJobDetailHandler: job.GetJobDetailHandlerFunc(func(params job.GetJobDetailParams, principal *auth.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation JobGetJobDetail has not yet been implemented")
+		}),
+		JobGetJobFilesHandler: job.GetJobFilesHandlerFunc(func(params job.GetJobFilesParams, principal *auth.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation JobGetJobFiles has not yet been implemented")
+		}),
+		JobGetJobLogsHandler: job.GetJobLogsHandlerFunc(func(params job.GetJobLogsParams, principal *auth.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation JobGetJobLogs has not yet been implemented")
+		}),
 		JobGetJobsHandler: job.GetJobsHandlerFunc(func(params job.GetJobsParams, principal *auth.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation JobGetJobs has not yet been implemented")
 		}),
@@ -190,6 +199,12 @@ type ScaleShiftAPI struct {
 	NotebookGetIpythonNotebooksHandler notebook.GetIpythonNotebooksHandler
 	// ImageGetImagesHandler sets the operation handler for the get images operation
 	ImageGetImagesHandler image.GetImagesHandler
+	// JobGetJobDetailHandler sets the operation handler for the get job detail operation
+	JobGetJobDetailHandler job.GetJobDetailHandler
+	// JobGetJobFilesHandler sets the operation handler for the get job files operation
+	JobGetJobFilesHandler job.GetJobFilesHandler
+	// JobGetJobLogsHandler sets the operation handler for the get job logs operation
+	JobGetJobLogsHandler job.GetJobLogsHandler
 	// JobGetJobsHandler sets the operation handler for the get jobs operation
 	JobGetJobsHandler job.GetJobsHandler
 	// RepositoryGetNgcImagesHandler sets the operation handler for the get ngc images operation
@@ -325,6 +340,18 @@ func (o *ScaleShiftAPI) Validate() error {
 
 	if o.ImageGetImagesHandler == nil {
 		unregistered = append(unregistered, "image.GetImagesHandler")
+	}
+
+	if o.JobGetJobDetailHandler == nil {
+		unregistered = append(unregistered, "job.GetJobDetailHandler")
+	}
+
+	if o.JobGetJobFilesHandler == nil {
+		unregistered = append(unregistered, "job.GetJobFilesHandler")
+	}
+
+	if o.JobGetJobLogsHandler == nil {
+		unregistered = append(unregistered, "job.GetJobLogsHandler")
 	}
 
 	if o.JobGetJobsHandler == nil {
@@ -552,6 +579,21 @@ func (o *ScaleShiftAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/images"] = image.NewGetImages(o.context, o.ImageGetImagesHandler)
+
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/jobs/{id}"] = job.NewGetJobDetail(o.context, o.JobGetJobDetailHandler)
+
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/jobs/{id}/files"] = job.NewGetJobFiles(o.context, o.JobGetJobFilesHandler)
+
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/jobs/{id}/logs"] = job.NewGetJobLogs(o.context, o.JobGetJobLogsHandler)
 
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)

@@ -527,6 +527,29 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   '/jobs/{id}':
+    get:
+      description: |
+        returns the details of a job
+      operationId: getJobDetail
+      tags:
+        - job
+      security:
+        - api-authorizer: []
+      parameters:
+        - name: id
+          in: path
+          description: Job ID
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/JobDetail'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
     patch:
       description: |
         modify the job status
@@ -577,6 +600,54 @@ paths:
       responses:
         '204':
           description: OK
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/jobs/{id}/logs':
+    get:
+      description: |
+        returns the logs of a job
+      operationId: getJobLogs
+      tags:
+        - job
+      security:
+        - api-authorizer: []
+      parameters:
+        - name: id
+          in: path
+          description: Job ID
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/JobLogs'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/jobs/{id}/files':
+    get:
+      description: |
+        returns the list of output files
+      operationId: getJobFiles
+      tags:
+        - job
+      security:
+        - api-authorizer: []
+      parameters:
+        - name: id
+          in: path
+          description: Job ID
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/JobFiles'
         default:
           description: Unexpected error
           schema:
@@ -1002,6 +1073,55 @@ definitions:
         format: date-time
       external_link:
         description: A link to an external status page
+        type: string
+  JobDetail:
+    description: the details of a job
+    allOf: 
+      - $ref: "#/definitions/Job"
+      - $ref: "#/definitions/JobLogs"
+      - $ref: "#/definitions/JobFiles"
+  JobLog:
+    description: the log structure
+    required:
+      - log
+    properties:
+      time:
+        type: string
+        format: date-time
+      log:
+        type: string
+  JobLogs:
+    description: the log structure
+    required:
+      - logs
+    properties:
+      logs:
+        type: array
+        items:
+          $ref: '#/definitions/JobLog'
+  JobFile:
+    description: the output file
+    required:
+      - name
+      - size
+    properties:
+      name:
+        type: string
+      size:
+        type: integer
+        format: int64
+      downloadURL:
+        type: string
+  JobFiles:
+    description: the output files
+    required:
+      - files
+    properties:
+      files:
+        type: array
+        items:
+          $ref: '#/definitions/JobFile'
+      apiToken:
         type: string
   Workspace:
     description: User's workspace

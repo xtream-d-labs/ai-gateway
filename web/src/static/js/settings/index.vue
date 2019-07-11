@@ -97,6 +97,7 @@ var vue = new Vue({
   }
 });
 $(document).ready(function () {
+  $('#menu-system, #menu-settings').addClass('active');
   $('#input-username').focus();
   $('.errors').parent().show();
 });

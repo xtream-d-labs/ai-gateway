@@ -12,7 +12,9 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/dgraph-io/badger"
@@ -256,6 +258,84 @@ func Status(ctx context.Context, token, jobID string) (*JobStatus, error) {
 	}
 	obj.Sort()
 	return obj.Results[0], nil
+}
+
+// Log the log structure
+type Log struct {
+	Time time.Time
+	Log  string
+}
+
+var (
+	reNewline = regexp.MustCompile(`\r\n|\r|\n`)
+	reDateLog = regexp.MustCompile(`\[(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)\]: (.*)`)
+	reAnsiSeq = regexp.MustCompile(`\x1B\[[0-?]*[ -/]*[@-~]`)
+)
+
+// Logs returns output of a job
+func Logs(ctx context.Context, token, jobID string) ([]*Log, error) {
+	files, err := OutputFiles(ctx, token, jobID)
+	if err != nil {
+		return nil, err
+	}
+	result := []*Log{}
+	for _, file := range files.Results {
+		if !strings.EqualFold(file.Name, "process_output.log") {
+			continue
+		}
+		headers := http.Header{}
+		headers.Add("Authorization", fmt.Sprintf("Token %s", token))
+		resp, err := send(
+			ctx,
+			http.MethodGet,
+			file.DownloadURL,
+			nil, nil, headers, 0)
+		if err != nil {
+			return nil, err
+		}
+		for _, line := range reNewline.Split(string(resp), -1) {
+			values := reDateLog.FindStringSubmatch(line)
+			if len(values) < 3 {
+				continue
+			}
+			value, e := time.Parse(time.RFC3339, values[1])
+			if e != nil {
+				continue
+			}
+			if values[2] == "" {
+				continue
+			}
+			result = append(result, &Log{
+				Time: value,
+				Log:  reAnsiSeq.ReplaceAllString(values[2], ""),
+			})
+		}
+		sort.Slice(result, func(i, j int) bool {
+			return result[i].Time.Before(result[j].Time)
+		})
+		return result, nil
+	}
+	return nil, fmt.Errorf("Cannot find logs of the specified job")
+}
+
+// outputFiles returns output files information
+func OutputFiles(ctx context.Context, token, jobID string) (*Files, error) {
+	headers := http.Header{}
+	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
+	resp, err := send(
+		ctx,
+		http.MethodGet,
+		fmt.Sprintf("%s/jobs/%s/files/", v3, jobID),
+		nil, nil, headers, 0)
+	if err != nil {
+		return nil, err
+	}
+	// parse http response body
+	files := &Files{}
+	if err := json.Unmarshal(resp, files); err != nil {
+		return nil, err
+	}
+	return files, nil
 }
 
 // Stop the specified job

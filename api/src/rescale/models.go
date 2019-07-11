@@ -163,3 +163,28 @@ func (job *JobStatuses) Sort() {
 		return tj.Before(*job.Results[i].StatusDate)
 	})
 }
+
+// Checksum defines checksum of a file
+type Checksum struct {
+	Func string `json:"hashFunction"`
+	Hash string `json:"fileHash"`
+}
+
+// File defines the file information
+type File struct {
+	ID          string      `json:"id"`
+	Name        string      `json:"name"`
+	Path        string      `json:"path"`
+	TypeID      int64       `json:"typeId"`
+	Size        int64       `json:"decryptedSize"`
+	Checksums   []*Checksum `json:"fileChecksums"`
+	UploadedAt  *time.Time  `json:"dateUploaded"`
+	DownloadURL string      `json:"downloadUrl"`
+	Owner       string      `json:"owner"`
+}
+
+// Files defines the files meta data
+type Files struct {
+	Count   int     `json:"count"`
+	Results []*File `json:"results"`
+}

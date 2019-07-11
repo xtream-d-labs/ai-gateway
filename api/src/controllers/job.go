@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -25,11 +26,15 @@ import (
 	"github.com/rescale-labs/scaleshift/api/src/log"
 	"github.com/rescale-labs/scaleshift/api/src/queue"
 	"github.com/rescale-labs/scaleshift/api/src/rescale"
+	"golang.org/x/sync/errgroup"
 	coreV1 "k8s.io/api/core/v1"
 )
 
 func jobRoute(api *operations.ScaleShiftAPI) {
 	api.JobGetJobsHandler = job.GetJobsHandlerFunc(getJobs)
+	api.JobGetJobDetailHandler = job.GetJobDetailHandlerFunc(getJobDetail)
+	api.JobGetJobLogsHandler = job.GetJobLogsHandlerFunc(getJobLogs)
+	api.JobGetJobFilesHandler = job.GetJobFilesHandlerFunc(getJobFiles)
 	api.JobPostNewJobHandler = job.PostNewJobHandlerFunc(postNewJob)
 	api.JobModifyJobHandler = job.ModifyJobHandlerFunc(modifyJob)
 	api.JobDeleteJobHandler = job.DeleteJobHandlerFunc(deleteJob)
@@ -38,10 +43,18 @@ func jobRoute(api *operations.ScaleShiftAPI) {
 func getJobs(params job.GetJobsParams, principal *auth.Principal) middleware.Responder {
 	creds := auth.FindCredentials(principal.Username)
 	ctx := params.HTTPRequest.Context()
+	return job.NewGetJobsOK().WithPayload(jobs(ctx, creds, nil))
+}
 
-	payload := []*models.Job{}
+func jobs(ctx context.Context, creds *auth.Credentials, ID *string) []*models.Job {
+	result := []*models.Job{}
 	if jobs, err := db.GetJobs(); err == nil {
 		for _, j := range jobs {
+			if ID != nil {
+				if !strings.EqualFold(swag.StringValue(ID), j.ID) {
+					continue
+				}
+			}
 			status := swag.String(j.Status)
 			var externalLink string
 			var ended time.Time
@@ -92,7 +105,7 @@ func getJobs(params job.GetJobsParams, principal *auth.Principal) middleware.Res
 					}
 				}
 			}
-			payload = append(payload, &models.Job{
+			result = append(result, &models.Job{
 				ID:           swag.String(j.ID),
 				Platform:     j.Platform.String(),
 				Status:       swag.StringValue(status),
@@ -105,7 +118,122 @@ func getJobs(params job.GetJobsParams, principal *auth.Principal) middleware.Res
 			})
 		}
 	}
-	return job.NewGetJobsOK().WithPayload(payload)
+	return result
+}
+
+func getJobDetail(params job.GetJobDetailParams, principal *auth.Principal) middleware.Responder {
+	creds := auth.FindCredentials(principal.Username)
+	ctx := params.HTTPRequest.Context()
+
+	payload := &models.JobDetail{}
+	eg := errgroup.Group{}
+	eg.Go(func() error {
+		if jobs := jobs(ctx, creds, swag.String(params.ID)); len(jobs) > 0 {
+			payload.Job = *jobs[0]
+		}
+		return nil
+	})
+	eg.Go(func() error {
+		payload.JobLogs = models.JobLogs{
+			Logs: jobLogs(ctx, creds, params.ID),
+		}
+		return nil
+	})
+	eg.Go(func() error {
+		payload.JobFiles = models.JobFiles{
+			APIToken: creds.Base.RescaleKey,
+			Files:    jobFiles(ctx, creds, params.ID),
+		}
+		return nil
+	})
+	if err := eg.Wait(); err != nil {
+		code := http.StatusUnauthorized
+		log.Error("Wait@getJobDetail", err, nil)
+		return job.NewGetJobDetailDefault(code).WithPayload(&models.Error{
+			Code:    swag.String(fmt.Sprintf("%d", code)),
+			Message: swag.String(err.Error()),
+		})
+	}
+	return job.NewGetJobDetailOK().WithPayload(payload)
+}
+
+func getJobLogs(params job.GetJobLogsParams, principal *auth.Principal) middleware.Responder {
+	creds := auth.FindCredentials(principal.Username)
+	ctx := params.HTTPRequest.Context()
+
+	return job.NewGetJobLogsOK().WithPayload(&models.JobLogs{
+		Logs: jobLogs(ctx, creds, params.ID),
+	})
+}
+
+func jobLogs(ctx context.Context, creds *auth.Credentials, ID string) []*models.JobLog {
+	result := []*models.JobLog{}
+	jobs, err := db.GetJobs()
+	if err != nil {
+		return result
+	}
+	for _, j := range jobs {
+		switch j.Status {
+		case db.K8sJobStart:
+			// TODO
+			log.Debug(fmt.Sprintf("Jobs %+v", *j), nil, nil)
+
+		case db.RescaleStart:
+			rLog, e := rescale.Logs(ctx, creds.Base.RescaleKey, j.TargetID)
+			if rLog == nil || e != nil {
+				break
+			}
+			for _, logs := range rLog {
+				result = append(result, &models.JobLog{
+					Time: strfmt.DateTime(logs.Time),
+					Log:  swag.String(logs.Log),
+				})
+			}
+		}
+	}
+	sort.Slice(result, func(i, j int) bool {
+		return time.Time(result[i].Time).Before(time.Time(result[j].Time))
+	})
+	return result
+}
+
+func getJobFiles(params job.GetJobFilesParams, principal *auth.Principal) middleware.Responder {
+	creds := auth.FindCredentials(principal.Username)
+	ctx := params.HTTPRequest.Context()
+
+	return job.NewGetJobFilesOK().WithPayload(&models.JobFiles{
+		APIToken: creds.Base.RescaleKey,
+		Files:    jobFiles(ctx, creds, params.ID),
+	})
+}
+
+func jobFiles(ctx context.Context, creds *auth.Credentials, ID string) []*models.JobFile {
+	result := []*models.JobFile{}
+	jobs, err := db.GetJobs()
+	if err != nil {
+		return result
+	}
+	for _, j := range jobs {
+		switch j.Status {
+		case db.K8sJobStart:
+			// There is no such things
+
+		case db.RescaleStart:
+			// Uncommnet if the Rescale API allows CORS
+			// rFiles, e := rescale.OutputFiles(ctx, creds.Base.RescaleKey, j.TargetID)
+			// if rFiles == nil || e != nil {
+			// 	break
+			// }
+			// for _, file := range rFiles.Results {
+			// 	result = append(result, &models.JobFile{
+			// 		Name:        swag.String(file.Name),
+			// 		Size:        swag.Int64(file.Size),
+			// 		DownloadURL: file.DownloadURL,
+			// 	})
+			// }
+		}
+	}
+	return result
 }
 
 func postNewJob(params job.PostNewJobParams, principal *auth.Principal) middleware.Responder {

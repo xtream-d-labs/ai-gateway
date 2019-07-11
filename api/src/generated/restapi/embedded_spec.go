@@ -392,6 +392,41 @@ func init() {
       }
     },
     "/jobs/{id}": {
+      "get": {
+        "security": [
+          {
+            "api-authorizer": []
+          }
+        ],
+        "description": "returns the details of a job\n",
+        "tags": [
+          "job"
+        ],
+        "operationId": "getJobDetail",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Job ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/JobDetail"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
       "delete": {
         "security": [
           {
@@ -465,6 +500,80 @@ func init() {
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{id}/files": {
+      "get": {
+        "security": [
+          {
+            "api-authorizer": []
+          }
+        ],
+        "description": "returns the list of output files\n",
+        "tags": [
+          "job"
+        ],
+        "operationId": "getJobFiles",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Job ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/JobFiles"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{id}/logs": {
+      "get": {
+        "security": [
+          {
+            "api-authorizer": []
+          }
+        ],
+        "description": "returns the logs of a job\n",
+        "tags": [
+          "job"
+        ],
+        "operationId": "getJobLogs",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Job ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/JobLogs"
+            }
           },
           "default": {
             "description": "Unexpected error",
@@ -1348,6 +1457,85 @@ func init() {
         }
       }
     },
+    "JobDetail": {
+      "description": "the details of a job",
+      "allOf": [
+        {
+          "$ref": "#/definitions/Job"
+        },
+        {
+          "$ref": "#/definitions/JobLogs"
+        },
+        {
+          "$ref": "#/definitions/JobFiles"
+        }
+      ]
+    },
+    "JobFile": {
+      "description": "the output file",
+      "required": [
+        "name",
+        "size"
+      ],
+      "properties": {
+        "downloadURL": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "JobFiles": {
+      "description": "the output files",
+      "required": [
+        "files"
+      ],
+      "properties": {
+        "apiToken": {
+          "type": "string"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/JobFile"
+          }
+        }
+      }
+    },
+    "JobLog": {
+      "description": "the log structure",
+      "required": [
+        "log"
+      ],
+      "properties": {
+        "log": {
+          "type": "string"
+        },
+        "time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "JobLogs": {
+      "description": "the log structure",
+      "required": [
+        "logs"
+      ],
+      "properties": {
+        "logs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/JobLog"
+          }
+        }
+      }
+    },
     "NgcImage": {
       "description": "NGC docker image information",
       "required": [
@@ -1898,6 +2086,41 @@ func init() {
       }
     },
     "/jobs/{id}": {
+      "get": {
+        "security": [
+          {
+            "api-authorizer": []
+          }
+        ],
+        "description": "returns the details of a job\n",
+        "tags": [
+          "job"
+        ],
+        "operationId": "getJobDetail",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Job ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/JobDetail"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
       "delete": {
         "security": [
           {
@@ -1961,6 +2184,80 @@ func init() {
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{id}/files": {
+      "get": {
+        "security": [
+          {
+            "api-authorizer": []
+          }
+        ],
+        "description": "returns the list of output files\n",
+        "tags": [
+          "job"
+        ],
+        "operationId": "getJobFiles",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Job ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/JobFiles"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{id}/logs": {
+      "get": {
+        "security": [
+          {
+            "api-authorizer": []
+          }
+        ],
+        "description": "returns the logs of a job\n",
+        "tags": [
+          "job"
+        ],
+        "operationId": "getJobLogs",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Job ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/JobLogs"
+            }
           },
           "default": {
             "description": "Unexpected error",
@@ -2791,6 +3088,85 @@ func init() {
         "status": {
           "description": "the status of the job",
           "type": "string"
+        }
+      }
+    },
+    "JobDetail": {
+      "description": "the details of a job",
+      "allOf": [
+        {
+          "$ref": "#/definitions/Job"
+        },
+        {
+          "$ref": "#/definitions/JobLogs"
+        },
+        {
+          "$ref": "#/definitions/JobFiles"
+        }
+      ]
+    },
+    "JobFile": {
+      "description": "the output file",
+      "required": [
+        "name",
+        "size"
+      ],
+      "properties": {
+        "downloadURL": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "JobFiles": {
+      "description": "the output files",
+      "required": [
+        "files"
+      ],
+      "properties": {
+        "apiToken": {
+          "type": "string"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/JobFile"
+          }
+        }
+      }
+    },
+    "JobLog": {
+      "description": "the log structure",
+      "required": [
+        "log"
+      ],
+      "properties": {
+        "log": {
+          "type": "string"
+        },
+        "time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "JobLogs": {
+      "description": "the log structure",
+      "required": [
+        "logs"
+      ],
+      "properties": {
+        "logs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/JobLog"
+          }
         }
       }
     },

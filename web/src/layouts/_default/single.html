@@ -11,7 +11,7 @@
   <meta http-equiv='Cache-Control' content='no-cache'>
   <meta http-equiv='X-XSS-Protection' content='1; mode=block'>
   <meta http-equiv='X-Content-Type-Options' content='nosniff'>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com/; script-src 'self' 'unsafe-eval'; connect-src 'self'; img-src 'self' https://mapr.com data:;font-src 'self' https://fonts.gstatic.com/ data:">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com/; script-src 'self' 'unsafe-eval'; connect-src 'self' https://platform.rescale.com https://platform.rescale.jp https://kr.rescale.com https://eu.rescale.com; img-src 'self' https://mapr.com data:;font-src 'self' https://fonts.gstatic.com/ data:">
   <link rel="icon" type="image/png" href="{{ .Site.BaseURL }}img/favicon.png">
   <link rel="apple-touch-icon" href="{{ .Site.BaseURL }}img/logo.png" sizes="180x180">
   <link rel="stylesheet" type="text/css" href="{{ .Site.BaseURL }}css/lib/admin-lte/skins/_all-skins.min.css" />
@@ -46,7 +46,7 @@
             <li class="dropdown user user-menu user-info" style="margin-right: 10px;">
               <a href="#" data-toggle="dropdown"
                  style="padding: 0px 10px 0px 15px;margin: 0;float: right;">
-                <i class="fa fa-cogs" style="font-size: 18px;height: 18px;"></i>
+                <i class="fa fa-ellipsis-v" style="font-size: 18px;height: 18px;"></i>
               </a>
               <div style="margin: -2px 11px 0 0;color: #7b7b7b;line-height: 19px;min-width: 85px;"
                    class="input-field inline right">
@@ -58,10 +58,6 @@
                     style="display: block;margin: 14px 5px 0 0;"></span>
               <ul class="dropdown-menu" style="width: 200px;">
                 <li class="user-footer" style="float: none;padding: 0;">
-                  <div>
-                    <a href="/settings/" class="btn btn-default btn-flat"
-                       style="width: 100%;height: inherit;margin: 0;">Settings</a>
-                  </div>
                   <div style="border-top: 1px solid #ddd;">
                     <a href="/about/" class="btn btn-default btn-flat"
                        style="width: 100%;height: inherit;margin: 0;">About ScaleShift</a>
@@ -120,12 +116,17 @@
             </a>
           </li>
           <li id="menu-tasks" class="treeview" style="display: none;">
+            <a href="/tasks/">
+              <i class="fas fa-tasks fa-fw"></i> <span>&nbsp;Tasks</span>
+            </a>
+          </li>
+          <li id="menu-system" class="treeview">
             <a href="#">
-              <i class="fas fa-cloud fa-fw"></i> <span>&nbsp;Tasks</span>
+              <i class="fas fa-cog fa-fw"></i> <span>&nbsp;System</span>
               <i class="fas fa-angle-left pull-right"></i>
             </a>
             <ul class="treeview-menu">
-              <li id="menu-training-tasks"><a href="/tasks/"><i class="fa fa-circle-o"></i> Training Tasks</a></li>
+              <li id="menu-settings"><a href="/settings/"><i class="fa fa-circle-o"></i> Settings</a></li>
             </ul>
           </li>
 

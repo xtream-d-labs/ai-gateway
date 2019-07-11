@@ -302,6 +302,10 @@ func PushJobImage(ctx context.Context, imageName, authConfig string) error {
 	// io.Copy(ioutil.Discard, reader.Body)
 	buf := bytes.Buffer{}
 	buf.ReadFrom(reader) // wait for its done
+
+	log.Info("ImagePush", nil, &log.Map{
+		"result": buf.String(),
+	})
 	if strings.Contains(buf.String(), buildErrorResponse) {
 		return fmt.Errorf(buf.String())
 	}
