@@ -164,7 +164,6 @@ func Upload(ctx context.Context, token, path string) (*UploadedFile, error) {
 		return nil, err
 	}
 	if _, err = io.Copy(part, f); err != nil {
-		log.Debug("1. Bin copy error", err, nil)
 		return nil, err
 	}
 	// writer & in should be closed in order to notify http client to close the connection
@@ -176,14 +175,12 @@ func Upload(ctx context.Context, token, path string) (*UploadedFile, error) {
 	}
 	// Wait for the HTTP request done
 	if err = <-done; err != nil {
-		log.Debug("4. HTTP Req error", err, nil)
 		return nil, err
 	}
 	// Format the result
 	obj := &UploadedFile{}
 	if body, err := ioutil.ReadAll(resp.Body); err == nil {
 		if err = json.Unmarshal(body, obj); err != nil {
-			log.Debug("5. Unmarshal", err, nil)
 			return nil, err
 		}
 	}

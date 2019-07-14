@@ -175,15 +175,22 @@ func jobLogs(ctx context.Context, creds *auth.Credentials, ID string) []*models.
 	for _, j := range jobs {
 		switch j.Status {
 		case db.K8sJobStart:
-			// TODO
-			log.Debug(fmt.Sprintf("Jobs %+v", *j), nil, nil)
-
-		case db.RescaleStart:
-			rLog, e := rescale.Logs(ctx, creds.Base.RescaleKey, j.TargetID)
-			if rLog == nil || e != nil {
+			k8sLog, e := kubernetes.Logs(creds.Base.K8sConfig, j.ID, "default")
+			if k8sLog == nil || e != nil {
 				break
 			}
-			for _, logs := range rLog {
+			for _, logs := range k8sLog {
+				result = append(result, &models.JobLog{
+					Time: strfmt.DateTime(logs.Time),
+					Log:  swag.String(logs.Log),
+				})
+			}
+		case db.RescaleStart:
+			rescaleLog, e := rescale.Logs(ctx, creds.Base.RescaleKey, j.TargetID)
+			if rescaleLog == nil || e != nil {
+				break
+			}
+			for _, logs := range rescaleLog {
 				result = append(result, &models.JobLog{
 					Time: strfmt.DateTime(logs.Time),
 					Log:  swag.String(logs.Log),

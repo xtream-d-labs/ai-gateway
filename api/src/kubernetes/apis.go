@@ -1,16 +1,24 @@
 package kubernetes
 
 import (
+	"bytes"
 	"fmt"
+	"io"
+	"regexp"
+	"sort"
+	"time"
 
 	"github.com/go-openapi/swag"
-	"github.com/rescale-labs/scaleshift/api/src/db"
 	batchV1 "k8s.io/api/batch/v1"
 	coreV1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
+)
+
+const (
+	containerName = "main"
 )
 
 // CreateJob creates a new kubernetes job
@@ -23,7 +31,7 @@ func CreateJob(kubeConfig, jobID, namespace, imageName string, cpu, gpu int64) e
 		Spec: coreV1.PodSpec{
 			Containers: []coreV1.Container{
 				coreV1.Container{
-					Name:  "main",
+					Name:  containerName,
 					Image: imageName,
 					Resources: coreV1.ResourceRequirements{
 						Requests: coreV1.ResourceList{
@@ -87,23 +95,89 @@ func PodStatus(kubeConfig, jobID, namespace string) (*coreV1.Pod, error) {
 	return &pods.Items[0], nil
 }
 
+// Log the log structure
+type Log struct {
+	Time time.Time
+	Log  string
+}
+
+var (
+	reNewline = regexp.MustCompile(`\n`)
+	reDateLog = regexp.MustCompile(`(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.*Z)(.*)`)
+	reAnsiSeq = regexp.MustCompile(`\x1B\[[0-?]*[ -/]*[@-~]`)
+)
+
 // Logs retrieve the pod log
-func Logs(kubeConfig, jobID, namespace string) (*string, error) {
+func Logs(kubeConfig, jobID, namespace string) ([]*Log, error) {
 	clientset, e := client(kubeConfig)
 	if e != nil {
 		return nil, e
 	}
-	name := fmt.Sprintf("job-%s", jobID)
-	if _, e = clientset.CoreV1().Pods(namespace).Get(name, metav1.GetOptions{}); e != nil {
+	pods, e := clientset.CoreV1().Pods(namespace).List(metav1.ListOptions{
+		LabelSelector: fmt.Sprintf("job-name=job-%s", jobID),
+	})
+	if e != nil {
 		return nil, e
 	}
-	return swag.String(db.StatusUnknown), nil
+	if len(pods.Items) == 0 {
+		return nil, fmt.Errorf("Not found")
+	}
+	req := clientset.CoreV1().Pods(namespace).GetLogs(pods.Items[0].ObjectMeta.Name, &coreV1.PodLogOptions{
+		Container:  containerName,
+		Timestamps: true,
+		Follow:     false,
+	})
+	out, e := req.Stream()
+	if e != nil {
+		return nil, e
+	}
+	defer out.Close()
+
+	buf := bytes.Buffer{}
+	io.Copy(&buf, out)
+
+	result := []*Log{}
+	for _, line := range reNewline.Split(buf.String(), -1) {
+		values := reDateLog.FindStringSubmatch(line)
+		if len(values) < 3 {
+			continue
+		}
+		value, e := time.Parse(time.RFC3339Nano, values[1])
+		if e != nil {
+			continue
+		}
+		if values[2] == "" {
+			continue
+		}
+		result = append(result, &Log{
+			Time: value,
+			Log:  reAnsiSeq.ReplaceAllString(values[2], ""),
+		})
+	}
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].Time.Before(result[j].Time)
+	})
+	return result, nil
 }
 
 // DeleteJob deletes the specified job
 func DeleteJob(kubeConfig, jobID, namespace string) error {
 	clientset, e := client(kubeConfig)
 	if e != nil {
+		return e
+	}
+	pods, e := clientset.CoreV1().Pods(namespace).List(metav1.ListOptions{
+		LabelSelector: fmt.Sprintf("job-name=job-%s", jobID),
+	})
+	if e != nil {
+		return e
+	}
+	if len(pods.Items) == 0 {
+		return fmt.Errorf("Not found")
+	}
+	if e = clientset.CoreV1().Pods(namespace).Delete(pods.Items[0].ObjectMeta.Name, &metav1.DeleteOptions{
+		GracePeriodSeconds: swag.Int64(0),
+	}); e != nil {
 		return e
 	}
 	name := fmt.Sprintf("job-%s", jobID)
