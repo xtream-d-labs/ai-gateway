@@ -9,7 +9,7 @@ js = "about/index.js"
       <div class="col s12" style="min-height: 182px;padding-bottom: 25px;margin-bottom: 40px;">
         <h4 class="form-signin-heading">ScaleShift</h4>
         <hr/>
-        <h6 style="margin: 30px 0 7px 15px;font-weight: 600;">Repository</h6>
+        <h6 style="margin: 30px 0 7px 3px;font-weight: 600;">Repository</h6>
         <ul>
           <li>
             <div class="row" style="padding: 5px 0;">
@@ -21,7 +21,7 @@ js = "about/index.js"
             </div>
           </li>
         </ul>
-        <h6 style="margin: 20px 0 7px 15px;font-weight: 600;">Versions</h6>
+        <h6 style="margin: 20px 0 12px 3px;font-weight: 600;">Versions</h6>
         <ul id="data">
           <li>
             <div class="row" style="padding: 5px 0;">
