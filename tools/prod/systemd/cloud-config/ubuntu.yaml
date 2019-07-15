@@ -9,6 +9,13 @@ write_files:
       SS_LOG_LEVEL=debug
       PWD=/home/ubuntu
 
+  - path: /etc/docker/config.json
+    permissions: '0666'
+    content: |
+      {
+        "insecure-registry": "localhost"
+      }
+
   - path: /etc/systemd/system/scaleshift.service
     permissions: '0666'
     content: |
