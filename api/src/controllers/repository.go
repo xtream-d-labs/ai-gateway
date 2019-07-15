@@ -17,6 +17,7 @@ import (
 	"github.com/rescale-labs/scaleshift/api/src/generated/models"
 	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations"
 	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations/repository"
+	"github.com/rescale-labs/scaleshift/api/src/lib"
 	"github.com/rescale-labs/scaleshift/api/src/log"
 	"github.com/rescale-labs/scaleshift/api/src/reg/registry"
 	"github.com/rescale-labs/scaleshift/api/src/reg/repoutils"
@@ -34,6 +35,7 @@ const repositriesNgcCacheKey = "cached-ngc-repositries"
 func getRepositories(params repository.GetRemoteRepositoriesParams, principal *auth.Principal) middleware.Responder {
 	creds := auth.FindCredentials(principal.Username)
 	payload := []*models.Repository{}
+	ctx := params.HTTPRequest.Context()
 
 	// @see https://stackoverflow.com/questions/37082826/insufficient-scope-when-attempting-to-get-docker-hub-catalog#answer-37649824
 	if config.Config.DockerRegistryEndpoint == repoutils.DefaultDockerRegistry {
@@ -51,29 +53,42 @@ func getRepositories(params repository.GetRemoteRepositoriesParams, principal *a
 							Description: repo.Description,
 						})
 					}
-				}
-			}
-		}
-	} else {
-		if cfg, e1 := repoutils.GetAuthConfig(
-			creds.Base.DockerUsername,
-			creds.Base.DockerPassword,
-			config.Config.DockerRegistryEndpoint,
-		); e1 == nil {
-			if reg, e2 := registry.NewInsecure(cfg, false); e2 == nil {
-				if catalogs, e3 := reg.Catalog("/v2/_catalog"); e3 == nil {
-					for _, catalog := range catalogs {
-						payload = append(payload, &models.Repository{
-							Namespace:   swag.String(config.Config.DockerRegistryHostName),
-							Name:        swag.String(catalog),
-							Description: "",
-						})
-					}
+					return repository.NewGetRemoteRepositoriesOK().WithPayload(payload)
 				}
 			}
 		}
 	}
-	return repository.NewGetRemoteRepositoriesOK().WithPayload(payload)
+	if cfg, e1 := repoutils.GetAuthConfig(
+		creds.Base.DockerUsername,
+		creds.Base.DockerPassword,
+		config.Config.DockerRegistryEndpoint,
+	); e1 == nil {
+		if reg, e2 := registry.NewInsecure(cfg, false); e2 == nil {
+			if catalogs, e3 := reg.Catalog("/v2/_catalog"); e3 == nil {
+				for _, catalog := range catalogs {
+					payload = append(payload, &models.Repository{
+						Namespace:   swag.String(config.Config.DockerRegistryHostName),
+						Name:        swag.String(catalog),
+						Description: "",
+					})
+				}
+				return repository.NewGetRemoteRepositoriesOK().WithPayload(payload)
+			}
+		}
+		// Trying VMWare/Harbor API
+		if repositories, e2 := lib.HarborRepositories(ctx, cfg); e2 == nil {
+			for _, repo := range repositories {
+				payload = append(payload, &models.Repository{
+					Namespace:   swag.String(config.Config.DockerRegistryHostName),
+					Name:        swag.String(repo.Name),
+					Description: "",
+				})
+			}
+			return repository.NewGetRemoteRepositoriesOK().WithPayload(payload)
+		}
+	}
+	code := http.StatusNotFound
+	return repository.NewGetRemoteRepositoriesDefault(code).WithPayload(newerror(code))
 }
 
 func getRemoteImages(params repository.GetRemoteImagesParams, principal *auth.Principal) middleware.Responder {

@@ -1,4 +1,4 @@
-package rescale
+package http
 
 import (
 	"bytes"
@@ -17,7 +17,8 @@ import (
 	"golang.org/x/net/context/ctxhttp"
 )
 
-func send(ctx context.Context, method, path string, query url.Values, body io.Reader, headers http.Header, contentLength int64) ([]byte, error) {
+// HttpSend a http request
+func HttpSend(ctx context.Context, method, path string, query url.Values, body io.Reader, headers http.Header, contentLength int64) ([]byte, error) {
 	cli := &http.Client{}
 	req, err := build(cli, method, apipath(path, query), body, headers, contentLength)
 	if err != nil {

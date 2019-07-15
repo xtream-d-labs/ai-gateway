@@ -135,10 +135,14 @@ func postConfigurations(params app.PostConfigurationsParams) middleware.Responde
 		if swag.IsZero(creds.Base.DockerUsername) && swag.IsZero(creds.Base.DockerPassword) {
 			return nil
 		}
+		host := creds.Base.DockerRegistry
+		if strings.HasSuffix(host, "/") {
+			host = strings.TrimSuffix(host, "/")
+		}
 		config, e1 := repoutils.GetAuthConfig(
 			creds.Base.DockerUsername,
 			creds.Base.DockerPassword,
-			creds.Base.DockerRegistry,
+			host,
 		)
 		if e1 != nil {
 			return xerrors.Errorf("[Docker registry] %s", e1.Error())

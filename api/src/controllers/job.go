@@ -46,6 +46,8 @@ func getJobs(params job.GetJobsParams, principal *auth.Principal) middleware.Res
 	return job.NewGetJobsOK().WithPayload(jobs(ctx, creds, nil))
 }
 
+const timeFormat = "2006-01-02 15:04:05.999999999 -0700 MST"
+
 func jobs(ctx context.Context, creds *auth.Credentials, ID *string) []*models.Job {
 	result := []*models.Job{}
 	if jobs, err := db.GetJobs(); err == nil {
@@ -61,19 +63,29 @@ func jobs(ctx context.Context, creds *auth.Credentials, ID *string) []*models.Jo
 
 			switch j.Status {
 			case db.K8sJobStart:
-				k8sStatus, e := kubernetes.PodStatus(creds.Base.K8sConfig, j.ID, "default")
-				if k8sStatus == nil || e != nil {
+				k8sPod, e := kubernetes.PodStatus(creds.Base.K8sConfig, j.ID, "default")
+				if k8sPod == nil || e != nil {
 					break
 				}
-				switch k8sStatus.Status.Phase {
+				switch k8sPod.Status.Phase {
 				case coreV1.PodPending:
 					status = swag.String(db.K8sJobPending)
 				case coreV1.PodRunning:
 					status = swag.String(db.K8sJobRunning)
 				case coreV1.PodSucceeded:
 					status = swag.String(db.K8sSucceeded)
+					if k8sJob, e1 := kubernetes.JobStatus(creds.Base.K8sConfig, j.ID, "default"); k8sJob != nil && e1 == nil {
+						if candidate, e2 := time.Parse(timeFormat, k8sJob.CompletionTime.String()); e2 == nil {
+							ended = candidate
+						}
+					}
 				case coreV1.PodFailed:
 					status = swag.String(db.K8sFailed)
+					if k8sJob, e1 := kubernetes.JobStatus(creds.Base.K8sConfig, j.ID, "default"); k8sJob != nil && e1 == nil {
+						if candidate, e2 := time.Parse(timeFormat, k8sJob.CompletionTime.String()); e2 == nil {
+							ended = candidate
+						}
+					}
 				case coreV1.PodUnknown:
 					status = swag.String(db.StatusUnknown)
 				}

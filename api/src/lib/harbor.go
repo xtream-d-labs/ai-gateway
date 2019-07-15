@@ -1,0 +1,60 @@
+package lib
+
+import (
+	"context"
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
+	"net/http"
+
+	"docker.io/go-docker/api/types"
+	util "github.com/rescale-labs/scaleshift/api/src/http"
+	"github.com/rescale-labs/scaleshift/api/src/log"
+)
+
+/**
+ * VMWare/Harbor API
+ * @see https://raw.githubusercontent.com/vmware/harbor/master/docs/swagger.yaml
+ */
+
+// HarborRepository defines the repo information
+type HarborProject struct {
+	ID   int64  `json:"project_id"`
+	Name string `json:"name"`
+}
+
+// HarborRepository defines the repo information
+type HarborRepository struct {
+	ProjectID   int64  `json:"project_id"`
+	ProjectName string `json:"project_name"`
+	Public      bool   `json:"project_public"`
+	Name        string `json:"repository_name"`
+	Tags        int64  `json:"tags_count"`
+}
+
+// HarborSerchResult defines the response of /api/search
+type HarborSerchResult struct {
+	Projects     []*HarborProject    `json:"project"`
+	Repositories []*HarborRepository `json:"repository"`
+}
+
+func HarborRepositories(ctx context.Context, auth types.AuthConfig) ([]*HarborRepository, error) {
+	headers := http.Header{}
+	headers.Add("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(
+		auth.Username+":"+auth.Password,
+	)))
+	resp, err := util.HttpSend(
+		ctx,
+		http.MethodGet,
+		fmt.Sprintf("%s/api/search", auth.ServerAddress),
+		nil, nil, headers, 0)
+	if err != nil {
+		log.Error("util.HttpSend", err, nil)
+		return nil, err
+	}
+	obj := HarborSerchResult{}
+	if err := json.Unmarshal(resp, &obj); err != nil {
+		return nil, err
+	}
+	return obj.Repositories, nil
+}

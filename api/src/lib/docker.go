@@ -63,7 +63,10 @@ func dockerServerVersion() (types.Version, error) {
 	return cli.ServerVersion(context.Background())
 }
 
-const buildErrorResponse = "returned a non-zero code"
+const (
+	buildErrorResponse = "returned a non-zero code"
+	sendErrorResponse  = "500 Internal Server Error"
+)
 
 func buildDockerImage(ctx context.Context, reader io.Reader, options types.ImageBuildOptions) error {
 	cli, err := docker.NewEnvClient()
@@ -81,8 +84,8 @@ func buildDockerImage(ctx context.Context, reader io.Reader, options types.Image
 	// io.Copy(ioutil.Discard, reader.Body)
 	buf := bytes.Buffer{}
 	buf.ReadFrom(builder.Body) // wait for its done
-	if strings.Contains(buf.String(), buildErrorResponse) {
-		return fmt.Errorf(buf.String())
+	if response := buf.String(); strings.Contains(response, buildErrorResponse) {
+		return fmt.Errorf(response)
 	}
 	return nil
 }
@@ -227,7 +230,14 @@ func BuildJobImage(ctx context.Context, jobID, builder string, fqdnToPush bool) 
 	name := trimDockerTag.ReplaceAllString(job.DockerImage, "")
 	name = trimDockerLib.ReplaceAllString(name, "")
 	if fqdnToPush {
-		if !strings.HasPrefix(name, config.Config.DockerRegistryHostName) {
+		if strings.HasPrefix(name, config.Config.DockerRegistryHostName) {
+			name = strings.Replace(
+				name,
+				config.Config.DockerRegistryHostName,
+				config.Config.DockerRegistryHostName+"/"+builder,
+				-1,
+			)
+		} else {
 			name = fmt.Sprintf(
 				"%s/%s/%s",
 				config.Config.DockerRegistryHostName,
@@ -303,8 +313,8 @@ func PushJobImage(ctx context.Context, imageName, authConfig string) error {
 	buf := bytes.Buffer{}
 	buf.ReadFrom(reader) // wait for its done
 
-	if strings.Contains(buf.String(), buildErrorResponse) {
-		return fmt.Errorf(buf.String())
+	if response := buf.String(); strings.Contains(response, sendErrorResponse) {
+		return fmt.Errorf(response)
 	}
 	return nil
 }

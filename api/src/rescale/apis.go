@@ -21,6 +21,7 @@ import (
 	"github.com/go-openapi/swag"
 	"github.com/rescale-labs/scaleshift/api/src/config"
 	"github.com/rescale-labs/scaleshift/api/src/db"
+	util "github.com/rescale-labs/scaleshift/api/src/http"
 	"github.com/rescale-labs/scaleshift/api/src/log"
 	"golang.org/x/net/context/ctxhttp"
 )
@@ -70,7 +71,7 @@ func CoreTypes(ctx context.Context, token string, page, pageSize *int64) ([]*Cor
 	headers := http.Header{}
 	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
 
-	resp, err := send(
+	resp, err := util.HttpSend(
 		ctx,
 		http.MethodGet,
 		fmt.Sprintf("%s/coretypes/", v3),
@@ -110,7 +111,7 @@ func Analyses(ctx context.Context, token, code string) (*Application, error) {
 
 	headers := http.Header{}
 	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
-	resp, err := send(
+	resp, err := util.HttpSend(
 		ctx,
 		http.MethodGet,
 		fmt.Sprintf("%s/analyses/", v3),
@@ -206,7 +207,7 @@ func CreateJob(ctx context.Context, token string, input JobInput) (*string, erro
 	headers := http.Header{}
 	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
 	headers.Add("Content-Type", "application/json")
-	resp, err := send(ctx, http.MethodPost, fmt.Sprintf("%s/jobs/", v3), nil, body, headers, 0)
+	resp, err := util.HttpSend(ctx, http.MethodPost, fmt.Sprintf("%s/jobs/", v3), nil, body, headers, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -222,7 +223,7 @@ func CreateJob(ctx context.Context, token string, input JobInput) (*string, erro
 func Submit(ctx context.Context, token, jobID string) error {
 	headers := http.Header{}
 	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
-	_, err := send(
+	_, err := util.HttpSend(
 		ctx,
 		http.MethodPost,
 		fmt.Sprintf("%s/jobs/%s/submit/", v3, jobID),
@@ -237,7 +238,7 @@ func Submit(ctx context.Context, token, jobID string) error {
 func Status(ctx context.Context, token, jobID string) (*JobStatus, error) {
 	headers := http.Header{}
 	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
-	resp, err := send(
+	resp, err := util.HttpSend(
 		ctx,
 		http.MethodGet,
 		fmt.Sprintf("%s/jobs/%s/statuses/", v3, jobID),
@@ -282,7 +283,7 @@ func Logs(ctx context.Context, token, jobID string) ([]*Log, error) {
 		}
 		headers := http.Header{}
 		headers.Add("Authorization", fmt.Sprintf("Token %s", token))
-		resp, err := send(
+		resp, err := util.HttpSend(
 			ctx,
 			http.MethodGet,
 			file.DownloadURL,
@@ -319,7 +320,7 @@ func Logs(ctx context.Context, token, jobID string) ([]*Log, error) {
 func OutputFiles(ctx context.Context, token, jobID string) (*Files, error) {
 	headers := http.Header{}
 	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
-	resp, err := send(
+	resp, err := util.HttpSend(
 		ctx,
 		http.MethodGet,
 		fmt.Sprintf("%s/jobs/%s/files/", v3, jobID),
@@ -339,7 +340,7 @@ func OutputFiles(ctx context.Context, token, jobID string) (*Files, error) {
 func Stop(ctx context.Context, token, jobID string) error {
 	headers := http.Header{}
 	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
-	_, err := send(
+	_, err := util.HttpSend(
 		ctx,
 		http.MethodPost,
 		fmt.Sprintf("%s/jobs/%s/stop/", v3, jobID),
@@ -354,7 +355,7 @@ func Stop(ctx context.Context, token, jobID string) error {
 func Delete(ctx context.Context, token, jobID string) error {
 	headers := http.Header{}
 	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
-	_, err := send(
+	_, err := util.HttpSend(
 		ctx,
 		http.MethodDelete,
 		fmt.Sprintf("%s/jobs/%s/", v3, jobID),
