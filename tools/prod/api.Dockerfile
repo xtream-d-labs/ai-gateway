@@ -1,4 +1,4 @@
-FROM golang:1.12.6-alpine3.9 AS build-app
+FROM golang:1.12.7-alpine3.10 AS build-app
 RUN apk --no-cache add build-base
 COPY src /go/src/github.com/rescale-labs/scaleshift/api/src
 WORKDIR /go/src/github.com/rescale-labs/scaleshift/api/src
@@ -9,8 +9,8 @@ RUN go build -ldflags \
     generated/cmd/scale-shift-server/main.go
 RUN mv main /app
 
-FROM alpine:3.9
-RUN apk --no-cache add "ca-certificates=20190108-r0" "openssl=1.1.1b-r1" "bash=4.4.19-r1"
+FROM alpine:3.10
+RUN apk --no-cache add "ca-certificates=20190108-r0" "openssl=1.1.1c-r0" "bash=5.0.0-r0"
 ARG API_VERSION
 ENV SS_API_VERSION=${API_VERSION:-unknown} \
     DOCKER_HOST=unix:///var/run/docker.sock \
