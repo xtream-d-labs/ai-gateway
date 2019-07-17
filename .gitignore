@@ -1,5 +1,6 @@
 api/certs
 api/src/vendor
+doc/backup
 doc/draft
 tmp
 todo
