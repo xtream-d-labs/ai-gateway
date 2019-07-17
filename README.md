@@ -35,7 +35,7 @@ You can pull any docker images to the client from NGC, DockerHub or your private
 
 <img src="https://raw.github.com/wiki/rescale-labs/scaleshift/img/how-it-works-3.png">
 
-When you click a `run` button, ScaleShift wraps the image with Jupyter notebook & run it as a docker container. Then you can build your own models on your specified software with [Jupyter notebook](https://jupyter.org/).
+When you click a `run` button, ScaleShift wraps the image with [Jupyter notebook](https://jupyter.org/) & run it as a docker container. Then you can build your own models on your specified software on it.
 
 ### 4. Train your models
 

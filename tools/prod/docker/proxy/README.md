@@ -5,3 +5,7 @@
 ## Supported tags and respective `Dockerfile` links
 
 ・1.10 ([proxy/Dockerfile](https://github.com/rescale-labs/scaleshift/blob/master/tools/prod/docker/proxy/Dockerfile))  
+
+## TLS
+
+See `https://www.envoyproxy.io/learn/ssl` if you'd like to secure the connection.
