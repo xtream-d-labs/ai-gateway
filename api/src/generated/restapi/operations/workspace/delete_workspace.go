@@ -8,7 +8,11 @@ package workspace
 import (
 	"net/http"
 
+	errors "github.com/go-openapi/errors"
 	middleware "github.com/go-openapi/runtime/middleware"
+	strfmt "github.com/go-openapi/strfmt"
+	swag "github.com/go-openapi/swag"
+	validate "github.com/go-openapi/validate"
 )
 
 // DeleteWorkspaceHandlerFunc turns a function with the right signature into a delete workspace handler
@@ -56,4 +60,54 @@ func (o *DeleteWorkspace) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
+}
+
+// DeleteWorkspaceBody workspace
+// swagger:model DeleteWorkspaceBody
+type DeleteWorkspaceBody struct {
+
+	// path
+	// Required: true
+	Path *string `json:"path"`
+}
+
+// Validate validates this delete workspace body
+func (o *DeleteWorkspaceBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validatePath(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *DeleteWorkspaceBody) validatePath(formats strfmt.Registry) error {
+
+	if err := validate.Required("body"+"."+"path", "body", o.Path); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *DeleteWorkspaceBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *DeleteWorkspaceBody) UnmarshalBinary(b []byte) error {
+	var res DeleteWorkspaceBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
 }

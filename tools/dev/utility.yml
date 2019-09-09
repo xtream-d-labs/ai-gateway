@@ -1,8 +1,8 @@
-version: "2.1"
+version: "2.4"
 
 services:
   codegen-api:
-    image: supinf/go-swagger:0.14.0
+    image: supinf/go-swagger:0.17.2
     command: generate server -P auth.Principal -f spec/openapi.yaml -t src/generated
     volumes:
       - ../../spec:/go/src/github.com/rescale-labs/scaleshift/api/spec
@@ -24,7 +24,7 @@ services:
     working_dir: /go/src/github.com/rescale-labs/scaleshift/api/src
 
   lint-api:
-    image: supinf/golangci-lint:1.12
+    image: supinf/golangci-lint:1.16
     command: run --config .golangci.yml
     volumes:
       - ../../api:/go/src/github.com/rescale-labs/scaleshift/api

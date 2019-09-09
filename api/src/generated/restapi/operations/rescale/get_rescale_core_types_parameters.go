@@ -69,6 +69,7 @@ func (o *GetRescaleCoreTypesParams) BindRequest(r *http.Request, route *middlewa
 	return nil
 }
 
+// bindAppVer binds and validates parameter AppVer from query.
 func (o *GetRescaleCoreTypesParams) bindAppVer(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
@@ -86,6 +87,7 @@ func (o *GetRescaleCoreTypesParams) bindAppVer(rawData []string, hasKey bool, fo
 	return nil
 }
 
+// bindMinGpus binds and validates parameter MinGpus from query.
 func (o *GetRescaleCoreTypesParams) bindMinGpus(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {

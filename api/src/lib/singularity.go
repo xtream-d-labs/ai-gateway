@@ -56,7 +56,7 @@ func BuildSingularityImage(jobID, authConfig, builder string) (*string, error) {
 	ctx := context.Background()
 	pullSingularityImage(ctx)
 
-	dir := filepath.Join(config.Config.SingImgContainerDir, job.ID)
+	dir := filepath.Join(config.Config.SingImgContainerDir, job.JobID)
 	if err = os.MkdirAll(dir, 0755); err != nil { // nolint
 		return nil, err
 	}
@@ -82,7 +82,7 @@ func BuildSingularityImage(jobID, authConfig, builder string) (*string, error) {
 		builder,
 		lib,
 		setup,
-		strings.Join(job.Commands, " "))
+		strings.Replace(job.Commands, ",", " ", -1))
 	log.Debug("Singularityfile", nil, &log.Map{
 		"content": sfile,
 	})
@@ -112,7 +112,7 @@ func BuildSingularityImage(jobID, authConfig, builder string) (*string, error) {
 	mounts := []mount.Mount{
 		mount.Mount{
 			Type:   mount.TypeBind,
-			Source: filepath.Join(config.Config.SingImgHostPath, job.ID),
+			Source: filepath.Join(config.Config.SingImgHostPath, job.JobID),
 			Target: "/home/singularity/image",
 		},
 		// FIXME
@@ -128,9 +128,13 @@ func BuildSingularityImage(jobID, authConfig, builder string) (*string, error) {
 		// },
 	}
 	if len(job.Workspaces) > 0 {
+		workspace := job.Workspaces
+		if workspaces := strings.Split(workspace, ","); len(workspaces) > 0 {
+			workspace = workspaces[0]
+		}
 		mounts = append(mounts, mount.Mount{
 			Type:   mount.TypeBind,
-			Source: filepath.Join(config.Config.WorkspaceHostDir, job.Workspaces[0]),
+			Source: filepath.Join(config.Config.WorkspaceHostDir, workspace),
 			Target: "/var/workspace",
 		})
 	}

@@ -201,19 +201,23 @@ func BuildJobImage(ctx context.Context, jobID, builder string, fqdnToPush bool) 
 		setup = "apk --no-cache add bash"
 	}
 
-	workspace := filepath.Join(config.Config.WorkspaceContainerDir, job.Workspaces[0])
+	workspace := job.Workspaces
+	if workspaces := strings.Split(workspace, ","); len(workspaces) > 0 {
+		workspace = workspaces[0]
+	}
+	workspace = filepath.Join(config.Config.WorkspaceContainerDir, workspace)
 	err = ioutil.WriteFile(filepath.Join(workspace, "Dockerfile"), []byte(fmt.Sprintf(
 		string(jobDockerFile),
 		job.DockerImage,
 		builder,
 		lib,
 		setup,
-		"\""+strings.Join(job.Commands, "\",\"")+"\"")), 0644)
+		"\""+strings.Replace(job.Commands, ",", "\",\"", -1)+"\"")), 0644)
 	if err != nil {
 		return nil, err
 	}
 	defer os.Remove(filepath.Join(workspace, "Dockerfile"))
-	dir, err := ioutil.TempDir("", job.ID)
+	dir, err := ioutil.TempDir("", job.JobID)
 	if err != nil {
 		return nil, err
 	}

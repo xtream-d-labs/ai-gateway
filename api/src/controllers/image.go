@@ -75,22 +75,22 @@ func getImages(params image.GetImagesParams) middleware.Responder {
 			ParentID:    image.ParentID,
 			RepoDigests: image.RepoDigests,
 			RepoTags:    tags,
-			Status:      db.StableImage,
+			Status:      "stable", // Normal docker images
 			Size:        image.Size,
 			VirtualSize: image.VirtualSize,
 			Created:     time.Unix(image.Created, 0).Format(time.RFC3339),
 		})
 	}
 	// pulling Images
-	if pImages, err := db.GetPullingImages(); err == nil {
+	if pImages, err := db.FindImages(db.ImageActionPulling); err == nil {
 		for _, image := range pImages {
 			if inStables(image.Tag, images) {
 				continue
 			}
 			result = append(result, &models.Image{
 				RepoTags: []string{image.Tag},
-				Status:   image.Status,
-				Created:  image.Started.Format(time.RFC3339),
+				Status:   image.Action,
+				Created:  image.CreatedAt.Format(time.RFC3339),
 			})
 		}
 	}
@@ -137,18 +137,27 @@ func postNewImage(params image.PostNewImageParams) middleware.Responder {
 			return image.NewPostNewImageDefault(code).WithPayload(newerror(code))
 		}
 	}
-	cli, auth, code := dockerClient(cfg)
+	cli, dockercfg, code := dockerClient(cfg)
 	if code != 0 {
 		return image.NewPostNewImageDefault(code).WithPayload(newerror(code))
 	}
 	defer cli.Close()
 
-	if err := db.SetPullingImageMeta(name); err != nil {
-		log.Error("SetPullingImageMeta@postNewImage", err, nil)
+	username := auth.Anonymous
+	if sess, err := auth.RetrieveSession(params.HTTPRequest); err == nil && sess != nil {
+		username = sess.DockerUsername
+	}
+	img := &db.Image{
+		Tag:    name,
+		Action: string(db.ImageActionPulling),
+		Owner:  username,
+	}
+	if err := img.Create(); err != nil {
+		log.Error("image.Create@postNewImage", err, nil)
 		code := http.StatusInternalServerError
 		return image.NewPostNewImageDefault(code).WithPayload(newerror(code))
 	}
-	if err := queue.SubmitPullImageJob(name, swag.StringValue(auth)); err != nil {
+	if err := queue.SubmitPullImageJob(name, swag.StringValue(dockercfg)); err != nil {
 		log.Error("SubmitPullImageJob@postNewImage", err, nil)
 		code := http.StatusInternalServerError
 		return image.NewPostNewImageDefault(code).WithPayload(newerror(code))

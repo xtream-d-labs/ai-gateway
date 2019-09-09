@@ -8,7 +8,11 @@ package app
 import (
 	"net/http"
 
+	errors "github.com/go-openapi/errors"
 	middleware "github.com/go-openapi/runtime/middleware"
+	strfmt "github.com/go-openapi/strfmt"
+	swag "github.com/go-openapi/swag"
+	validate "github.com/go-openapi/validate"
 )
 
 // PostNewSessionHandlerFunc turns a function with the right signature into a post new session handler
@@ -56,4 +60,76 @@ func (o *PostNewSession) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
+}
+
+// PostNewSessionBody AccountInfo
+// swagger:model PostNewSessionBody
+type PostNewSessionBody struct {
+
+	// Password for the private Docker registry
+	// Required: true
+	// Format: password
+	DockerPassword *strfmt.Password `json:"docker_password"`
+
+	// Username for the private Docker registry
+	// Required: true
+	DockerUsername *string `json:"docker_username"`
+}
+
+// Validate validates this post new session body
+func (o *PostNewSessionBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateDockerPassword(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateDockerUsername(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *PostNewSessionBody) validateDockerPassword(formats strfmt.Registry) error {
+
+	if err := validate.Required("body"+"."+"docker_password", "body", o.DockerPassword); err != nil {
+		return err
+	}
+
+	if err := validate.FormatOf("body"+"."+"docker_password", "body", "password", o.DockerPassword.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *PostNewSessionBody) validateDockerUsername(formats strfmt.Registry) error {
+
+	if err := validate.Required("body"+"."+"docker_username", "body", o.DockerUsername); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *PostNewSessionBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *PostNewSessionBody) UnmarshalBinary(b []byte) error {
+	var res PostNewSessionBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
 }

@@ -8,7 +8,11 @@ package notebook
 import (
 	"net/http"
 
+	errors "github.com/go-openapi/errors"
 	middleware "github.com/go-openapi/runtime/middleware"
+	strfmt "github.com/go-openapi/strfmt"
+	swag "github.com/go-openapi/swag"
+	validate "github.com/go-openapi/validate"
 )
 
 // PostNewNotebookHandlerFunc turns a function with the right signature into a post new notebook handler
@@ -56,4 +60,57 @@ func (o *PostNewNotebook) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
+}
+
+// PostNewNotebookBody ImageName
+// swagger:model PostNewNotebookBody
+type PostNewNotebookBody struct {
+
+	// Docker image name
+	// Required: true
+	Image *string `json:"image"`
+
+	// workspace to be mounted
+	Workspace string `json:"workspace,omitempty"`
+}
+
+// Validate validates this post new notebook body
+func (o *PostNewNotebookBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateImage(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *PostNewNotebookBody) validateImage(formats strfmt.Registry) error {
+
+	if err := validate.Required("body"+"."+"image", "body", o.Image); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *PostNewNotebookBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *PostNewNotebookBody) UnmarshalBinary(b []byte) error {
+	var res PostNewNotebookBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
 }

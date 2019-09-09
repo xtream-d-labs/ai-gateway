@@ -6,9 +6,14 @@ package job
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"encoding/json"
 	"net/http"
 
+	errors "github.com/go-openapi/errors"
 	middleware "github.com/go-openapi/runtime/middleware"
+	strfmt "github.com/go-openapi/strfmt"
+	swag "github.com/go-openapi/swag"
+	validate "github.com/go-openapi/validate"
 	"github.com/rescale-labs/scaleshift/api/src/auth"
 )
 
@@ -70,4 +75,143 @@ func (o *PostNewJob) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
+}
+
+// PostNewJobBody JobAttrs
+// swagger:model PostNewJobBody
+type PostNewJobBody struct {
+
+	// commands to be excuted after the entrypoint
+	Commands []string `json:"commands"`
+
+	// The number of CPU cores
+	Cores int64 `json:"cores,omitempty"`
+
+	// Rescale CoreType as its infrastructure
+	Coretype string `json:"coretype,omitempty"`
+
+	// Requesting millicores of CPU
+	CPU int64 `json:"cpu,omitempty"`
+
+	// The entrypoint file of the job
+	EntrypointFile string `json:"entrypoint_file,omitempty"`
+
+	// Requesting number of GPU
+	Gpu int64 `json:"gpu,omitempty"`
+
+	// Requesting bytes of memory
+	Mem int64 `json:"mem,omitempty"`
+
+	// Notebook container ID
+	NotebookID string `json:"notebook_id,omitempty"`
+
+	// Platform ID
+	// Enum: [kubernetes rescale]
+	PlatformID string `json:"platform_id,omitempty"`
+}
+
+// Validate validates this post new job body
+func (o *PostNewJobBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validatePlatformID(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+var postNewJobBodyTypePlatformIDPropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["kubernetes","rescale"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		postNewJobBodyTypePlatformIDPropEnum = append(postNewJobBodyTypePlatformIDPropEnum, v)
+	}
+}
+
+const (
+
+	// PostNewJobBodyPlatformIDKubernetes captures enum value "kubernetes"
+	PostNewJobBodyPlatformIDKubernetes string = "kubernetes"
+
+	// PostNewJobBodyPlatformIDRescale captures enum value "rescale"
+	PostNewJobBodyPlatformIDRescale string = "rescale"
+)
+
+// prop value enum
+func (o *PostNewJobBody) validatePlatformIDEnum(path, location string, value string) error {
+	if err := validate.Enum(path, location, value, postNewJobBodyTypePlatformIDPropEnum); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *PostNewJobBody) validatePlatformID(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.PlatformID) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := o.validatePlatformIDEnum("body"+"."+"platform_id", "body", o.PlatformID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *PostNewJobBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *PostNewJobBody) UnmarshalBinary(b []byte) error {
+	var res PostNewJobBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+// PostNewJobCreatedBody newJobID
+// swagger:model PostNewJobCreatedBody
+type PostNewJobCreatedBody struct {
+
+	// ID of the new job
+	ID string `json:"id,omitempty"`
+}
+
+// Validate validates this post new job created body
+func (o *PostNewJobCreatedBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *PostNewJobCreatedBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *PostNewJobCreatedBody) UnmarshalBinary(b []byte) error {
+	var res PostNewJobCreatedBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
 }

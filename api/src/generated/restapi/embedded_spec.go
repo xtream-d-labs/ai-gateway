@@ -1893,7 +1893,59 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/postConfigurationsParamsBody"
+              "type": "object",
+              "title": "AccountInfo",
+              "properties": {
+                "docker_hostname": {
+                  "description": "Hostname for the private Docker registry",
+                  "type": "string"
+                },
+                "docker_password": {
+                  "description": "Password for the private Docker registry",
+                  "type": "string",
+                  "format": "password"
+                },
+                "docker_registry": {
+                  "description": "Docker Registry endpoint",
+                  "type": "string"
+                },
+                "docker_username": {
+                  "description": "Username for the private Docker registry",
+                  "type": "string"
+                },
+                "k8s_config": {
+                  "description": "kubecfg",
+                  "type": "string"
+                },
+                "ngc_apikey": {
+                  "description": "NGC - API Key",
+                  "type": "string"
+                },
+                "ngc_email": {
+                  "description": "E-mail address for NGC console",
+                  "type": "string",
+                  "format": "email"
+                },
+                "ngc_password": {
+                  "description": "Password for NGC console",
+                  "type": "string",
+                  "format": "password"
+                },
+                "rescale_key": {
+                  "description": "Rescale - API Key",
+                  "type": "string"
+                },
+                "rescale_platform": {
+                  "description": "Rescale platform endopoint",
+                  "type": "string",
+                  "enum": [
+                    "https://platform.rescale.com",
+                    "https://platform.rescale.jp",
+                    "https://kr.rescale.com",
+                    "https://eu.rescale.com"
+                  ]
+                }
+              }
             }
           }
         ],
@@ -1973,7 +2025,17 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/postNewImageParamsBody"
+              "type": "object",
+              "title": "ImageName",
+              "required": [
+                "image"
+              ],
+              "properties": {
+                "image": {
+                  "description": "Docker image name",
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -2001,7 +2063,17 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/deleteImageParamsBody"
+              "type": "object",
+              "title": "ImageName",
+              "required": [
+                "image"
+              ],
+              "properties": {
+                "image": {
+                  "description": "Docker image name",
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -2065,7 +2137,57 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/postNewJobParamsBody"
+              "type": "object",
+              "title": "JobAttrs",
+              "properties": {
+                "commands": {
+                  "description": "commands to be excuted after the entrypoint",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "cores": {
+                  "description": "The number of CPU cores",
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "coretype": {
+                  "description": "Rescale CoreType as its infrastructure",
+                  "type": "string"
+                },
+                "cpu": {
+                  "description": "Requesting millicores of CPU",
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "entrypoint_file": {
+                  "description": "The entrypoint file of the job",
+                  "type": "string"
+                },
+                "gpu": {
+                  "description": "Requesting number of GPU",
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "mem": {
+                  "description": "Requesting bytes of memory",
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "notebook_id": {
+                  "description": "Notebook container ID",
+                  "type": "string"
+                },
+                "platform_id": {
+                  "description": "Platform ID",
+                  "type": "string",
+                  "enum": [
+                    "kubernetes",
+                    "rescale"
+                  ]
+                }
+              }
             }
           }
         ],
@@ -2073,7 +2195,14 @@ func init() {
           "201": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/postNewJobCreatedBody"
+              "type": "object",
+              "title": "newJobID",
+              "properties": {
+                "id": {
+                  "description": "ID of the new job",
+                  "type": "string"
+                }
+              }
             }
           },
           "default": {
@@ -2177,7 +2306,17 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/modifyJobParamsBody"
+              "type": "object",
+              "title": "JobAttrs",
+              "properties": {
+                "status": {
+                  "description": "status",
+                  "type": "string",
+                  "enum": [
+                    "stopped"
+                  ]
+                }
+              }
             }
           }
         ],
@@ -2305,7 +2444,21 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/postNewNotebookParamsBody"
+              "type": "object",
+              "title": "ImageName",
+              "required": [
+                "image"
+              ],
+              "properties": {
+                "image": {
+                  "description": "Docker image name",
+                  "type": "string"
+                },
+                "workspace": {
+                  "description": "workspace to be mounted",
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -2399,7 +2552,18 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/modifyNotebookParamsBody"
+              "type": "object",
+              "title": "NotebookAttrs",
+              "properties": {
+                "status": {
+                  "description": "status",
+                  "type": "string",
+                  "enum": [
+                    "started",
+                    "stopped"
+                  ]
+                }
+              }
             }
           }
         ],
@@ -2745,7 +2909,23 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/postNewSessionParamsBody"
+              "type": "object",
+              "title": "AccountInfo",
+              "required": [
+                "docker_username",
+                "docker_password"
+              ],
+              "properties": {
+                "docker_password": {
+                  "description": "Password for the private Docker registry",
+                  "type": "string",
+                  "format": "password"
+                },
+                "docker_username": {
+                  "description": "Username for the private Docker registry",
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -2825,7 +3005,16 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/deleteWorkspaceParamsBody"
+              "type": "object",
+              "title": "workspace",
+              "required": [
+                "path"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -3464,235 +3653,6 @@ func init() {
           "type": "string"
         }
       }
-    },
-    "deleteImageParamsBody": {
-      "type": "object",
-      "title": "ImageName",
-      "required": [
-        "image"
-      ],
-      "properties": {
-        "image": {
-          "description": "Docker image name",
-          "type": "string"
-        }
-      },
-      "x-go-gen-location": "operations"
-    },
-    "deleteWorkspaceParamsBody": {
-      "type": "object",
-      "title": "workspace",
-      "required": [
-        "path"
-      ],
-      "properties": {
-        "path": {
-          "type": "string"
-        }
-      },
-      "x-go-gen-location": "operations"
-    },
-    "modifyJobParamsBody": {
-      "type": "object",
-      "title": "JobAttrs",
-      "properties": {
-        "status": {
-          "description": "status",
-          "type": "string",
-          "enum": [
-            "stopped"
-          ]
-        }
-      },
-      "x-go-gen-location": "operations"
-    },
-    "modifyNotebookParamsBody": {
-      "type": "object",
-      "title": "NotebookAttrs",
-      "properties": {
-        "status": {
-          "description": "status",
-          "type": "string",
-          "enum": [
-            "started",
-            "stopped"
-          ]
-        }
-      },
-      "x-go-gen-location": "operations"
-    },
-    "postConfigurationsParamsBody": {
-      "type": "object",
-      "title": "AccountInfo",
-      "properties": {
-        "docker_hostname": {
-          "description": "Hostname for the private Docker registry",
-          "type": "string"
-        },
-        "docker_password": {
-          "description": "Password for the private Docker registry",
-          "type": "string",
-          "format": "password"
-        },
-        "docker_registry": {
-          "description": "Docker Registry endpoint",
-          "type": "string"
-        },
-        "docker_username": {
-          "description": "Username for the private Docker registry",
-          "type": "string"
-        },
-        "k8s_config": {
-          "description": "kubecfg",
-          "type": "string"
-        },
-        "ngc_apikey": {
-          "description": "NGC - API Key",
-          "type": "string"
-        },
-        "ngc_email": {
-          "description": "E-mail address for NGC console",
-          "type": "string",
-          "format": "email"
-        },
-        "ngc_password": {
-          "description": "Password for NGC console",
-          "type": "string",
-          "format": "password"
-        },
-        "rescale_key": {
-          "description": "Rescale - API Key",
-          "type": "string"
-        },
-        "rescale_platform": {
-          "description": "Rescale platform endopoint",
-          "type": "string",
-          "enum": [
-            "https://platform.rescale.com",
-            "https://platform.rescale.jp",
-            "https://kr.rescale.com",
-            "https://eu.rescale.com"
-          ]
-        }
-      },
-      "x-go-gen-location": "operations"
-    },
-    "postNewImageParamsBody": {
-      "type": "object",
-      "title": "ImageName",
-      "required": [
-        "image"
-      ],
-      "properties": {
-        "image": {
-          "description": "Docker image name",
-          "type": "string"
-        }
-      },
-      "x-go-gen-location": "operations"
-    },
-    "postNewJobCreatedBody": {
-      "type": "object",
-      "title": "newJobID",
-      "properties": {
-        "id": {
-          "description": "ID of the new job",
-          "type": "string"
-        }
-      },
-      "x-go-gen-location": "operations"
-    },
-    "postNewJobParamsBody": {
-      "type": "object",
-      "title": "JobAttrs",
-      "properties": {
-        "commands": {
-          "description": "commands to be excuted after the entrypoint",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "cores": {
-          "description": "The number of CPU cores",
-          "type": "integer",
-          "format": "int64"
-        },
-        "coretype": {
-          "description": "Rescale CoreType as its infrastructure",
-          "type": "string"
-        },
-        "cpu": {
-          "description": "Requesting millicores of CPU",
-          "type": "integer",
-          "format": "int64"
-        },
-        "entrypoint_file": {
-          "description": "The entrypoint file of the job",
-          "type": "string"
-        },
-        "gpu": {
-          "description": "Requesting number of GPU",
-          "type": "integer",
-          "format": "int64"
-        },
-        "mem": {
-          "description": "Requesting bytes of memory",
-          "type": "integer",
-          "format": "int64"
-        },
-        "notebook_id": {
-          "description": "Notebook container ID",
-          "type": "string"
-        },
-        "platform_id": {
-          "description": "Platform ID",
-          "type": "string",
-          "enum": [
-            "kubernetes",
-            "rescale"
-          ]
-        }
-      },
-      "x-go-gen-location": "operations"
-    },
-    "postNewNotebookParamsBody": {
-      "type": "object",
-      "title": "ImageName",
-      "required": [
-        "image"
-      ],
-      "properties": {
-        "image": {
-          "description": "Docker image name",
-          "type": "string"
-        },
-        "workspace": {
-          "description": "workspace to be mounted",
-          "type": "string"
-        }
-      },
-      "x-go-gen-location": "operations"
-    },
-    "postNewSessionParamsBody": {
-      "type": "object",
-      "title": "AccountInfo",
-      "required": [
-        "docker_username",
-        "docker_password"
-      ],
-      "properties": {
-        "docker_password": {
-          "description": "Password for the private Docker registry",
-          "type": "string",
-          "format": "password"
-        },
-        "docker_username": {
-          "description": "Username for the private Docker registry",
-          "type": "string"
-        }
-      },
-      "x-go-gen-location": "operations"
     }
   },
   "securityDefinitions": {

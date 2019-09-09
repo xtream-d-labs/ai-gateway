@@ -53,7 +53,7 @@ func jobs(ctx context.Context, creds *auth.Credentials, ID *string) []*models.Jo
 	if jobs, err := db.GetJobs(); err == nil {
 		for _, j := range jobs {
 			if ID != nil {
-				if !strings.EqualFold(swag.StringValue(ID), j.ID) {
+				if !strings.EqualFold(swag.StringValue(ID), j.JobID) {
 					continue
 				}
 			}
@@ -61,35 +61,35 @@ func jobs(ctx context.Context, creds *auth.Credentials, ID *string) []*models.Jo
 			var externalLink string
 			var ended time.Time
 
-			switch j.Status {
-			case db.K8sJobStart:
-				k8sPod, e := kubernetes.PodStatus(creds.Base.K8sConfig, j.ID, "default")
+			switch db.JobStatus(j.Status) {
+			case db.JobStatusK8sStarted:
+				k8sPod, e := kubernetes.PodStatus(creds.Base.K8sConfig, j.JobID, "default")
 				if k8sPod == nil || e != nil {
 					break
 				}
 				switch k8sPod.Status.Phase {
 				case coreV1.PodPending:
-					status = swag.String(db.K8sJobPending)
+					status = db.JobStatusK8sPending.Value()
 				case coreV1.PodRunning:
-					status = swag.String(db.K8sJobRunning)
+					status = db.JobStatusK8sRunning.Value()
 				case coreV1.PodSucceeded:
-					status = swag.String(db.K8sSucceeded)
-					if k8sJob, e1 := kubernetes.JobStatus(creds.Base.K8sConfig, j.ID, "default"); k8sJob != nil && e1 == nil {
+					status = db.JobStatusK8sSucceeded.Value()
+					if k8sJob, e1 := kubernetes.JobStatus(creds.Base.K8sConfig, j.JobID, "default"); k8sJob != nil && e1 == nil {
 						if candidate, e2 := time.Parse(timeFormat, k8sJob.CompletionTime.String()); e2 == nil {
 							ended = candidate
 						}
 					}
 				case coreV1.PodFailed:
-					status = swag.String(db.K8sFailed)
-					if k8sJob, e1 := kubernetes.JobStatus(creds.Base.K8sConfig, j.ID, "default"); k8sJob != nil && e1 == nil {
+					status = db.JobStatusK8sFailed.Value()
+					if k8sJob, e1 := kubernetes.JobStatus(creds.Base.K8sConfig, j.JobID, "default"); k8sJob != nil && e1 == nil {
 						if candidate, e2 := time.Parse(timeFormat, k8sJob.CompletionTime.String()); e2 == nil {
 							ended = candidate
 						}
 					}
 				case coreV1.PodUnknown:
-					status = swag.String(db.StatusUnknown)
+					status = db.JobStatusUnknown.Value()
 				}
-			case db.RescaleStart:
+			case db.JobStatusRescaleStarted:
 				rStatus, e := rescale.Status(ctx, creds.Base.RescaleKey, j.TargetID)
 				if rStatus == nil || e != nil {
 					break
@@ -101,33 +101,35 @@ func jobs(ctx context.Context, creds *auth.Credentials, ID *string) []*models.Jo
 				switch rStatus.Status {
 				case rescale.JobStatusPending, rescale.JobStatusQueued,
 					rescale.JobStatusWait4Cls, rescale.JobStatusWaitQueue:
-					status = swag.String(db.RescaleStart)
+					status = db.JobStatusRescaleStarted.Value()
 				case rescale.JobStatusStarted, rescale.JobStatusValidated,
 					rescale.JobStatusExecuting:
-					status = swag.String(db.RescaleRunning)
+					status = db.JobStatusRescaleRunning.Value()
 				case rescale.JobStatusCompleted:
-					status = swag.String(db.RescaleSucceed)
+					status = db.JobStatusRescaleSucceed.Value()
 					if rStatus.StatusDate != nil {
 						ended = *rStatus.StatusDate
 					}
 				case rescale.JobStatusStopping, rescale.JobStatusForceStop:
-					status = swag.String(db.RescaleFailed)
+					status = db.JobStatusRescaleFailed.Value()
 					if rStatus.StatusDate != nil {
 						ended = *rStatus.StatusDate
 					}
 				}
 			}
-			result = append(result, &models.Job{
-				ID:           swag.String(j.ID),
-				Platform:     j.Platform.String(),
+			tmp := &models.Job{
+				ID:           swag.String(j.JobID),
+				Platform:     db.PlatformType(j.Platform).String(),
 				Status:       swag.StringValue(status),
 				Image:        j.DockerImage,
-				Mounts:       j.Workspaces,
-				Commands:     j.Commands,
+				Mounts:       strings.Split(j.Workspaces, ","),
+				Commands:     strings.Split(j.Commands, ","),
 				ExternalLink: externalLink,
-				Started:      strfmt.DateTime(j.Started),
+				Started:      strfmt.DateTime(j.CreatedAt),
 				Ended:        strfmt.DateTime(ended),
-			})
+			}
+			log.Debug(fmt.Sprintf("%+v", tmp), nil, nil)
+			result = append(result, tmp)
 		}
 	}
 	return result
@@ -185,9 +187,9 @@ func jobLogs(ctx context.Context, creds *auth.Credentials, ID string) []*models.
 		return result
 	}
 	for _, j := range jobs {
-		switch j.Status {
-		case db.K8sJobStart:
-			k8sLog, e := kubernetes.Logs(creds.Base.K8sConfig, j.ID, "default")
+		switch db.JobStatus(j.Status) {
+		case db.JobStatusK8sStarted:
+			k8sLog, e := kubernetes.Logs(creds.Base.K8sConfig, j.JobID, "default")
 			if k8sLog == nil || e != nil {
 				break
 			}
@@ -197,7 +199,7 @@ func jobLogs(ctx context.Context, creds *auth.Credentials, ID string) []*models.
 					Log:  swag.String(logs.Log),
 				})
 			}
-		case db.RescaleStart:
+		case db.JobStatusRescaleStarted:
 			rescaleLog, e := rescale.Logs(ctx, creds.Base.RescaleKey, j.TargetID)
 			if rescaleLog == nil || e != nil {
 				break
@@ -233,11 +235,11 @@ func jobFiles(ctx context.Context, creds *auth.Credentials, ID string) []*models
 		return result
 	}
 	for _, j := range jobs {
-		switch j.Status {
-		case db.K8sJobStart:
+		switch db.JobStatus(j.Status) {
+		case db.JobStatusK8sStarted:
 			// There is no such things
 
-		case db.RescaleStart:
+		case db.JobStatusRescaleStarted:
 			// Uncommnet if the Rescale API allows CORS
 			// rFiles, e := rescale.OutputFiles(ctx, creds.Base.RescaleKey, j.TargetID)
 			// if rFiles == nil || e != nil {
@@ -336,22 +338,22 @@ func postNewJob(params job.PostNewJobParams, principal *auth.Principal) middlewa
 	}
 	image, _, _ := lib.ContainerAttrs(container.Config.Labels)
 	newjob := &db.Job{
-		Platform:    platform,
-		ID:          uuid.New().String(),
-		Status:      db.BuildingJob,
+		Platform:    int(platform),
+		JobID:       uuid.New().String(),
+		Action:      string(db.JobActionBuilding),
+		Status:      string(db.JobStatusImageBuilding),
 		DockerImage: image,
 		PythonFile:  ipynb,
-		Workspaces:  workspaces,
-		Commands:    commands,
+		Workspaces:  strings.Join(workspaces, ","),
+		Commands:    strings.Join(commands, ","),
 		CPU:         params.Body.CPU,
 		Memory:      params.Body.Mem,
 		GPU:         params.Body.Gpu,
 		CoreType:    params.Body.Coretype,
 		Cores:       params.Body.Cores,
-		Started:     time.Now(),
 	}
-	if err := db.SetJobMeta(newjob); err != nil {
-		log.Error("SetJobMeta@postNewJob", err, nil)
+	if err := newjob.Create(); err != nil {
+		log.Error("job.Create@postNewJob", err, nil)
 		code := http.StatusInternalServerError
 		return job.NewPostNewJobDefault(code).WithPayload(newerror(code))
 	}
@@ -366,7 +368,7 @@ func postNewJob(params job.PostNewJobParams, principal *auth.Principal) middlewa
 	case models.PostNewJobParamsBodyPlatformIDKubernetes:
 		config.Config.DockerRegistryUserName = creds.Base.DockerUsername
 		if err := queue.BuildJobDockerImage(
-			newjob.ID,
+			newjob.JobID,
 			creds.Base.DockerPassword,
 			principal.Username,
 			creds.Base.K8sConfig,
@@ -377,7 +379,7 @@ func postNewJob(params job.PostNewJobParams, principal *auth.Principal) middlewa
 		}
 	case models.PostNewJobParamsBodyPlatformIDRescale:
 		if err := queue.BuildSingularityImageJob(
-			newjob.ID,
+			newjob.JobID,
 			credential,
 			creds.Base.RescaleKey,
 			principal.Username,
@@ -387,8 +389,8 @@ func postNewJob(params job.PostNewJobParams, principal *auth.Principal) middlewa
 			return job.NewPostNewJobDefault(code).WithPayload(newerror(code))
 		}
 	}
-	return job.NewPostNewJobCreated().WithPayload(&models.PostNewJobCreatedBody{
-		ID: newjob.ID,
+	return job.NewPostNewJobCreated().WithPayload(&job.PostNewJobCreatedBody{
+		ID: newjob.JobID,
 	})
 }
 
@@ -404,10 +406,10 @@ func modifyJob(params job.ModifyJobParams, principal *auth.Principal) middleware
 	}
 	switch params.Body.Status { // nolint:gocritic
 	case models.ModifyJobParamsBodyStatusStopped:
-		switch j.Status {
-		case db.K8sJobStart:
+		switch db.JobStatus(j.Status) {
+		case db.JobStatusK8sStarted:
 			// There is no proper method
-		case db.RescaleStart:
+		case db.JobStatusRescaleStarted:
 			if swag.IsZero(creds.Base.RescaleKey) {
 				code := http.StatusForbidden
 				return job.NewModifyJobDefault(code).WithPayload(newerror(code))
@@ -415,7 +417,7 @@ func modifyJob(params job.ModifyJobParams, principal *auth.Principal) middleware
 			if e := rescale.Stop(ctx, creds.Base.RescaleKey, j.TargetID); e != nil {
 				log.Error("StopRescaleJob@modifyJob", e, nil)
 			}
-			if e := db.UpdateJob(j.ID, db.RescaleJobStoreKey, db.RescaleJobStoreKey, db.RescaleFailed); e != nil {
+			if e := db.UpdateJob(j.JobID, db.JobActionRescale, db.JobActionRescale, db.JobStatusRescaleFailed, nil); e != nil {
 				log.Error("UpdateJob@modifyJob", e, nil)
 			}
 		}
@@ -433,16 +435,19 @@ func deleteJob(params job.DeleteJobParams, principal *auth.Principal) middleware
 		code := http.StatusBadRequest
 		return job.NewDeleteJobDefault(code).WithPayload(newerror(code))
 	}
-	switch j.Status {
-	case db.K8sJobStart, db.K8sJobPending, db.K8sJobRunning, db.K8sSucceeded, db.K8sFailed:
+	switch db.JobStatus(j.Status) {
+	case db.JobStatusK8sStarted, db.JobStatusK8sPending,
+		db.JobStatusK8sRunning, db.JobStatusK8sSucceeded,
+		db.JobStatusK8sFailed:
 		if swag.IsZero(creds.Base.K8sConfig) {
 			code := http.StatusForbidden
 			return job.NewDeleteJobDefault(code).WithPayload(newerror(code))
 		}
-		if e := kubernetes.DeleteJob(creds.Base.K8sConfig, j.ID, "default"); e != nil {
+		if e := kubernetes.DeleteJob(creds.Base.K8sConfig, j.JobID, "default"); e != nil {
 			log.Error("DeleteKubernetesJob@deleteJob", e, nil)
 		}
-	case db.RescaleStart, db.RescaleRunning, db.RescaleSucceed, db.RescaleFailed:
+	case db.JobStatusRescaleStarted, db.JobStatusRescaleRunning,
+		db.JobStatusRescaleSucceed, db.JobStatusRescaleFailed:
 		if swag.IsZero(creds.Base.RescaleKey) {
 			code := http.StatusForbidden
 			return job.NewDeleteJobDefault(code).WithPayload(newerror(code))
@@ -451,13 +456,13 @@ func deleteJob(params job.DeleteJobParams, principal *auth.Principal) middleware
 			log.Error("DeleteRescaleJob@deleteJob", e, nil)
 		}
 	}
-	err = db.RemoveJob(j.ID)
+	err = db.RemoveJob(j.JobID)
 	if err != nil {
 		log.Error("RemoveJob@deleteJob", err, nil)
 		code := http.StatusInternalServerError
 		return job.NewDeleteJobDefault(code).WithPayload(newerror(code))
 	}
-	err = os.RemoveAll(filepath.Join(config.Config.SingImgContainerDir, j.ID))
+	err = os.RemoveAll(filepath.Join(config.Config.SingImgContainerDir, j.JobID))
 	if err != nil {
 		log.Error("RemoveAll@deleteJob", err, nil)
 		code := http.StatusInternalServerError

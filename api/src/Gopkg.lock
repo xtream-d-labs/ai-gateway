@@ -311,6 +311,14 @@
   version = "v6.5.0"
 
 [[projects]]
+  digest = "1:ec6f9bf5e274c833c911923c9193867f3f18788c461f76f05f62bb1510e0ae65"
+  name = "github.com/go-sql-driver/mysql"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "72cd26f257d44c1114970e19afddcd812016007e"
+  version = "v1.4.1"
+
+[[projects]]
   digest = "1:f83d740263b44fdeef3e1bce6147b5d7283fcad1a693d39639be33993ecf3db1"
   name = "github.com/gogo/protobuf"
   packages = [
@@ -409,6 +417,25 @@
   pruneopts = "UT"
   revision = "c6ca198ec95c841fdb89fc0de7496fed11ab854e"
   version = "v1.4.0"
+
+[[projects]]
+  digest = "1:6d39be33a917111436132ff319562545899eaeca7039a1bfffd0cd0246990d78"
+  name = "github.com/jinzhu/gorm"
+  packages = [
+    ".",
+    "dialects/mysql",
+  ]
+  pruneopts = "UT"
+  revision = "836fb2c19d84dac7b0272958dfb9af7cf0d0ade4"
+  version = "v1.9.10"
+
+[[projects]]
+  digest = "1:01ed62f8f4f574d8aff1d88caee113700a2b44c42351943fa73cc1808f736a50"
+  name = "github.com/jinzhu/inflection"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "f5c5f50e6090ae76a29240b61ae2a90dd810112e"
+  version = "v1.0.0"
 
 [[projects]]
   digest = "1:f5a2051c55d05548d2d4fd23d244027b59fbd943217df8aa3b5e170ac2fd6e1b"
@@ -552,14 +579,6 @@
   version = "v1.0.3"
 
 [[projects]]
-  digest = "1:43b8a34f6390d8fbdcfd300ed52103064e9eaaecc7e50b7e3518fe246ebe8403"
-  name = "github.com/tylerb/graceful"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "4654dfbb6ad53cb5e27f37d99b02e16c1872fbbb"
-  version = "v1.2.15"
-
-[[projects]]
   digest = "1:01d5dc3bfb14cf8fb2c924dcf026231218604b8ed15daaa028875d49e7f09071"
   name = "github.com/vmihailenco/msgpack"
   packages = [
@@ -580,7 +599,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:f892bca652961f297274260fa6f58ce262f5f84ba425042b5330518e0219f7b2"
+  digest = "1:dcb1366cc76a841a63cdfe33fbcea5caaa4b16d6edfdc890bd10848e0bcb6313"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -591,6 +610,7 @@
     "idna",
     "internal/socks",
     "internal/timeseries",
+    "netutil",
     "proxy",
     "publicsuffix",
     "trace",
@@ -692,10 +712,11 @@
   revision = "3ee3066db522c6628d440a3a91c4abdd7f5ef22f"
 
 [[projects]]
-  digest = "1:d30e31835e732e19181d39554c478fc99d93a9b74bab7b3783eb13e747834724"
+  digest = "1:eacfb57b593e109c3e95175777c7f2f1cb8ad5b04b5c4fe1c019d59c335a3bbd"
   name = "google.golang.org/appengine"
   packages = [
     ".",
+    "cloudsql",
     "datastore",
     "internal",
     "internal/app_identity",
@@ -948,17 +969,23 @@
     "github.com/go-openapi/strfmt",
     "github.com/go-openapi/swag",
     "github.com/go-openapi/validate",
+    "github.com/go-sql-driver/mysql",
     "github.com/google/uuid",
     "github.com/jessevdk/go-flags",
+    "github.com/jinzhu/gorm",
+    "github.com/jinzhu/gorm/dialects/mysql",
     "github.com/kelseyhightower/envconfig",
     "github.com/opencontainers/go-digest",
     "github.com/peterhellberg/link",
     "github.com/pottava/ngc-registry-api/app/ngc/registry",
     "github.com/sirupsen/logrus",
-    "github.com/tylerb/graceful",
     "golang.org/x/net/context/ctxhttp",
+    "golang.org/x/net/netutil",
     "golang.org/x/sync/errgroup",
     "golang.org/x/xerrors",
+    "k8s.io/api/batch/v1",
+    "k8s.io/api/core/v1",
+    "k8s.io/apimachinery/pkg/api/resource",
     "k8s.io/apimachinery/pkg/apis/meta/v1",
     "k8s.io/client-go/kubernetes",
     "k8s.io/client-go/tools/clientcmd",

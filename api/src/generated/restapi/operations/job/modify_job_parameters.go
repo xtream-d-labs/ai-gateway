@@ -14,8 +14,6 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 
 	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/rescale-labs/scaleshift/api/src/generated/models"
 )
 
 // NewModifyJobParams creates a new ModifyJobParams object
@@ -38,7 +36,7 @@ type ModifyJobParams struct {
 	  Required: true
 	  In: body
 	*/
-	Body *models.ModifyJobParamsBody
+	Body ModifyJobBody
 	/*Job ID
 	  Required: true
 	  In: path
@@ -57,7 +55,7 @@ func (o *ModifyJobParams) BindRequest(r *http.Request, route *middleware.Matched
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body models.ModifyJobParamsBody
+		var body ModifyJobBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			if err == io.EOF {
 				res = append(res, errors.Required("body", "body"))
@@ -65,14 +63,13 @@ func (o *ModifyJobParams) BindRequest(r *http.Request, route *middleware.Matched
 				res = append(res, errors.NewParseError("body", "body", "", err))
 			}
 		} else {
-
 			// validate body object
 			if err := body.Validate(route.Formats); err != nil {
 				res = append(res, err)
 			}
 
 			if len(res) == 0 {
-				o.Body = &body
+				o.Body = body
 			}
 		}
 	} else {
@@ -89,6 +86,7 @@ func (o *ModifyJobParams) BindRequest(r *http.Request, route *middleware.Matched
 	return nil
 }
 
+// bindID binds and validates parameter ID from path.
 func (o *ModifyJobParams) bindID(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {

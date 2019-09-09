@@ -102,10 +102,6 @@
   version = "1.4.1"
 
 [[constraint]]
-  name = "github.com/tylerb/graceful"
-  version = "1.2.15"
-
-[[constraint]]
   branch = "master"
   name = "golang.org/x/net"
 

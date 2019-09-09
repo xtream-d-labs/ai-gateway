@@ -67,6 +67,7 @@ func (o *GetNgcImagesParams) BindRequest(r *http.Request, route *middleware.Matc
 	return nil
 }
 
+// bindID binds and validates parameter ID from path.
 func (o *GetNgcImagesParams) bindID(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
@@ -81,6 +82,7 @@ func (o *GetNgcImagesParams) bindID(rawData []string, hasKey bool, formats strfm
 	return nil
 }
 
+// bindNamespace binds and validates parameter Namespace from path.
 func (o *GetNgcImagesParams) bindNamespace(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {

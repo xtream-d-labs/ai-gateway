@@ -99,13 +99,13 @@ var files = new Vue({
 
 function statusValue(status) {
   switch (status) {
-  case 'building-job':
+  case 'building':
     return 'preparing';
-  case 'pushing-job':
-  case 'k8s-job':
+  case 'pushing':
+  case 'k8s-job-init':
   case 'rescale-send':
     return 'sending';
-  case 'k8s-job-start':
+  case 'k8s-job-started':
   case 'k8s-job-pending':
   case 'k8s-job-runnning':
   case 'rescale-start':

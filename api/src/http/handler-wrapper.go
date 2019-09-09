@@ -113,7 +113,8 @@ func Wrap(handler http.Handler) http.Handler {
 // ServerShutdown wraps the HTTP server shutdown event
 func ServerShutdown() {
 	db.ShutdownQueue()
-	db.ShutdownDB()
+	db.ShutdownCache()
+	db.Shutdown()
 }
 
 func eqauls(r *http.Request, url string) bool {

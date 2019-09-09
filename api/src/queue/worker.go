@@ -12,6 +12,7 @@ import (
 	docker "docker.io/go-docker"
 	"docker.io/go-docker/api/types"
 	"github.com/go-openapi/swag"
+	"github.com/rescale-labs/scaleshift/api/src/auth"
 	"github.com/rescale-labs/scaleshift/api/src/config"
 	"github.com/rescale-labs/scaleshift/api/src/db"
 	"github.com/rescale-labs/scaleshift/api/src/kubernetes"
@@ -83,20 +84,6 @@ func PushJobDockerImage(jobID, imageName, dockerCredential, k8sConfig string) er
 	return db.Enqueue(string(bytes))
 }
 
-// ApplyKubernetesJob puts a new job
-func ApplyKubernetesJob(jobID, imageName, k8sConfig string) error {
-	bytes, err := json.Marshal(job{
-		Action: actionApplyK8s,
-		Arg1:   jobID,
-		Arg2:   imageName,
-		Arg3:   k8sConfig,
-	})
-	if err != nil {
-		return err
-	}
-	return db.Enqueue(string(bytes))
-}
-
 // BuildSingularityImageJob puts a new job
 func BuildSingularityImageJob(ID, dockerCredential, rescaleConfig, builderName string) error {
 	bytes, err := json.Marshal(job{
@@ -128,7 +115,7 @@ func SubmitToRescaleJob(ID, rescaleConfig, simg string) error {
 
 func buildersName(candidate string) string {
 	if candidate == "" {
-		return "unknown"
+		return auth.Anonymous
 	}
 	return candidate
 }
@@ -206,7 +193,7 @@ func worker(name string) (err error) {
 			log.Error("Worker failed at BuildJobImage", e2, nil)
 			return e2
 		}
-		err = db.UpdateJob(j.Arg1, db.BuildingJobStoreKey, db.PushingJobStoreKey, db.PushingJob)
+		err = db.UpdateJob(j.Arg1, db.JobActionBuilding, db.JobActionPushing, db.JobStatusImagePushing, nil)
 		if err != nil {
 			log.Error("Worker failed at UpdateJob@actionBuildJobImg", err, nil)
 			return err
@@ -224,48 +211,35 @@ func worker(name string) (err error) {
 		// Arg2: ImageName
 		// Arg3: DockerCredential
 		// Arg4: KubernetesConfig
+		job, e3 := db.GetJob(j.Arg1)
+		if e3 != nil {
+			log.Error("Worker failed at GetJob@actionPushJobImg", e3, nil)
+			return e3
+		}
 		if err = lib.PushJobImage(ctx, j.Arg2, j.Arg3); err != nil {
 			log.Error("Worker failed at PushJobImage", err, nil)
 			return err
 		}
+		log.Debug("Pushed the Job Image!", nil, &log.Map{
+			"id":   job.JobID,
+			"name": j.Arg2,
+		})
 		if err = lib.DeleteImage(ctx, j.Arg2); err != nil {
 			log.Error("Worker failed at DeleteImage", err, nil)
 			return err
 		}
-		err = db.UpdateJob(j.Arg1, db.PushingJobStoreKey, db.KubernetesJobStoreKey, db.KubernetesJob)
-		if err != nil {
-			log.Error("Worker failed at UpdateJob@actionPushJobImg", err, nil)
-			return err
-		}
-		if err = ApplyKubernetesJob(j.Arg1, j.Arg2, j.Arg4); err != nil {
-			log.Error("Worker failed at ApplyKubernetesJob", err, nil)
-			return err
-		}
-		log.Debug("Pushed the Job Image!", nil, &log.Map{
-			"id":   j.Arg1,
-			"name": j.Arg2,
-		})
-	case actionApplyK8s:
-		// Arg1: JobID
-		// Arg2: ImageName
-		// Arg3: KubernetesConfig
-		job, e3 := db.GetJob(j.Arg1)
-		if e3 != nil {
-			log.Error("Worker failed at GetJob@actionApplyK8s", e3, nil)
-			return e3
-		}
-		err = kubernetes.CreateJob(j.Arg3, j.Arg1, "default", j.Arg2, job.CPU, job.GPU)
+		err = kubernetes.CreateJob(j.Arg4, j.Arg1, "default", j.Arg2, job.CPU, job.GPU)
 		if err != nil {
 			return err
 		}
 		// Change this job's status
-		err = db.UpdateJob(j.Arg1, db.KubernetesJobStoreKey, db.KubernetesJobStoreKey, db.K8sJobStart)
+		err = db.UpdateJob(job.JobID, db.JobActionPushing, db.JobActionKubernetes, db.JobStatusK8sStarted, nil)
 		if err != nil {
 			log.Error("Worker failed at UpdateJob@actionApplyK8s", err, nil)
 			return err
 		}
 		log.Debug("Job submitted!", nil, &log.Map{
-			"id":   j.Arg1,
+			"id":   job.JobID,
 			"name": j.Arg2,
 			"cmds": job.Commands,
 		})
@@ -288,7 +262,7 @@ func worker(name string) (err error) {
 			log.Error("Worker failed at DeleteImage", err, nil)
 			return err
 		}
-		err = db.UpdateJob(j.Arg1, db.BuildingJobStoreKey, db.RescaleJobStoreKey, db.RescaleSend)
+		err = db.UpdateJob(j.Arg1, db.JobActionBuilding, db.JobActionRescale, db.JobStatusRescaleSend, nil)
 		if err != nil {
 			log.Error("Worker failed at UpdateJob", err, nil)
 			return err
@@ -303,12 +277,12 @@ func worker(name string) (err error) {
 		// Arg1: ID
 		// Arg2: RescaleConfig
 		// Arg3: SingularityImage
-		job, err := db.GetJob(j.Arg1)
-		if err != nil {
-			log.Error("Worker failed at GetJob@SendRescaleJob", err, nil)
-			return err
-		}
 		// Upload the singularity image
+		job, e3 := db.GetJob(j.Arg1)
+		if e3 != nil {
+			log.Error("Worker failed at GetJob@actionSendRescale", e3, nil)
+			return e3
+		}
 		meta, err := rescale.Upload(ctx, j.Arg2, j.Arg3)
 		if err != nil {
 			log.Error("Worker failed at Upload@SendRescaleJob", err, nil)
@@ -352,7 +326,7 @@ func worker(name string) (err error) {
 			return err
 		}
 		// Change this job's status
-		err = db.UpdateJobDetail(j.Arg1, db.RescaleJobStoreKey, db.RescaleJobStoreKey, db.RescaleStart, jobID)
+		err = db.UpdateJob(j.Arg1, db.JobActionRescale, db.JobActionRescale, db.JobStatusRescaleStarted, jobID)
 		if err != nil {
 			log.Error("Worker failed at UpdateJob@SendRescaleJob", err, nil)
 			return err

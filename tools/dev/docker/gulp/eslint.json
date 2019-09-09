@@ -28,7 +28,7 @@
       "vuelidate": true,
       "validators": true,
       "M": true,
-      "marked": true,
+      "showdown": true,
       "API": true,
       "models": true,
       "auth": true,

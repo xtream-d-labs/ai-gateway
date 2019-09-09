@@ -57,6 +57,7 @@ func (o *GetIpythonNotebooksParams) BindRequest(r *http.Request, route *middlewa
 	return nil
 }
 
+// bindID binds and validates parameter ID from path.
 func (o *GetIpythonNotebooksParams) bindID(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {

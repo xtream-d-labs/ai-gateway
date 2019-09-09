@@ -1,4 +1,5 @@
 // <script>
+var converter = new showdown.Converter();
 var images = [];
 var conditions = {
   firstLoad: true,
@@ -28,7 +29,7 @@ var vue = new Vue({
           code: image.namespace + '/' + image.name,
           namespace: image.namespace,
           name: image.name,
-          description: marked(image.description)
+          description: converter.makeHtml(image.description)
         });
       });
       filtered.sort(function (a, b) {

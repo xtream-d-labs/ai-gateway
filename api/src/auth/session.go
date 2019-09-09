@@ -8,7 +8,6 @@ import (
 
 	"github.com/SermoDigital/jose/crypto"
 	"github.com/SermoDigital/jose/jws"
-	"github.com/dgraph-io/badger"
 	"github.com/rescale-labs/scaleshift/api/src/db"
 	"github.com/rescale-labs/scaleshift/api/src/generated/models"
 	"github.com/rescale-labs/scaleshift/api/src/log"
@@ -34,7 +33,7 @@ type Credentials struct {
 
 const (
 	sessionKey = "claims"
-	anonymous  = "anonymous"
+	Anonymous  = "anonymous"
 )
 
 // ToJWT translate session to JWT string
@@ -99,29 +98,20 @@ func toString(value interface{}) string {
 
 // FindCredentials returns creds from local DB
 func FindCredentials(username string) *Credentials {
-	creds := &Credentials{
+	if username == "" {
+		username = Anonymous
+	}
+	if bytes, err := db.GetCache(username); err == nil {
+		creds := &Credentials{}
+		if err = json.Unmarshal(bytes, creds); err == nil {
+			return creds
+		}
+	}
+	return &Credentials{
 		Base: &models.Configuration{
 			DockerUsername: username,
 		},
 	}
-	if username == "" {
-		username = anonymous
-	}
-	db.GetValue(func(txn *badger.Txn) error {
-		value, err := txn.Get([]byte(username))
-		if err != nil {
-			return nil
-		}
-		marshaled, err := value.Value()
-		if err != nil {
-			return err
-		}
-		if err := json.Unmarshal(marshaled, &creds); err != nil {
-			return err
-		}
-		return nil
-	})
-	return creds
 }
 
 // Save to local DB
@@ -132,17 +122,15 @@ func (c *Credentials) Save() error {
 	}
 	username := c.Base.DockerUsername
 	if username == "" {
-		username = anonymous
+		username = Anonymous
 	}
-	return db.SetValue(func(txn *badger.Txn) error {
-		return txn.Set([]byte(username), bytes)
-	})
+	return db.SetCache(username, bytes, nil)
 }
 
 // ToSession translate credentials to session
 func (c *Credentials) ToSession() *Session {
 	username := c.Base.DockerUsername
-	if username == anonymous {
+	if username == Anonymous {
 		username = ""
 	}
 	return &Session{

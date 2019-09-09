@@ -43,13 +43,13 @@ func HarborRepositories(ctx context.Context, auth types.AuthConfig) ([]*HarborRe
 	headers.Add("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(
 		auth.Username+":"+auth.Password,
 	)))
-	resp, err := util.HttpSend(
+	resp, err := util.HTTPSend(
 		ctx,
 		http.MethodGet,
 		fmt.Sprintf("%s/api/search", auth.ServerAddress),
 		nil, nil, headers, 0)
 	if err != nil {
-		log.Error("util.HttpSend", err, nil)
+		log.Error("util.HTTPSend", err, nil)
 		return nil, err
 	}
 	obj := HarborSerchResult{}

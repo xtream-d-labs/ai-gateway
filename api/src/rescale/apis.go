@@ -17,7 +17,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dgraph-io/badger"
 	"github.com/go-openapi/swag"
 	"github.com/rescale-labs/scaleshift/api/src/config"
 	"github.com/rescale-labs/scaleshift/api/src/db"
@@ -49,7 +48,7 @@ func EnableCache(enabled bool) {
 // CoreTypes returns supported core types
 func CoreTypes(ctx context.Context, token string, page, pageSize *int64) ([]*CoreType, error) {
 	if useCache {
-		if bytes, e := db.GetValueSimple(coretypesCacheKey); e == nil {
+		if bytes, e := db.GetCache(coretypesCacheKey); e == nil {
 			result := []*CoreType{}
 			json.Unmarshal(bytes, &result)
 			if len(result) > 0 {
@@ -71,7 +70,7 @@ func CoreTypes(ctx context.Context, token string, page, pageSize *int64) ([]*Cor
 	headers := http.Header{}
 	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
 
-	resp, err := util.HttpSend(
+	resp, err := util.HTTPSend(
 		ctx,
 		http.MethodGet,
 		fmt.Sprintf("%s/coretypes/", v3),
@@ -87,13 +86,14 @@ func CoreTypes(ctx context.Context, token string, page, pageSize *int64) ([]*Cor
 	sort.Slice(obj.Results, func(i, j int) bool {
 		return obj.Results[i].DisplayOrder < obj.Results[j].DisplayOrder
 	})
-	db.SetValue(func(txn *badger.Txn) error {
-		bytes, err := json.Marshal(obj.Results)
-		if err != nil {
-			return err
-		}
-		return txn.SetWithTTL([]byte(coretypesCacheKey), bytes, 1*time.Hour)
-	})
+	bytes, err := json.Marshal(obj.Results)
+	if err != nil {
+		return nil, err
+	}
+	duration := 1 * time.Hour
+	if err = db.SetCache(coretypesCacheKey, bytes, &duration); err != nil {
+		return nil, err
+	}
 	return obj.Results, nil
 }
 
@@ -111,7 +111,7 @@ func Analyses(ctx context.Context, token, code string) (*Application, error) {
 
 	headers := http.Header{}
 	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
-	resp, err := util.HttpSend(
+	resp, err := util.HTTPSend(
 		ctx,
 		http.MethodGet,
 		fmt.Sprintf("%s/analyses/", v3),
@@ -207,7 +207,7 @@ func CreateJob(ctx context.Context, token string, input JobInput) (*string, erro
 	headers := http.Header{}
 	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
 	headers.Add("Content-Type", "application/json")
-	resp, err := util.HttpSend(ctx, http.MethodPost, fmt.Sprintf("%s/jobs/", v3), nil, body, headers, 0)
+	resp, err := util.HTTPSend(ctx, http.MethodPost, fmt.Sprintf("%s/jobs/", v3), nil, body, headers, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -223,7 +223,7 @@ func CreateJob(ctx context.Context, token string, input JobInput) (*string, erro
 func Submit(ctx context.Context, token, jobID string) error {
 	headers := http.Header{}
 	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
-	_, err := util.HttpSend(
+	_, err := util.HTTPSend(
 		ctx,
 		http.MethodPost,
 		fmt.Sprintf("%s/jobs/%s/submit/", v3, jobID),
@@ -238,7 +238,7 @@ func Submit(ctx context.Context, token, jobID string) error {
 func Status(ctx context.Context, token, jobID string) (*JobStatus, error) {
 	headers := http.Header{}
 	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
-	resp, err := util.HttpSend(
+	resp, err := util.HTTPSend(
 		ctx,
 		http.MethodGet,
 		fmt.Sprintf("%s/jobs/%s/statuses/", v3, jobID),
@@ -283,7 +283,7 @@ func Logs(ctx context.Context, token, jobID string) ([]*Log, error) {
 		}
 		headers := http.Header{}
 		headers.Add("Authorization", fmt.Sprintf("Token %s", token))
-		resp, err := util.HttpSend(
+		resp, err := util.HTTPSend(
 			ctx,
 			http.MethodGet,
 			file.DownloadURL,
@@ -320,7 +320,7 @@ func Logs(ctx context.Context, token, jobID string) ([]*Log, error) {
 func OutputFiles(ctx context.Context, token, jobID string) (*Files, error) {
 	headers := http.Header{}
 	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
-	resp, err := util.HttpSend(
+	resp, err := util.HTTPSend(
 		ctx,
 		http.MethodGet,
 		fmt.Sprintf("%s/jobs/%s/files/", v3, jobID),
@@ -340,7 +340,7 @@ func OutputFiles(ctx context.Context, token, jobID string) (*Files, error) {
 func Stop(ctx context.Context, token, jobID string) error {
 	headers := http.Header{}
 	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
-	_, err := util.HttpSend(
+	_, err := util.HTTPSend(
 		ctx,
 		http.MethodPost,
 		fmt.Sprintf("%s/jobs/%s/stop/", v3, jobID),
@@ -355,7 +355,7 @@ func Stop(ctx context.Context, token, jobID string) error {
 func Delete(ctx context.Context, token, jobID string) error {
 	headers := http.Header{}
 	headers.Add("Authorization", fmt.Sprintf("Token %s", token))
-	_, err := util.HttpSend(
+	_, err := util.HTTPSend(
 		ctx,
 		http.MethodDelete,
 		fmt.Sprintf("%s/jobs/%s/", v3, jobID),

@@ -8,7 +8,11 @@ package image
 import (
 	"net/http"
 
+	errors "github.com/go-openapi/errors"
 	middleware "github.com/go-openapi/runtime/middleware"
+	strfmt "github.com/go-openapi/strfmt"
+	swag "github.com/go-openapi/swag"
+	validate "github.com/go-openapi/validate"
 )
 
 // DeleteImageHandlerFunc turns a function with the right signature into a delete image handler
@@ -56,4 +60,54 @@ func (o *DeleteImage) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
+}
+
+// DeleteImageBody ImageName
+// swagger:model DeleteImageBody
+type DeleteImageBody struct {
+
+	// Docker image name
+	// Required: true
+	Image *string `json:"image"`
+}
+
+// Validate validates this delete image body
+func (o *DeleteImageBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateImage(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *DeleteImageBody) validateImage(formats strfmt.Registry) error {
+
+	if err := validate.Required("body"+"."+"image", "body", o.Image); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *DeleteImageBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *DeleteImageBody) UnmarshalBinary(b []byte) error {
+	var res DeleteImageBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
 }

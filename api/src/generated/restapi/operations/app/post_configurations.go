@@ -6,9 +6,14 @@ package app
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"encoding/json"
 	"net/http"
 
+	errors "github.com/go-openapi/errors"
 	middleware "github.com/go-openapi/runtime/middleware"
+	strfmt "github.com/go-openapi/strfmt"
+	swag "github.com/go-openapi/swag"
+	validate "github.com/go-openapi/validate"
 )
 
 // PostConfigurationsHandlerFunc turns a function with the right signature into a post configurations handler
@@ -56,4 +61,175 @@ func (o *PostConfigurations) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
+}
+
+// PostConfigurationsBody AccountInfo
+// swagger:model PostConfigurationsBody
+type PostConfigurationsBody struct {
+
+	// Hostname for the private Docker registry
+	DockerHostname string `json:"docker_hostname,omitempty"`
+
+	// Password for the private Docker registry
+	// Format: password
+	DockerPassword strfmt.Password `json:"docker_password,omitempty"`
+
+	// Docker Registry endpoint
+	DockerRegistry string `json:"docker_registry,omitempty"`
+
+	// Username for the private Docker registry
+	DockerUsername string `json:"docker_username,omitempty"`
+
+	// kubecfg
+	K8sConfig string `json:"k8s_config,omitempty"`
+
+	// NGC - API Key
+	NgcApikey string `json:"ngc_apikey,omitempty"`
+
+	// E-mail address for NGC console
+	// Format: email
+	NgcEmail strfmt.Email `json:"ngc_email,omitempty"`
+
+	// Password for NGC console
+	// Format: password
+	NgcPassword strfmt.Password `json:"ngc_password,omitempty"`
+
+	// Rescale - API Key
+	RescaleKey string `json:"rescale_key,omitempty"`
+
+	// Rescale platform endopoint
+	// Enum: [https://platform.rescale.com https://platform.rescale.jp https://kr.rescale.com https://eu.rescale.com]
+	RescalePlatform string `json:"rescale_platform,omitempty"`
+}
+
+// Validate validates this post configurations body
+func (o *PostConfigurationsBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateDockerPassword(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateNgcEmail(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateNgcPassword(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateRescalePlatform(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *PostConfigurationsBody) validateDockerPassword(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.DockerPassword) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("body"+"."+"docker_password", "body", "password", o.DockerPassword.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *PostConfigurationsBody) validateNgcEmail(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.NgcEmail) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("body"+"."+"ngc_email", "body", "email", o.NgcEmail.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *PostConfigurationsBody) validateNgcPassword(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.NgcPassword) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("body"+"."+"ngc_password", "body", "password", o.NgcPassword.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var postConfigurationsBodyTypeRescalePlatformPropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["https://platform.rescale.com","https://platform.rescale.jp","https://kr.rescale.com","https://eu.rescale.com"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		postConfigurationsBodyTypeRescalePlatformPropEnum = append(postConfigurationsBodyTypeRescalePlatformPropEnum, v)
+	}
+}
+
+const (
+
+	// PostConfigurationsBodyRescalePlatformHTTPSPlatformRescaleCom captures enum value "https://platform.rescale.com"
+	PostConfigurationsBodyRescalePlatformHTTPSPlatformRescaleCom string = "https://platform.rescale.com"
+
+	// PostConfigurationsBodyRescalePlatformHTTPSPlatformRescaleJp captures enum value "https://platform.rescale.jp"
+	PostConfigurationsBodyRescalePlatformHTTPSPlatformRescaleJp string = "https://platform.rescale.jp"
+
+	// PostConfigurationsBodyRescalePlatformHTTPSKrRescaleCom captures enum value "https://kr.rescale.com"
+	PostConfigurationsBodyRescalePlatformHTTPSKrRescaleCom string = "https://kr.rescale.com"
+
+	// PostConfigurationsBodyRescalePlatformHTTPSEuRescaleCom captures enum value "https://eu.rescale.com"
+	PostConfigurationsBodyRescalePlatformHTTPSEuRescaleCom string = "https://eu.rescale.com"
+)
+
+// prop value enum
+func (o *PostConfigurationsBody) validateRescalePlatformEnum(path, location string, value string) error {
+	if err := validate.Enum(path, location, value, postConfigurationsBodyTypeRescalePlatformPropEnum); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *PostConfigurationsBody) validateRescalePlatform(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.RescalePlatform) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := o.validateRescalePlatformEnum("body"+"."+"rescale_platform", "body", o.RescalePlatform); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *PostConfigurationsBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *PostConfigurationsBody) UnmarshalBinary(b []byte) error {
+	var res PostConfigurationsBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
 }

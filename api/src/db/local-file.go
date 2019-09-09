@@ -2,13 +2,14 @@ package db
 
 import (
 	"bytes"
+	"time"
 
 	"github.com/dgraph-io/badger"
 	"github.com/rescale-labs/scaleshift/api/src/config"
 )
 
 var (
-	db *badger.DB
+	cache *badger.DB
 )
 
 func init() {
@@ -16,32 +17,32 @@ func init() {
 	opts.Dir = config.Config.DatabaseDir
 	opts.ValueDir = config.Config.DatabaseDir
 	if candidate, err := badger.Open(opts); err == nil {
-		db = candidate
+		cache = candidate
 	}
-	if db == nil {
+	if cache == nil {
 		panic("DB cannot be created")
 	}
 }
 
-// ShutdownDB stop its service
-func ShutdownDB() {
-	db.Close()
+// ShutdownCache stop its service
+func ShutdownCache() {
+	cache.Close()
 }
 
-// SetValue with the specified function
-func SetValue(f func(txn *badger.Txn) error) error {
-	return db.Update(f)
+// SetCache with the specified function
+func SetCache(key string, value []byte, duration *time.Duration) error {
+	return cache.Update(func(txn *badger.Txn) error {
+		if duration != nil {
+			return txn.SetWithTTL([]byte(key), value, *duration)
+		}
+		return txn.Set([]byte(key), value)
+	})
 }
 
-// GetValue with the specified function
-func GetValue(f func(txn *badger.Txn) error) error {
-	return db.View(f)
-}
-
-// GetValueSimple returns []bytes
-func GetValueSimple(key string) ([]byte, error) {
+// GetCache returns []bytes
+func GetCache(key string) ([]byte, error) {
 	out := bytes.Buffer{}
-	if err := GetValue(func(txn *badger.Txn) error {
+	if err := cache.View(func(txn *badger.Txn) error {
 		item, err := txn.Get([]byte(key))
 		if err != nil {
 			if err == badger.ErrKeyNotFound {

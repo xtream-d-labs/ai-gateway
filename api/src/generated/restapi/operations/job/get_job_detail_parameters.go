@@ -57,6 +57,7 @@ func (o *GetJobDetailParams) BindRequest(r *http.Request, route *middleware.Matc
 	return nil
 }
 
+// bindID binds and validates parameter ID from path.
 func (o *GetJobDetailParams) bindID(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {

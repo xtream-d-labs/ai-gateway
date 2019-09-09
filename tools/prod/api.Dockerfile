@@ -6,7 +6,7 @@ ARG API_VERSION
 ARG API_COMMIT
 RUN go build -ldflags \
     "-s -w -X github.com/rescale-labs/scaleshift/api/src/config.date=$(date +%Y-%m-%d) -X github.com/rescale-labs/scaleshift/api/src/config.version=${API_VERSION} -X github.com/rescale-labs/scaleshift/api/src/config.commit=${API_COMMIT}" \
-    generated/cmd/scale-shift-server/main.go
+    main.go
 RUN mv main /app
 
 FROM alpine:3.10

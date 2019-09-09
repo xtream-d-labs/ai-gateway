@@ -8,7 +8,7 @@ RUN curl --location --silent --show-error --out /gosu \
 RUN chmod +x /gosu
 
 FROM golang:1.12.7-alpine3.10 AS build-app
-ENV SINGULARITY_VERESION=v3.2.1
+ENV SINGULARITY_VERESION=v3.3.0
 RUN apk --no-cache add "build-base=0.5-r1" "linux-headers=4.19.36-r0" \
        "openssl-dev=1.1.1c-r0" "util-linux-dev=2.33.2-r0" "gawk=5.0.1-r0" \
        "git=2.22.0-r0" \

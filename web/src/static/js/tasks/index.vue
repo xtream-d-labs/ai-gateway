@@ -86,13 +86,13 @@ var vue = new Vue({
 
 function statusValue(status) {
   switch (status) {
-  case 'building-job':
+  case 'building':
     return 'preparing';
-  case 'pushing-job':
-  case 'k8s-job':
+  case 'pushing':
+  case 'k8s-job-init':
   case 'rescale-send':
     return 'sending';
-  case 'k8s-job-start':
+  case 'k8s-job-started':
   case 'k8s-job-pending':
   case 'k8s-job-runnning':
   case 'rescale-start':
@@ -109,13 +109,13 @@ function statusValue(status) {
 
 function statusMore(status) {
   switch (status) {
-  case 'building-job':
+  case 'building':
     return 'Building a docker/singularity image for the job';
-  case 'pushing-job':
-  case 'k8s-job':
+  case 'pushing':
+  case 'k8s-job-init':
   case 'rescale-send':
     return 'Sending files to the cloud';
-  case 'k8s-job-start':
+  case 'k8s-job-started':
   case 'k8s-job-pending':
     return 'The job is still pending';
   case 'k8s-job-runnning':
@@ -134,13 +134,13 @@ function statusMore(status) {
 
 function statusOrder(status) {
   switch (status) {
-  case 'building-job':
+  case 'building':
     return 1;
-  case 'pushing-job':
-  case 'k8s-job':
+  case 'pushing':
+  case 'k8s-job-init':
   case 'rescale-send':
     return 2;
-  case 'k8s-job-start':
+  case 'k8s-job-started':
   case 'k8s-job-pending':
     return 3;
   case 'k8s-job-runnning':
@@ -158,15 +158,15 @@ function statusOrder(status) {
 
 function statusClass(state) {
   switch (state) {
-  case 'building-job':
+  case 'building':
     return {
         'label-info':    true,
         'label-warning': false,
         'label-success': false,
         'label-danger':  false
     };
-  case 'pushing-job':
-  case 'k8s-job':
+  case 'pushing':
+  case 'k8s-job-init':
   case 'rescale-send':
     return {
         'label-info':    false,
@@ -174,7 +174,7 @@ function statusClass(state) {
         'label-success': false,
         'label-danger':  false
     };
-  case 'k8s-job-start':
+  case 'k8s-job-started':
   case 'k8s-job-pending':
   case 'k8s-job-runnning':
   case 'rescale-start':

@@ -6,9 +6,14 @@ package job
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"encoding/json"
 	"net/http"
 
+	errors "github.com/go-openapi/errors"
 	middleware "github.com/go-openapi/runtime/middleware"
+	strfmt "github.com/go-openapi/strfmt"
+	swag "github.com/go-openapi/swag"
+	validate "github.com/go-openapi/validate"
 	"github.com/rescale-labs/scaleshift/api/src/auth"
 )
 
@@ -70,4 +75,85 @@ func (o *ModifyJob) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
+}
+
+// ModifyJobBody JobAttrs
+// swagger:model ModifyJobBody
+type ModifyJobBody struct {
+
+	// status
+	// Enum: [stopped]
+	Status string `json:"status,omitempty"`
+}
+
+// Validate validates this modify job body
+func (o *ModifyJobBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateStatus(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+var modifyJobBodyTypeStatusPropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["stopped"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		modifyJobBodyTypeStatusPropEnum = append(modifyJobBodyTypeStatusPropEnum, v)
+	}
+}
+
+const (
+
+	// ModifyJobBodyStatusStopped captures enum value "stopped"
+	ModifyJobBodyStatusStopped string = "stopped"
+)
+
+// prop value enum
+func (o *ModifyJobBody) validateStatusEnum(path, location string, value string) error {
+	if err := validate.Enum(path, location, value, modifyJobBodyTypeStatusPropEnum); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *ModifyJobBody) validateStatus(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.Status) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := o.validateStatusEnum("body"+"."+"status", "body", o.Status); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *ModifyJobBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *ModifyJobBody) UnmarshalBinary(b []byte) error {
+	var res ModifyJobBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
 }

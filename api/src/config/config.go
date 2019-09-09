@@ -54,6 +54,7 @@ type config struct { // nolint:maligned
 	SecuredTransport       bool     `envconfig:"SECURED_TRANSPORT" default:"false"`
 	ContentEncoding        bool     `envconfig:"CONTENT_ENCODING" default:"false"`
 	ImagesToBeIgnored      []string `envconfig:"IMAGES_TOBE_IGNORED" default:""`
+	DatabaseEndpoint       string   `envconfig:"DATABASE_ENDPOINT" default:""`
 	DatabaseDir            string   `envconfig:"DATABASE_CNTR_DIR" default:"/tmp/badger"`
 	WorkspaceHostDir       string   `envconfig:"WORKSPACE_HOST_DIR"`
 	WorkspaceContainerDir  string   `envconfig:"WORKSPACE_CNTR_DIR" default:"/tmp/work"`

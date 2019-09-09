@@ -25,7 +25,7 @@ type PostNewJobCreated struct {
 	/*
 	  In: Body
 	*/
-	Payload *models.PostNewJobCreatedBody `json:"body,omitempty"`
+	Payload *PostNewJobCreatedBody `json:"body,omitempty"`
 }
 
 // NewPostNewJobCreated creates PostNewJobCreated with default headers values
@@ -35,13 +35,13 @@ func NewPostNewJobCreated() *PostNewJobCreated {
 }
 
 // WithPayload adds the payload to the post new job created response
-func (o *PostNewJobCreated) WithPayload(payload *models.PostNewJobCreatedBody) *PostNewJobCreated {
+func (o *PostNewJobCreated) WithPayload(payload *PostNewJobCreatedBody) *PostNewJobCreated {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the post new job created response
-func (o *PostNewJobCreated) SetPayload(payload *models.PostNewJobCreatedBody) {
+func (o *PostNewJobCreated) SetPayload(payload *PostNewJobCreatedBody) {
 	o.Payload = payload
 }
 

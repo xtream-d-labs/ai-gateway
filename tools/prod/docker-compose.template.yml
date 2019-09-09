@@ -1,4 +1,4 @@
-version: "3.2"
+version: "2.4"
 
 services:
   api:
@@ -17,8 +17,11 @@ services:
     volumes:
       - ${PWD}/scaleshift/workspaces:/tmp/work
       - ${PWD}/scaleshift/simages:/tmp/simg
-      - database:/tmp/badger
+      - database-cache:/tmp/badger
       - /var/run/docker.sock:/var/run/docker.sock
+    # depends_on:
+    #   db:
+    #     condition: service_healthy
     restart: always
     container_name: api
 
@@ -30,7 +33,7 @@ services:
     container_name: web
 
   proxy:
-    image: scaleshift/proxy:1.10
+    image: scaleshift/proxy:1.11
     ports:
       - "%{publish_port}:80"
     logging:
@@ -38,5 +41,19 @@ services:
     restart: always
     container_name: proxy
 
+  db:
+    image: scaleshift/mysql:5.6
+    volumes:
+      - database-mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqlshow -u ${MYSQL_USER} -p${MYSQL_PASSWORD}"]
+      interval: "5s"
+      retries: 10
+    logging:
+      driver: none
+    restart: always
+    container_name: db
+
 volumes:
-  database:
+  database-cache:
+  database-mysql:

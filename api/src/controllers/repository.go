@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/dgraph-io/badger"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
@@ -125,9 +124,8 @@ func getNgcRepositories(params repository.GetNgcRepositoriesParams, principal *a
 		return repository.NewGetRepositoriesDefault(code).WithPayload(newerror(code))
 	}
 	result := []*models.Repository{}
-	if bytes, e := db.GetValueSimple(repositriesNgcCacheKey); e == nil {
-		json.Unmarshal(bytes, &result)
-		if len(result) > 0 {
+	if bytes, _ := db.GetCache(repositriesNgcCacheKey); bytes != nil {
+		if json.Unmarshal(bytes, &result) == nil && len(result) > 0 {
 			return repository.NewGetRepositoriesOK().WithPayload(result)
 		}
 	}
@@ -150,13 +148,16 @@ func getNgcRepositories(params repository.GetNgcRepositoriesParams, principal *a
 			Description: repositry.Description,
 		})
 	}
-	db.SetValue(func(txn *badger.Txn) error {
-		bytes, err := json.Marshal(result)
-		if err != nil {
-			return err
-		}
-		return txn.SetWithTTL([]byte(repositriesNgcCacheKey), bytes, 1*time.Hour)
-	})
+	bytes, err := json.Marshal(result)
+	if err != nil {
+		code := http.StatusInternalServerError
+		return repository.NewGetRepositoriesDefault(code).WithPayload(newerror(code))
+	}
+	duration := 1 * time.Hour
+	if db.SetCache(repositriesNgcCacheKey, bytes, &duration) != nil {
+		code := http.StatusInternalServerError
+		return repository.NewGetRepositoriesDefault(code).WithPayload(newerror(code))
+	}
 	return repository.NewGetRepositoriesOK().WithPayload(result)
 }
 

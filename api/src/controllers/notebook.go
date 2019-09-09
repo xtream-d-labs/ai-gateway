@@ -78,7 +78,7 @@ func getNotebooks(params notebook.GetNotebooksParams) middleware.Responder {
 		})
 	}
 	// building Images
-	if images, err := db.GetBuildingImages(); err == nil {
+	if images, err := db.FindImages(db.ImageActionBuilding); err == nil {
 		for idx, image := range images {
 			result = append(result, &models.Notebook{
 				ID:      swag.String(fmt.Sprintf("building-image-%d", idx)),
@@ -86,7 +86,7 @@ func getNotebooks(params notebook.GetNotebooksParams) middleware.Responder {
 				Image:   swag.String(image.Tag),
 				State:   "creating",
 				Port:    0,
-				Started: strfmt.DateTime(image.Started),
+				Started: strfmt.DateTime(image.CreatedAt),
 			})
 		}
 	}
@@ -130,8 +130,17 @@ func postNewNotebook(params notebook.PostNewNotebookParams) middleware.Responder
 			break
 		}
 	}
-	if err := db.SetBuildImageMeta(name); err != nil {
-		log.Error("SetBuildImageMeta@postNewNotebook", err, nil)
+	username := auth.Anonymous
+	if sess, err := auth.RetrieveSession(params.HTTPRequest); err == nil && sess != nil {
+		username = sess.DockerUsername
+	}
+	image := &db.Image{
+		Tag:    name,
+		Action: string(db.ImageActionBuilding),
+		Owner:  username,
+	}
+	if err := image.Create(); err != nil {
+		log.Error("image.Create@postNewNotebook", err, nil)
 		code := http.StatusInternalServerError
 		return notebook.NewPostNewNotebookDefault(code).WithPayload(newerror(code))
 	}

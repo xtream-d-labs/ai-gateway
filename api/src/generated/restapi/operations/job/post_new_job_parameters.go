@@ -12,8 +12,6 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
-
-	models "github.com/rescale-labs/scaleshift/api/src/generated/models"
 )
 
 // NewPostNewJobParams creates a new PostNewJobParams object
@@ -36,7 +34,7 @@ type PostNewJobParams struct {
 	  Required: true
 	  In: body
 	*/
-	Body *models.PostNewJobParamsBody
+	Body PostNewJobBody
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -50,7 +48,7 @@ func (o *PostNewJobParams) BindRequest(r *http.Request, route *middleware.Matche
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body models.PostNewJobParamsBody
+		var body PostNewJobBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			if err == io.EOF {
 				res = append(res, errors.Required("body", "body"))
@@ -58,14 +56,13 @@ func (o *PostNewJobParams) BindRequest(r *http.Request, route *middleware.Matche
 				res = append(res, errors.NewParseError("body", "body", "", err))
 			}
 		} else {
-
 			// validate body object
 			if err := body.Validate(route.Formats); err != nil {
 				res = append(res, err)
 			}
 
 			if len(res) == 0 {
-				o.Body = &body
+				o.Body = body
 			}
 		}
 	} else {

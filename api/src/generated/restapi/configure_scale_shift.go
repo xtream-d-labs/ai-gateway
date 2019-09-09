@@ -7,9 +7,8 @@ import (
 	"log"
 	"net/http"
 
-	errors "github.com/go-openapi/errors"
-	runtime "github.com/go-openapi/runtime"
-	graceful "github.com/tylerb/graceful"
+	"github.com/go-openapi/errors"
+	"github.com/go-openapi/runtime"
 
 	"github.com/rescale-labs/scaleshift/api/src/auth"
 	"github.com/rescale-labs/scaleshift/api/src/controllers"
@@ -17,7 +16,7 @@ import (
 	wrapper "github.com/rescale-labs/scaleshift/api/src/http"
 )
 
-//go:generate swagger generate server --target ../src/generated --name  --spec ../spec/openapi.yaml --principal auth.Principal
+//go:generate swagger generate server --target ../src/generated --name ScaleShift --spec ../spec/openapi.yaml --principal auth.Principal
 
 func configureFlags(api *operations.ScaleShiftAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
@@ -53,7 +52,7 @@ func configureTLS(tlsConfig *tls.Config) {
 // If you need to modify a config, store server instance to stop it individually later, this is the place.
 // This function can be called multiple times, depending on the number of serving schemes.
 // scheme value will be set accordingly: "http", "https" or "unix"
-func configureServer(s *graceful.Server, scheme, addr string) {
+func configureServer(s *http.Server, scheme, addr string) {
 }
 
 // The middleware configuration is for the handler executors. These do not apply to the swagger.json document.

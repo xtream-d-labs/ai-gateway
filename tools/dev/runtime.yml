@@ -1,19 +1,21 @@
-version: "2.1"
+version: "2.4"
 
 services:
   api:
     image: scaleshift/dev:go-20190715
     build: docker/go
-    command: go run generated/cmd/scale-shift-server/main.go --host 0.0.0.0 --port 80
+    command: go run main.go --host 0.0.0.0 --port 80
     environment:
       - SS_RESCALE_ENDPOINT=https://platform.rescale.jp
       - SS_RESCALE_API_TOKEN
       - SS_LOG_LEVEL=debug
+      - SS_LOG_FORMAT=json
       - SS_MAX_WORKERS=4
       - SS_MUST_SIGN_IN=false
       - SS_IMAGES_TOBE_IGNORED=scaleshift/,ss-jupyter/,supinf/,<none>
       - SS_WORKSPACE_HOST_DIR=${PWD}/tools/dev/tmp/work
       - SS_SINGULARITY_HOST_DIR=${PWD}/tools/dev/tmp/simg
+      - SS_DATABASE_ENDPOINT=user:pass@tcp(db:3306)/scaleshift?charset=utf8mb4&collation=utf8_unicode_ci&parseTime=true
       - DOCKER_HOST=unix:///var/run/docker.sock
     volumes:
       - ../../api:/go/src/github.com/rescale-labs/scaleshift/api
@@ -22,6 +24,9 @@ services:
       - ./tmp/simg:/tmp/simg
       - ./tmp/work:/tmp/work
       - /var/run/docker.sock:/var/run/docker.sock
+    # depends_on:
+    #   db:
+    #     condition: service_healthy
     working_dir: /go/src/github.com/rescale-labs/scaleshift/api/src
     restart: always
     container_name: api
@@ -45,8 +50,29 @@ services:
     restart: always
     container_name: proxy
 
+  db:
+    image: mysql:5.6.44
+    ports:
+      - 3306:3306
+    volumes:
+      - ./tmp/mysql:/var/lib/mysql
+      - ../database/conf:/etc/mysql/conf.d
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=scaleshift
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=pass
+    healthcheck:
+      test: ["CMD-SHELL", "mysqlshow -u ${MYSQL_USER} -p${MYSQL_PASSWORD}"]
+      interval: "5s"
+      retries: 10
+    logging:
+      driver: none
+    restart: always
+    container_name: db
+
   gulp:
-    image: scaleshift/dev:gulp-20190403
+    image: scaleshift/dev:gulp-20190903
     build: docker/gulp
     volumes:
       - ../../api/src:/monitor/api

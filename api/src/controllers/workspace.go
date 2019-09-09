@@ -98,9 +98,9 @@ func findNotebooks(path string, containers []types.Container) []string {
 func findJobs(path string, jobs []*db.Job) []string {
 	result := []string{}
 	for _, job := range jobs {
-		for _, workspace := range job.Workspaces {
+		for _, workspace := range strings.Split(job.Workspaces, ",") {
 			if strings.EqualFold(path, workspace) {
-				result = append(result, job.ID)
+				result = append(result, job.JobID)
 				break
 			}
 		}

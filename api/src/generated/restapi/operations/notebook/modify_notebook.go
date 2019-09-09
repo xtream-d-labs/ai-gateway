@@ -6,9 +6,14 @@ package notebook
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"encoding/json"
 	"net/http"
 
+	errors "github.com/go-openapi/errors"
 	middleware "github.com/go-openapi/runtime/middleware"
+	strfmt "github.com/go-openapi/strfmt"
+	swag "github.com/go-openapi/swag"
+	validate "github.com/go-openapi/validate"
 )
 
 // ModifyNotebookHandlerFunc turns a function with the right signature into a modify notebook handler
@@ -56,4 +61,88 @@ func (o *ModifyNotebook) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
+}
+
+// ModifyNotebookBody NotebookAttrs
+// swagger:model ModifyNotebookBody
+type ModifyNotebookBody struct {
+
+	// status
+	// Enum: [started stopped]
+	Status string `json:"status,omitempty"`
+}
+
+// Validate validates this modify notebook body
+func (o *ModifyNotebookBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateStatus(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+var modifyNotebookBodyTypeStatusPropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["started","stopped"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		modifyNotebookBodyTypeStatusPropEnum = append(modifyNotebookBodyTypeStatusPropEnum, v)
+	}
+}
+
+const (
+
+	// ModifyNotebookBodyStatusStarted captures enum value "started"
+	ModifyNotebookBodyStatusStarted string = "started"
+
+	// ModifyNotebookBodyStatusStopped captures enum value "stopped"
+	ModifyNotebookBodyStatusStopped string = "stopped"
+)
+
+// prop value enum
+func (o *ModifyNotebookBody) validateStatusEnum(path, location string, value string) error {
+	if err := validate.Enum(path, location, value, modifyNotebookBodyTypeStatusPropEnum); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *ModifyNotebookBody) validateStatus(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.Status) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := o.validateStatusEnum("body"+"."+"status", "body", o.Status); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *ModifyNotebookBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *ModifyNotebookBody) UnmarshalBinary(b []byte) error {
+	var res ModifyNotebookBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
 }

@@ -68,6 +68,7 @@ func (o *GetRescaleApplicationVersionParams) BindRequest(r *http.Request, route 
 	return nil
 }
 
+// bindCode binds and validates parameter Code from path.
 func (o *GetRescaleApplicationVersionParams) bindCode(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
@@ -86,6 +87,7 @@ func (o *GetRescaleApplicationVersionParams) bindCode(rawData []string, hasKey b
 	return nil
 }
 
+// validateCode carries on validations for parameter Code
 func (o *GetRescaleApplicationVersionParams) validateCode(formats strfmt.Registry) error {
 
 	if err := validate.Enum("code", "path", o.Code, []interface{}{"singularity"}); err != nil {
@@ -95,6 +97,7 @@ func (o *GetRescaleApplicationVersionParams) validateCode(formats strfmt.Registr
 	return nil
 }
 
+// bindVersion binds and validates parameter Version from path.
 func (o *GetRescaleApplicationVersionParams) bindVersion(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
