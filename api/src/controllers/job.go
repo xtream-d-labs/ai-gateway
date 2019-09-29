@@ -48,12 +48,12 @@ func getJobs(params job.GetJobsParams, principal *auth.Principal) middleware.Res
 
 const timeFormat = "2006-01-02 15:04:05.999999999 -0700 MST"
 
-func jobs(ctx context.Context, creds *auth.Credentials, ID *string) []*models.Job {
+func jobs(ctx context.Context, creds *auth.Credentials, id *string) []*models.Job {
 	result := []*models.Job{}
 	if jobs, err := db.GetJobs(); err == nil {
 		for _, j := range jobs {
-			if ID != nil {
-				if !strings.EqualFold(swag.StringValue(ID), j.JobID) {
+			if id != nil {
+				if !strings.EqualFold(swag.StringValue(id), j.JobID) {
 					continue
 				}
 			}
@@ -180,13 +180,16 @@ func getJobLogs(params job.GetJobLogsParams, principal *auth.Principal) middlewa
 	})
 }
 
-func jobLogs(ctx context.Context, creds *auth.Credentials, ID string) []*models.JobLog {
+func jobLogs(ctx context.Context, creds *auth.Credentials, id string) []*models.JobLog {
 	result := []*models.JobLog{}
 	jobs, err := db.GetJobs()
 	if err != nil {
 		return result
 	}
 	for _, j := range jobs {
+		if !strings.EqualFold(id, j.JobID) {
+			continue
+		}
 		switch db.JobStatus(j.Status) {
 		case db.JobStatusK8sStarted:
 			k8sLog, e := kubernetes.Logs(creds.Base.K8sConfig, j.JobID, "default")
@@ -228,13 +231,16 @@ func getJobFiles(params job.GetJobFilesParams, principal *auth.Principal) middle
 	})
 }
 
-func jobFiles(ctx context.Context, creds *auth.Credentials, ID string) []*models.JobFile {
+func jobFiles(ctx context.Context, creds *auth.Credentials, id string) []*models.JobFile {
 	result := []*models.JobFile{}
 	jobs, err := db.GetJobs()
 	if err != nil {
 		return result
 	}
 	for _, j := range jobs {
+		if !strings.EqualFold(id, j.JobID) {
+			continue
+		}
 		switch db.JobStatus(j.Status) {
 		case db.JobStatusK8sStarted:
 			// There is no such things

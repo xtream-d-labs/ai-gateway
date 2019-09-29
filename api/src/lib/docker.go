@@ -123,29 +123,26 @@ func runDockerContainer(ctx context.Context, name string,
 	return swag.String(res.ID), nil
 }
 
-func waitforExitDockerContainer(ctx context.Context, ID string) (*string, error) {
+func waitforExitDockerContainer(ctx context.Context, id string) (*string, error) {
 	cli, err := docker.NewEnvClient()
 	if err != nil {
 		return nil, err
 	}
 	defer cli.Close()
 
-	resultC, errC := cli.ContainerWait(ctx, ID, container.WaitConditionNotRunning)
+	resultC, errC := cli.ContainerWait(ctx, id, container.WaitConditionNotRunning)
 	select {
 	case <-resultC:
 	case err = <-errC:
-		removeDockerContainer(ctx, cli, ID)
+		removeDockerContainer(ctx, cli, id)
 		return nil, err
 	}
+	out, err := LogsOfDockerContainer(ctx, cli, id)
 	if err != nil {
+		removeDockerContainer(ctx, cli, id)
 		return nil, err
 	}
-	out, err := LogsOfDockerContainer(ctx, cli, ID)
-	if err != nil {
-		removeDockerContainer(ctx, cli, ID)
-		return nil, err
-	}
-	removeDockerContainer(ctx, cli, ID)
+	removeDockerContainer(ctx, cli, id)
 	return out, nil
 }
 
@@ -155,8 +152,8 @@ var (
 )
 
 // LogsOfDockerContainer retrieves logs from a specified container
-func LogsOfDockerContainer(ctx context.Context, cli *docker.Client, ID string) (*string, error) {
-	out, err := cli.ContainerLogs(ctx, ID, types.ContainerLogsOptions{
+func LogsOfDockerContainer(ctx context.Context, cli *docker.Client, id string) (*string, error) {
+	out, err := cli.ContainerLogs(ctx, id, types.ContainerLogsOptions{
 		ShowStdout: true,
 		ShowStderr: true,
 	})
@@ -173,9 +170,9 @@ func LogsOfDockerContainer(ctx context.Context, cli *docker.Client, ID string) (
 	return swag.String(string(log)), nil
 }
 
-func removeDockerContainer(ctx context.Context, cli *docker.Client, ID string) error {
+func removeDockerContainer(ctx context.Context, cli *docker.Client, id string) error {
 	options := types.ContainerRemoveOptions{Force: true}
-	return cli.ContainerRemove(ctx, ID, options)
+	return cli.ContainerRemove(ctx, id, options)
 }
 
 // BuildJobImage builds a docker image for the job

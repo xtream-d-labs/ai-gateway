@@ -31,6 +31,7 @@ type Credentials struct {
 	NgcSession string                `json:"ngc_session,omitempty"`
 }
 
+// constant variables
 const (
 	sessionKey = "claims"
 	Anonymous  = "anonymous"

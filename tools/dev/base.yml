@@ -1,0 +1,42 @@
+version: "2.4"
+
+services:
+
+  db:
+    image: mysql:5.6.44
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=scaleshift
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=pass
+    volumes:
+      - scaleshift_database:/var/lib/mysql
+      - ../database/conf:/etc/mysql/conf.d
+    healthcheck:
+      test: ["CMD-SHELL", "mysqlshow -u root -proot"]
+      interval: "5s"
+      retries: 10
+    logging:
+      driver: none
+    networks:
+      - scaleshift_network
+    restart: always
+    container_name: scaleshift_db
+
+  db_waiter:
+    image: alpine:3.10
+    entrypoint: env
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - scaleshift_network
+    container_name: scaleshift_db_waiter
+
+volumes:
+  scaleshift_database:
+
+networks:
+  scaleshift_network:

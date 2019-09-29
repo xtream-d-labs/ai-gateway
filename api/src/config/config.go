@@ -11,7 +11,7 @@ import (
 var (
 	version = "dev"
 	commit  string
-	date    = "---"
+	date    string
 )
 
 // API props
@@ -58,7 +58,7 @@ type config struct { // nolint:maligned
 	DatabaseDir            string   `envconfig:"DATABASE_CNTR_DIR" default:"/tmp/badger"`
 	WorkspaceHostDir       string   `envconfig:"WORKSPACE_HOST_DIR"`
 	WorkspaceContainerDir  string   `envconfig:"WORKSPACE_CNTR_DIR" default:"/tmp/work"`
-	SingImg                string   `envconfig:"SINGULARITY_IMAGE" default:"scaleshift/singularity:3.2"`
+	SingImg                string   `envconfig:"SINGULARITY_IMAGE" default:"scaleshift/singularity:3.4"`
 	DocToSinImg            string   `envconfig:"SINGULARITY_IMAGE" default:"scaleshift/singularity:2.6-d2s"`
 	SingImgHostPath        string   `envconfig:"SINGULARITY_HOST_DIR"`
 	SingImgContainerDir    string   `envconfig:"SINGULARITY_CNTR_DIR" default:"/tmp/simg"`
@@ -94,7 +94,7 @@ func init() {
 	initRescaleAPIToken = Config.RescaleAPIToken
 }
 
-// BuildDate returns the version of this app
+// BuildVersion returns the version of this app
 func BuildVersion() string {
 	if len(commit) > 0 {
 		return fmt.Sprintf("%s-%s", version, commit)

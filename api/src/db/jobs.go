@@ -25,8 +25,10 @@ type Job struct {
 	TargetID    string `gorm:"column:target_id;"` // Job ID of the target platform
 }
 
+// JobAction defines how to handle the job
 type JobAction string
 
+// JobActions
 const (
 	JobActionBuilding   JobAction = "building"
 	JobActionPushing    JobAction = "pushing"
@@ -37,6 +39,7 @@ const (
 // PlatformType defines in where the job will be run
 type PlatformType int
 
+// PlatformTypes
 const (
 	PlatformKubernetes PlatformType = iota
 	PlatformRescale
@@ -49,8 +52,10 @@ func (p PlatformType) String() string {
 	return models.JobPlatformRescale
 }
 
+// JobStatus defines the status of a job
 type JobStatus string
 
+// JobStatuses
 const (
 	JobStatusImageBuilding  JobStatus = "building"
 	JobStatusImagePushing   JobStatus = "pushing"
@@ -68,10 +73,12 @@ const (
 	JobStatusUnknown        JobStatus = "unknown"
 )
 
+// Value casts its value to the pointer
 func (s JobStatus) Value() *string {
 	return swag.String(string(s))
 }
 
+// Create persists its data to database
 func (job *Job) Create() error {
 	return db.Create(job).Error
 }
@@ -95,26 +102,26 @@ func GetJob(jobID string) (*Job, error) {
 }
 
 // RemoveBuildingJobImagesJobs removes job
-func RemoveBuildingJobImagesJobs(ID string) error {
-	return removeJob(ID, JobActionBuilding)
+func RemoveBuildingJobImagesJobs(id string) error {
+	return removeJob(id, JobActionBuilding)
 }
 
 // RemovePushingJobImageJobs removes job
-func RemovePushingJobImageJobs(ID string) error {
-	return removeJob(ID, JobActionPushing)
+func RemovePushingJobImageJobs(id string) error {
+	return removeJob(id, JobActionPushing)
 }
 
-func removeJob(ID string, action JobAction) error {
-	return db.Delete(Job{}, "job_id = ? and action = ?", ID, action).Error
+func removeJob(id string, action JobAction) error {
+	return db.Delete(Job{}, "job_id = ? and action = ?", id, action).Error
 }
 
 // RemoveJob removes a job you specified
-func RemoveJob(ID string) error {
-	return db.Delete(Job{}, "job_id = ?", ID).Error
+func RemoveJob(id string) error {
+	return db.Delete(Job{}, "job_id = ?", id).Error
 }
 
 // UpdateJob update job status
-func UpdateJob(ID string, from, to JobAction, status JobStatus, targetID *string) error {
+func UpdateJob(id string, from, to JobAction, status JobStatus, targetID *string) error {
 	fields := map[string]interface{}{
 		"action": to,
 		"status": status,
@@ -122,5 +129,5 @@ func UpdateJob(ID string, from, to JobAction, status JobStatus, targetID *string
 	if targetID == nil {
 		fields["target_id"] = swag.StringValue(targetID)
 	}
-	return db.Model(&Job{}).Where("job_id = ? and action = ?", ID, from).Updates(fields).Error
+	return db.Model(&Job{}).Where("job_id = ? and action = ?", id, from).Updates(fields).Error
 }

@@ -208,10 +208,6 @@ func getNotebookDetails(params notebook.GetNotebookDetailsParams) middleware.Res
 		Token:   swag.String(token),
 		Mounts:  mounts,
 	}
-	if result == nil {
-		code := http.StatusNotFound
-		return notebook.NewGetNotebookDetailsDefault(code).WithPayload(newerror(code))
-	}
 	return notebook.NewGetNotebookDetailsOK().WithPayload(result)
 }
 

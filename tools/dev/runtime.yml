@@ -1,10 +1,18 @@
 version: "2.4"
 
 services:
+
   api:
-    image: scaleshift/dev:go-20190715
-    build: docker/go
-    command: go run main.go --host 0.0.0.0 --port 80
+    image: scaleshift/api:local
+    build:
+      context: ../../
+      dockerfile: tools/prod/api.Dockerfile
+      args:
+        BASE_IMAGE: scaleshift/api:cache
+      target: builder
+    entrypoint: tini -- tail -f /dev/null
+    ports:
+      - 9000:80
     environment:
       - SS_RESCALE_ENDPOINT=https://platform.rescale.jp
       - SS_RESCALE_API_TOKEN
@@ -15,21 +23,20 @@ services:
       - SS_IMAGES_TOBE_IGNORED=scaleshift/,ss-jupyter/,supinf/,<none>
       - SS_WORKSPACE_HOST_DIR=${PWD}/tools/dev/tmp/work
       - SS_SINGULARITY_HOST_DIR=${PWD}/tools/dev/tmp/simg
-      - SS_DATABASE_ENDPOINT=user:pass@tcp(db:3306)/scaleshift?charset=utf8mb4&collation=utf8_unicode_ci&parseTime=true
+      - SS_DATABASE_ENDPOINT=user:pass@tcp(scaleshift_db:3306)/scaleshift?charset=utf8mb4&collation=utf8_unicode_ci&parseTime=true
       - DOCKER_HOST=unix:///var/run/docker.sock
     volumes:
-      - ../../api:/go/src/github.com/rescale-labs/scaleshift/api
-      - ../../api/certs:/certs
-      - ./tmp/db:/tmp/badger
-      - ./tmp/simg:/tmp/simg
-      - ./tmp/work:/tmp/work
+      # - ./api:/go/src/github.com/rescale-labs/scaleshift/api
+      - ./api/certs:/certs
+      - ./tools/dev/tmp/db:/tmp/badger
+      - ./tools/dev/tmp/simg:/tmp/simg
+      - ./tools/dev/tmp/work:/tmp/work
       - /var/run/docker.sock:/var/run/docker.sock
-    # depends_on:
-    #   db:
-    #     condition: service_healthy
     working_dir: /go/src/github.com/rescale-labs/scaleshift/api/src
+    networks:
+      - services
     restart: always
-    container_name: api
+    container_name: scaleshift_api
 
   web:
     image: supinf/hugo:0.x
@@ -38,8 +45,10 @@ services:
       - ../../web/src:/app
     logging:
       driver: none
+    networks:
+      - services
     restart: always
-    container_name: web
+    container_name: scaleshift_web
 
   proxy:
     image: scaleshift/proxy:1.10
@@ -47,32 +56,13 @@ services:
       - 8080:80
     logging:
       driver: none
+    networks:
+      - services
     restart: always
-    container_name: proxy
-
-  db:
-    image: mysql:5.6.44
-    ports:
-      - 3306:3306
-    volumes:
-      - ./tmp/mysql:/var/lib/mysql
-      - ../database/conf:/etc/mysql/conf.d
-    environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=scaleshift
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=pass
-    healthcheck:
-      test: ["CMD-SHELL", "mysqlshow -u ${MYSQL_USER} -p${MYSQL_PASSWORD}"]
-      interval: "5s"
-      retries: 10
-    logging:
-      driver: none
-    restart: always
-    container_name: db
+    container_name: scaleshift_proxy
 
   gulp:
-    image: scaleshift/dev:gulp-20190903
+    image: scaleshift/gulp:local-20190903
     build: docker/gulp
     volumes:
       - ../../api/src:/monitor/api
@@ -87,5 +77,12 @@ services:
       cpu:
         soft: 20
         hard: 40
+    networks:
+      - services
     restart: always
-    container_name: gulp
+    container_name: scaleshift_gulp
+
+networks:
+  services:
+    external:
+      name: dev_scaleshift_network

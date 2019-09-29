@@ -1,6 +1,7 @@
 version: "2.4"
 
 services:
+
   codegen-api:
     image: supinf/go-swagger:0.17.2
     command: generate server -P auth.Principal -f spec/openapi.yaml -t src/generated
@@ -17,8 +18,12 @@ services:
       - ../../web/src:/work/src
 
   deps-api:
-    image: supinf/go-dep:0.5
-    command: ensure
+    image: scaleshift/dev:libs
+    build:
+      context: .
+      dockerfile: ../prod/api.Dockerfile
+      target: libs
+    command: go mod vendor
     volumes:
       - ../../api:/go/src/github.com/rescale-labs/scaleshift/api
     working_dir: /go/src/github.com/rescale-labs/scaleshift/api/src
@@ -31,8 +36,13 @@ services:
     working_dir: /go/src/github.com/rescale-labs/scaleshift/api/src
 
   test-api:
-    image: scaleshift/dev:go-20190403
-    build: docker/go
+    image: scaleshift/api:local
+    build:
+      context: .
+      dockerfile: ../prod/api.Dockerfile
+      args:
+        BASE_IMAGE: scaleshift/api:cache
+      target: builder
     command: sh -c "go test -cover -bench -benchmem `go list ./... | grep -v /generated/` -v"
     volumes:
       - ../../api:/go/src/github.com/rescale-labs/scaleshift/api

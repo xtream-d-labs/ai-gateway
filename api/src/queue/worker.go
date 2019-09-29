@@ -55,10 +55,10 @@ func SubmitBuildImageJob(imageName, imageID, workspace, wrappedImageID, builderN
 }
 
 // BuildJobDockerImage puts a new job
-func BuildJobDockerImage(ID, dockerCredential, builderName, k8sConfig string) error {
+func BuildJobDockerImage(id, dockerCredential, builderName, k8sConfig string) error {
 	bytes, err := json.Marshal(job{
 		Action: actionBuildJobImg,
-		Arg1:   ID,
+		Arg1:   id,
 		Arg2:   dockerCredential,
 		Arg3:   buildersName(builderName),
 		Arg4:   k8sConfig,
@@ -85,10 +85,10 @@ func PushJobDockerImage(jobID, imageName, dockerCredential, k8sConfig string) er
 }
 
 // BuildSingularityImageJob puts a new job
-func BuildSingularityImageJob(ID, dockerCredential, rescaleConfig, builderName string) error {
+func BuildSingularityImageJob(id, dockerCredential, rescaleConfig, builderName string) error {
 	bytes, err := json.Marshal(job{
 		Action: actionSingularity,
-		Arg1:   ID,
+		Arg1:   id,
 		Arg2:   dockerCredential,
 		Arg3:   rescaleConfig,
 		Arg4:   buildersName(builderName),
@@ -100,10 +100,10 @@ func BuildSingularityImageJob(ID, dockerCredential, rescaleConfig, builderName s
 }
 
 // SubmitToRescaleJob puts a new job
-func SubmitToRescaleJob(ID, rescaleConfig, simg string) error {
+func SubmitToRescaleJob(id, rescaleConfig, simg string) error {
 	bytes, err := json.Marshal(job{
 		Action: actionSendRescale,
-		Arg1:   ID,
+		Arg1:   id,
 		Arg2:   rescaleConfig,
 		Arg3:   simg,
 	})

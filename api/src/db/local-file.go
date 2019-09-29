@@ -13,9 +13,7 @@ var (
 )
 
 func init() {
-	opts := badger.DefaultOptions
-	opts.Dir = config.Config.DatabaseDir
-	opts.ValueDir = config.Config.DatabaseDir
+	opts := badger.DefaultOptions(config.Config.DatabaseDir)
 	if candidate, err := badger.Open(opts); err == nil {
 		cache = candidate
 	}
@@ -32,10 +30,14 @@ func ShutdownCache() {
 // SetCache with the specified function
 func SetCache(key string, value []byte, duration *time.Duration) error {
 	return cache.Update(func(txn *badger.Txn) error {
-		if duration != nil {
-			return txn.SetWithTTL([]byte(key), value, *duration)
+		entry := &badger.Entry{
+			Key:   []byte(key),
+			Value: value,
 		}
-		return txn.Set([]byte(key), value)
+		if duration != nil {
+			entry.WithTTL(*duration)
+		}
+		return txn.SetEntry(entry)
 	})
 }
 
@@ -50,8 +52,11 @@ func GetCache(key string) ([]byte, error) {
 			}
 			return err
 		}
-		value, err := item.Value()
-		if err != nil {
+		var value []byte
+		if err = item.Value(func(val []byte) error {
+			value = append([]byte{}, val...)
+			return nil
+		}); err != nil {
 			return err
 		}
 		out.Write(value)

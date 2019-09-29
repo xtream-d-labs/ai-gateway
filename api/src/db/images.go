@@ -12,13 +12,16 @@ type Image struct {
 	Owner  string
 }
 
+// ImageAction defines how handle a image
 type ImageAction string
 
+// ImageActions
 const (
 	ImageActionPulling  ImageAction = "pulling"
 	ImageActionBuilding ImageAction = "building"
 )
 
+// Create persists its data to database
 func (image *Image) Create() error {
 	return db.Create(image).Error
 }

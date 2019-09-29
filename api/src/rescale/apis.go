@@ -80,7 +80,7 @@ func CoreTypes(ctx context.Context, token string, page, pageSize *int64) ([]*Cor
 	}
 	// parse http response body
 	obj := struct{ Results []*CoreType }{}
-	if err := json.Unmarshal(resp, &obj); err != nil {
+	if err = json.Unmarshal(resp, &obj); err != nil {
 		return nil, err
 	}
 	sort.Slice(obj.Results, func(i, j int) bool {

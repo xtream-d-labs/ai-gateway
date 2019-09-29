@@ -1,37 +1,24 @@
 # Local development
 
-## 1. Codegen with the OpenAPI spec file
+## 1. Initialize th app
+
+Codegen with the OpenAPI spec file, resolve dependencies & generate RSA keys.
 
 Using [openapi.yaml](https://github.com/rescale-labs/scaleshift/blob/master/spec/openapi.yaml), you can generate its source code.
 
 ```console
-docker-compose --file tools/dev/utility.yml run --rm codegen-api
-docker-compose --file tools/dev/utility.yml run --rm codegen-web
+make init
 ```
 
-## 2. Resolve dependencies
+## 2. Run the application
 
 ```console
-docker-compose --file tools/dev/utility.yml run --rm deps-api
+make run
+open http://localhost:8080
 ```
 
 ## 3. Test it locally
 
 ```console
-docker-compose --file tools/dev/utility.yml run --rm lint-api
-docker-compose --file tools/dev/utility.yml run --rm test-api
-```
-
-## 4. Generate RSA keys
-
-```console
-docker-compose --file tools/dev/utility.yml run --rm gen-private-key
-docker-compose --file tools/dev/utility.yml run --rm gen-public-key
-```
-
-## 5. Run the application
-
-```console
-docker-compose --file tools/dev/runtime.yml up
-open http://localhost:8080
+make test/src
 ```

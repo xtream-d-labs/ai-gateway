@@ -151,7 +151,7 @@ func BuildSingularityImage(jobID, authConfig, builder string) (*string, error) {
 }
 
 // ConvertToSingularityImage converts a docker image to a singularity image
-func ConvertToSingularityImage(ID, name string) (*string, error) {
+func ConvertToSingularityImage(id, name string) (*string, error) {
 	ctx := context.Background()
 	pullDoc2SingularityImage(ctx)
 
@@ -161,14 +161,14 @@ func ConvertToSingularityImage(ID, name string) (*string, error) {
 		Image: config.Config.DocToSinImg,
 		Cmd:   strslice.StrSlice(cmds),
 	}
-	dir := filepath.Join(config.Config.SingImgContainerDir, ID)
+	dir := filepath.Join(config.Config.SingImgContainerDir, id)
 	if err := os.MkdirAll(dir, 0755); err != nil { // nolint
 		return nil, err
 	}
 	mounts := []mount.Mount{
 		mount.Mount{
 			Type:   mount.TypeBind,
-			Source: filepath.Join(config.Config.SingImgHostPath, ID),
+			Source: filepath.Join(config.Config.SingImgHostPath, id),
 			Target: "/output",
 		},
 		mount.Mount{
