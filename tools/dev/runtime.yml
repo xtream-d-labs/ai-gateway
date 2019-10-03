@@ -10,7 +10,7 @@ services:
       args:
         BASE_IMAGE: scaleshift/api:cache
       target: builder
-    entrypoint: tini -- tail -f /dev/null
+    entrypoint: tini -- sleep 31536000
     ports:
       - 9000:80
     environment:
@@ -26,11 +26,10 @@ services:
       - SS_DATABASE_ENDPOINT=user:pass@tcp(scaleshift_db:3306)/scaleshift?charset=utf8mb4&collation=utf8_unicode_ci&parseTime=true
       - DOCKER_HOST=unix:///var/run/docker.sock
     volumes:
-      # - ./api:/go/src/github.com/rescale-labs/scaleshift/api
-      - ./api/certs:/certs
-      - ./tools/dev/tmp/db:/tmp/badger
-      - ./tools/dev/tmp/simg:/tmp/simg
-      - ./tools/dev/tmp/work:/tmp/work
+      - ../../api/certs:/certs
+      - ./tmp/db:/tmp/badger
+      - ./tmp/simg:/tmp/simg
+      - ./tmp/work:/tmp/work
       - /var/run/docker.sock:/var/run/docker.sock
     working_dir: /go/src/github.com/rescale-labs/scaleshift/api/src
     networks:
@@ -62,10 +61,9 @@ services:
     container_name: scaleshift_proxy
 
   gulp:
-    image: scaleshift/gulp:local-20190903
+    image: scaleshift/gulp:local-20191003
     build: docker/gulp
     volumes:
-      - ../../api/src:/monitor/api
       - ../../web:/monitor/web
       - /var/run/docker.sock:/var/run/docker.sock
     logging:
