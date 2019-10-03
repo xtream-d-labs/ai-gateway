@@ -32,7 +32,7 @@ EOT
 
 docker build -f tools/prod/api.Dockerfile -t "${DOCKER_REPO}/api:${version}-${commit}" \
     --build-arg API_VERSION="${version}" --build-arg API_COMMIT="${commit}" \
-    --target prod api
+    --target prod .
 cp -f spec/openapi.yaml web/src/
 docker build -f tools/prod/web.Dockerfile -t "${DOCKER_REPO}/web:${version}-${commit}" \
     --build-arg WEB_VERSION="${version}-${commit}" web/src

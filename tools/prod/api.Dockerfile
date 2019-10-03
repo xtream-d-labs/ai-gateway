@@ -23,7 +23,7 @@ COPY --from=builder /root/.cache /root/.cache
 FROM alpine:3.10 as prod
 RUN apk --no-cache add bash openssl
 COPY --from=libs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY api/templates /go/src/github.com/rescale-labs/scaleshift/api/
+COPY api/templates /go/src/github.com/rescale-labs/scaleshift/api/templates
 COPY api/src/entrypoint.sh /
 VOLUME ["/tmp/badger", "/tmp/work", "/tmp/simg"]
 ARG API_VERSION="dev"
