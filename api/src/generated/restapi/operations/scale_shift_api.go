@@ -21,6 +21,7 @@ import (
 
 	"github.com/rescale-labs/scaleshift/api/src/auth"
 	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations/app"
+	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations/app_errors"
 	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations/image"
 	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations/job"
 	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations/notebook"
@@ -57,6 +58,9 @@ func NewScaleShiftAPI(spec *loads.Document) *ScaleShiftAPI {
 		}),
 		WorkspaceDeleteWorkspaceHandler: workspace.DeleteWorkspaceHandlerFunc(func(params workspace.DeleteWorkspaceParams) middleware.Responder {
 			return middleware.NotImplemented("operation WorkspaceDeleteWorkspace has not yet been implemented")
+		}),
+		AppErrorsGetAppErrorsHandler: app_errors.GetAppErrorsHandlerFunc(func(params app_errors.GetAppErrorsParams) middleware.Responder {
+			return middleware.NotImplemented("operation AppErrorsGetAppErrors has not yet been implemented")
 		}),
 		AppGetConfigurationsHandler: app.GetConfigurationsHandlerFunc(func(params app.GetConfigurationsParams) middleware.Responder {
 			return middleware.NotImplemented("operation AppGetConfigurations has not yet been implemented")
@@ -191,6 +195,8 @@ type ScaleShiftAPI struct {
 	NotebookDeleteNotebookHandler notebook.DeleteNotebookHandler
 	// WorkspaceDeleteWorkspaceHandler sets the operation handler for the delete workspace operation
 	WorkspaceDeleteWorkspaceHandler workspace.DeleteWorkspaceHandler
+	// AppErrorsGetAppErrorsHandler sets the operation handler for the get app errors operation
+	AppErrorsGetAppErrorsHandler app_errors.GetAppErrorsHandler
 	// AppGetConfigurationsHandler sets the operation handler for the get configurations operation
 	AppGetConfigurationsHandler app.GetConfigurationsHandler
 	// AppGetEndpointsHandler sets the operation handler for the get endpoints operation
@@ -324,6 +330,10 @@ func (o *ScaleShiftAPI) Validate() error {
 
 	if o.WorkspaceDeleteWorkspaceHandler == nil {
 		unregistered = append(unregistered, "workspace.DeleteWorkspaceHandler")
+	}
+
+	if o.AppErrorsGetAppErrorsHandler == nil {
+		unregistered = append(unregistered, "app_errors.GetAppErrorsHandler")
 	}
 
 	if o.AppGetConfigurationsHandler == nil {
@@ -559,6 +569,11 @@ func (o *ScaleShiftAPI) initHandlerCache() {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
 	o.handlers["DELETE"]["/workspaces"] = workspace.NewDeleteWorkspace(o.context, o.WorkspaceDeleteWorkspaceHandler)
+
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/errors"] = app_errors.NewGetAppErrors(o.context, o.AppErrorsGetAppErrorsHandler)
 
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)

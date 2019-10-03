@@ -26,6 +26,7 @@ func Routes(api *operations.ScaleShiftAPI) {
 	workspaceRoute(api)
 	jobRoute(api)
 	rescaleRoute(api)
+	errorRoute(api)
 }
 
 func newerror(code int) *models.Error {

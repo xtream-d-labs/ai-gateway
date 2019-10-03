@@ -783,6 +783,24 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  '/errors':
+    get:
+      description: |
+        returns the list of application errors
+      operationId: getAppErrors
+      tags:
+        - app-errors
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/AppError'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   '/versions':
     get:
       description: |
@@ -1205,6 +1223,23 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/RescaleApplicationVersion'
+  AppError:
+    description: Application Error
+    required:
+      - caption
+    properties:
+      caption:
+        type: string
+      condition:
+        type: string
+      detail:
+        type: string
+      owner:
+        type: string
+      occursAt:
+        description: when it happened
+        type: string
+        format: date-time
   Version:
     description: application version
     type: object

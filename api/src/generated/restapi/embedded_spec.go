@@ -165,6 +165,32 @@ func init() {
         }
       }
     },
+    "/errors": {
+      "get": {
+        "description": "returns the list of application errors\n",
+        "tags": [
+          "app-errors"
+        ],
+        "operationId": "getAppErrors",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/AppError"
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
     "/images": {
       "get": {
         "description": "returns local images\n",
@@ -1210,6 +1236,31 @@ func init() {
     }
   },
   "definitions": {
+    "AppError": {
+      "description": "Application Error",
+      "required": [
+        "caption"
+      ],
+      "properties": {
+        "caption": {
+          "type": "string"
+        },
+        "condition": {
+          "type": "string"
+        },
+        "detail": {
+          "type": "string"
+        },
+        "occursAt": {
+          "description": "when it happened",
+          "type": "string",
+          "format": "date-time"
+        },
+        "owner": {
+          "type": "string"
+        }
+      }
+    },
     "Configuration": {
       "description": "app's configurations",
       "required": [
@@ -1988,6 +2039,32 @@ func init() {
         }
       }
     },
+    "/errors": {
+      "get": {
+        "description": "returns the list of application errors\n",
+        "tags": [
+          "app-errors"
+        ],
+        "operationId": "getAppErrors",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/AppError"
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
     "/images": {
       "get": {
         "description": "returns local images\n",
@@ -3033,6 +3110,31 @@ func init() {
     }
   },
   "definitions": {
+    "AppError": {
+      "description": "Application Error",
+      "required": [
+        "caption"
+      ],
+      "properties": {
+        "caption": {
+          "type": "string"
+        },
+        "condition": {
+          "type": "string"
+        },
+        "detail": {
+          "type": "string"
+        },
+        "occursAt": {
+          "description": "when it happened",
+          "type": "string",
+          "format": "date-time"
+        },
+        "owner": {
+          "type": "string"
+        }
+      }
+    },
     "Configuration": {
       "description": "app's configurations",
       "required": [

@@ -17,7 +17,7 @@ import (
  * @see https://raw.githubusercontent.com/vmware/harbor/master/docs/swagger.yaml
  */
 
-// HarborRepository defines the repo information
+// HarborProject defines the repo information
 type HarborProject struct {
 	ID   int64  `json:"project_id"`
 	Name string `json:"name"`
@@ -38,6 +38,7 @@ type HarborSerchResult struct {
 	Repositories []*HarborRepository `json:"repository"`
 }
 
+// HarborRepositories returns harbor repos
 func HarborRepositories(ctx context.Context, auth types.AuthConfig) ([]*HarborRepository, error) {
 	headers := http.Header{}
 	headers.Add("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(

@@ -26,11 +26,12 @@ func init() {
 }
 
 // SubmitPullImageJob puts a new job
-func SubmitPullImageJob(imageName, authConfig string) error {
+func SubmitPullImageJob(imageName, authConfig, principal string) error {
 	bytes, err := json.Marshal(job{
 		Action: actionPullImage,
 		Arg1:   imageName,
 		Arg2:   authConfig,
+		Arg3:   principalName(principal),
 	})
 	if err != nil {
 		return err
@@ -46,7 +47,7 @@ func SubmitBuildImageJob(imageName, imageID, workspace, wrappedImageID, builderN
 		Arg2:   imageID,
 		Arg3:   workspace,
 		Arg4:   wrappedImageID,
-		Arg5:   buildersName(builderName),
+		Arg5:   principalName(builderName),
 	})
 	if err != nil {
 		return err
@@ -60,7 +61,7 @@ func BuildJobDockerImage(id, dockerCredential, builderName, k8sConfig string) er
 		Action: actionBuildJobImg,
 		Arg1:   id,
 		Arg2:   dockerCredential,
-		Arg3:   buildersName(builderName),
+		Arg3:   principalName(builderName),
 		Arg4:   k8sConfig,
 	})
 	if err != nil {
@@ -70,13 +71,14 @@ func BuildJobDockerImage(id, dockerCredential, builderName, k8sConfig string) er
 }
 
 // PushJobDockerImage pushes a docker image
-func PushJobDockerImage(jobID, imageName, dockerCredential, k8sConfig string) error {
+func PushJobDockerImage(jobID, imageName, dockerCredential, k8sConfig, principal string) error {
 	bytes, err := json.Marshal(job{
 		Action: actionPushJobImg,
 		Arg1:   jobID,
 		Arg2:   imageName,
 		Arg3:   dockerCredential,
 		Arg4:   k8sConfig,
+		Arg5:   principalName(principal),
 	})
 	if err != nil {
 		return err
@@ -91,7 +93,7 @@ func BuildSingularityImageJob(id, dockerCredential, rescaleConfig, builderName s
 		Arg1:   id,
 		Arg2:   dockerCredential,
 		Arg3:   rescaleConfig,
-		Arg4:   buildersName(builderName),
+		Arg4:   principalName(builderName),
 	})
 	if err != nil {
 		return err
@@ -100,12 +102,13 @@ func BuildSingularityImageJob(id, dockerCredential, rescaleConfig, builderName s
 }
 
 // SubmitToRescaleJob puts a new job
-func SubmitToRescaleJob(id, rescaleConfig, simg string) error {
+func SubmitToRescaleJob(id, rescaleConfig, simg, principal string) error {
 	bytes, err := json.Marshal(job{
 		Action: actionSendRescale,
 		Arg1:   id,
 		Arg2:   rescaleConfig,
 		Arg3:   simg,
+		Arg4:   principalName(principal),
 	})
 	if err != nil {
 		return err
@@ -113,7 +116,7 @@ func SubmitToRescaleJob(id, rescaleConfig, simg string) error {
 	return db.Enqueue(string(bytes))
 }
 
-func buildersName(candidate string) string {
+func principalName(candidate string) string {
 	if candidate == "" {
 		return auth.Anonymous
 	}
@@ -153,8 +156,12 @@ func worker(name string) (err error) {
 	case actionPullImage:
 		// Arg1: DockerImageName
 		// Arg2: AuthConfig
+		// Arg3: Principal
 		if err = pullImage(ctx, j.Arg1, j.Arg2); err != nil {
-			log.Error("Worker failed at PullImage", err, nil)
+			db.ImageError(
+				j.Arg3, "Could not pull the specified image",
+				db.ImageActionPulling, j.Arg1, err,
+			)
 			return err
 		}
 	case actionWrapJupyter:
@@ -162,23 +169,29 @@ func worker(name string) (err error) {
 		// Arg2: DockerImageID
 		// Arg3: WorkspaceHostDirectory
 		// Arg4: WrappedDockerImageID
-		// Arg5: BuildersName
+		// Arg5: Principal
 		wrappedImage := swag.String(j.Arg4)
 		if swag.IsZero(j.Arg4) {
 			wrappedImage, err = lib.WrapWithJupyterNotebook(ctx, j.Arg2, j.Arg1, j.Arg5)
 			if err != nil {
-				log.Error("Worker failed at WrapImageWithJupyterNotebook", err, nil)
+				db.OnlineError(
+					j.Arg5, "Failed to wrap the image with jupyter notebook",
+					db.OnlineActionWrapJupyter, err,
+				)
 				return err
 			}
 		}
 		workdir := lib.DetectImageWorkDir(ctx, swag.StringValue(wrappedImage))
 		ID, e1 := lib.RunJupyterNotebook(ctx, j.Arg1, swag.StringValue(wrappedImage), j.Arg3, workdir)
 		if e1 != nil {
-			log.Error("Worker failed at RunJupyterNotebook", e1, nil)
+			db.OnlineError(
+				j.Arg5, "Failed to start a jupyter notebook",
+				db.OnlineActionRunJupyter, e1,
+			)
 			return e1
 		}
 		if err = db.RemoveBuildingImage(j.Arg1); err != nil {
-			return err
+			log.Warn("Failed to remove a building image", err, nil)
 		}
 		log.Debug("Run JupyterNotebook!", nil, &log.Map{
 			"id": swag.StringValue(ID),
@@ -186,20 +199,34 @@ func worker(name string) (err error) {
 	case actionBuildJobImg:
 		// Arg1: ID
 		// Arg2: DockerCredential
-		// Arg3: BuildersName
+		// Arg3: Principal
 		// Arg4: KubernetesConfig
 		name, e2 := lib.BuildJobImage(ctx, j.Arg1, j.Arg3, true)
 		if e2 != nil {
-			log.Error("Worker failed at BuildJobImage", e2, nil)
+			db.JobError(
+				j.Arg3, "Failed to build an image for the task",
+				db.JobActionBuilding, j.Arg1, e2,
+			)
 			return e2
 		}
-		err = db.UpdateJob(j.Arg1, db.JobActionBuilding, db.JobActionPushing, db.JobStatusImagePushing, nil)
-		if err != nil {
-			log.Error("Worker failed at UpdateJob@actionBuildJobImg", err, nil)
+		if err = db.UpdateJob(
+			j.Arg1,
+			db.JobActionBuilding,
+			db.JobActionPushing,
+			db.JobStatusImagePushing,
+			nil,
+		); err != nil {
+			db.OnlineError(
+				j.Arg3, "Failed to update the task status",
+				db.OnlineActionUpdateStatus, err,
+			)
 			return err
 		}
-		if err = PushJobDockerImage(j.Arg1, swag.StringValue(name), j.Arg2, j.Arg4); err != nil {
-			log.Error("Worker failed at PushJobDockerImage", err, nil)
+		if err = PushJobDockerImage(j.Arg1, swag.StringValue(name), j.Arg2, j.Arg4, j.Arg3); err != nil {
+			db.OnlineError(
+				j.Arg3, "Failed to update the task status",
+				db.OnlineActionUpdateStatus, err,
+			)
 			return err
 		}
 		log.Debug("Built Job Image!", nil, &log.Map{
@@ -211,13 +238,20 @@ func worker(name string) (err error) {
 		// Arg2: ImageName
 		// Arg3: DockerCredential
 		// Arg4: KubernetesConfig
+		// Arg5: Principal
 		job, e3 := db.GetJob(j.Arg1)
 		if e3 != nil {
-			log.Error("Worker failed at GetJob@actionPushJobImg", e3, nil)
+			db.OnlineError(
+				j.Arg5, "Failed to retrieve the task configuration",
+				db.OnlineActionSelectData, e3,
+			)
 			return e3
 		}
 		if err = lib.PushJobImage(ctx, j.Arg2, j.Arg3); err != nil {
-			log.Error("Worker failed at PushJobImage", err, nil)
+			db.JobError(
+				j.Arg5, "Failed to push the image to cloud",
+				db.JobActionPushing, j.Arg1, err,
+			)
 			return err
 		}
 		log.Debug("Pushed the Job Image!", nil, &log.Map{
@@ -225,17 +259,27 @@ func worker(name string) (err error) {
 			"name": j.Arg2,
 		})
 		if err = lib.DeleteImage(ctx, j.Arg2); err != nil {
-			log.Error("Worker failed at DeleteImage", err, nil)
-			return err
+			log.Warn("Failed to remove the task image", err, nil)
 		}
-		err = kubernetes.CreateJob(j.Arg4, j.Arg1, "default", j.Arg2, job.CPU, job.GPU)
-		if err != nil {
+		if err = kubernetes.CreateJob(j.Arg4, j.Arg1, "default", j.Arg2, job.CPU, job.GPU); err != nil {
+			db.JobError(
+				j.Arg5, "Failed to create a kubernetes job",
+				db.JobActionKubernetes, j.Arg1, err,
+			)
 			return err
 		}
 		// Change this job's status
-		err = db.UpdateJob(job.JobID, db.JobActionPushing, db.JobActionKubernetes, db.JobStatusK8sStarted, nil)
-		if err != nil {
-			log.Error("Worker failed at UpdateJob@actionApplyK8s", err, nil)
+		if err = db.UpdateJob(
+			job.JobID,
+			db.JobActionPushing,
+			db.JobActionKubernetes,
+			db.JobStatusK8sStarted,
+			nil,
+		); err != nil {
+			db.OnlineError(
+				j.Arg5, "Failed to update the task status",
+				db.OnlineActionUpdateStatus, err,
+			)
 			return err
 		}
 		log.Debug("Job submitted!", nil, &log.Map{
@@ -247,28 +291,44 @@ func worker(name string) (err error) {
 		// Arg1: ID
 		// Arg2: DockerCredential
 		// Arg3: RescaleConfig
-		// Arg4: BuildersName
+		// Arg4: Principal
 		name, e4 := lib.BuildJobImage(ctx, j.Arg1, j.Arg4, false)
 		if e4 != nil {
-			log.Error("Worker failed at BuildJobImage", e4, nil)
+			db.ImageError(
+				j.Arg4, "Failed to build a docker image for the task",
+				db.ImageActionBuilding, swag.StringValue(name), e4,
+			)
 			return e4
 		}
 		simg, e5 := lib.ConvertToSingularityImage(j.Arg1, swag.StringValue(name))
 		if e5 != nil {
-			log.Error("Worker failed at BuildSingularityImage", e5, nil)
+			db.OnlineError(
+				j.Arg4, "Failed to convert the docker image to singularity",
+				db.OnlineActionConvertToSig, e5,
+			)
 			return e5
 		}
 		if err = lib.DeleteImage(ctx, swag.StringValue(name)); err != nil {
-			log.Error("Worker failed at DeleteImage", err, nil)
+			log.Warn("Failed to remove a temporary docker image", err, nil)
+		}
+		if err = db.UpdateJob(
+			j.Arg1,
+			db.JobActionBuilding,
+			db.JobActionRescale,
+			db.JobStatusRescaleSend,
+			nil,
+		); err != nil {
+			db.OnlineError(
+				j.Arg4, "Failed to update the task status",
+				db.OnlineActionUpdateStatus, err,
+			)
 			return err
 		}
-		err = db.UpdateJob(j.Arg1, db.JobActionBuilding, db.JobActionRescale, db.JobStatusRescaleSend, nil)
-		if err != nil {
-			log.Error("Worker failed at UpdateJob", err, nil)
-			return err
-		}
-		if err = SubmitToRescaleJob(j.Arg1, j.Arg3, swag.StringValue(simg)); err != nil {
-			log.Error("Worker failed at SubmitToRescaleJob", err, nil)
+		if err = SubmitToRescaleJob(j.Arg1, j.Arg3, swag.StringValue(simg), j.Arg4); err != nil {
+			db.OnlineError(
+				j.Arg4, "Failed to update the task status",
+				db.OnlineActionUpdateStatus, err,
+			)
 			return err
 		}
 		log.Debug("Built Singularity Image!", nil, nil)
@@ -277,15 +337,22 @@ func worker(name string) (err error) {
 		// Arg1: ID
 		// Arg2: RescaleConfig
 		// Arg3: SingularityImage
+		// Arg4: Principal
 		// Upload the singularity image
 		job, e3 := db.GetJob(j.Arg1)
 		if e3 != nil {
-			log.Error("Worker failed at GetJob@actionSendRescale", e3, nil)
+			db.OnlineError(
+				j.Arg4, "Failed to retrieve the task configuration",
+				db.OnlineActionSelectData, e3,
+			)
 			return e3
 		}
 		meta, err := rescale.Upload(ctx, j.Arg2, j.Arg3)
 		if err != nil {
-			log.Error("Worker failed at Upload@SendRescaleJob", err, nil)
+			db.JobError(
+				j.Arg4, "Failed to upload files to Rescale",
+				db.JobActionRescale, j.Arg1, err,
+			)
 			return err
 		}
 		// Create a new job
@@ -317,18 +384,32 @@ func worker(name string) (err error) {
 		}
 		jobID, err := rescale.CreateJob(ctx, j.Arg2, input)
 		if err != nil {
-			log.Error("Worker failed at CreateJob@SendRescaleJob", err, nil)
+			db.JobError(
+				j.Arg4, "Failed to create a Rescale job",
+				db.JobActionRescale, j.Arg1, err,
+			)
 			return err
 		}
 		// Submit the job
 		if err = rescale.Submit(ctx, j.Arg2, swag.StringValue(jobID)); err != nil {
-			log.Error("Worker failed at Submit@SendRescaleJob", err, nil)
+			db.JobError(
+				j.Arg4, "Failed to start the Rescale job",
+				db.JobActionRescale, j.Arg1, err,
+			)
 			return err
 		}
 		// Change this job's status
-		err = db.UpdateJob(j.Arg1, db.JobActionRescale, db.JobActionRescale, db.JobStatusRescaleStarted, jobID)
-		if err != nil {
-			log.Error("Worker failed at UpdateJob@SendRescaleJob", err, nil)
+		if err = db.UpdateJob(
+			j.Arg1,
+			db.JobActionRescale,
+			db.JobActionRescale,
+			db.JobStatusRescaleStarted,
+			jobID,
+		); err != nil {
+			db.OnlineError(
+				j.Arg5, "Failed to update the task status",
+				db.OnlineActionUpdateStatus, err,
+			)
 			return err
 		}
 		log.Debug("Job submitted!", nil, &log.Map{

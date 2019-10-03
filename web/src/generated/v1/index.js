@@ -16,12 +16,12 @@
 (function(factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/AccountInfo', 'model/AccountInfo1', 'model/Configuration', 'model/Endpoints', 'model/Error', 'model/IPythonNotebook', 'model/Image', 'model/ImageName', 'model/ImageName1', 'model/ImageName2', 'model/Job', 'model/JobAttrs', 'model/JobAttrs1', 'model/JobFile', 'model/JobFiles', 'model/JobLog', 'model/JobLogs', 'model/NewJobID', 'model/NgcImage', 'model/Notebook', 'model/NotebookAttrs', 'model/NotebookDetail', 'model/Repository', 'model/RescaleApplication', 'model/RescaleApplicationVersion', 'model/RescaleCoreType', 'model/RescaleCoreTypeResources', 'model/Session', 'model/Version', 'model/Versions', 'model/Workspace', 'model/JobDetail', 'api/AppApi', 'api/ImageApi', 'api/JobApi', 'api/NotebookApi', 'api/RepositoryApi', 'api/RescaleApi', 'api/WorkspaceApi'], factory);
+    define(['ApiClient', 'model/AccountInfo', 'model/AccountInfo1', 'model/AppError', 'model/Configuration', 'model/Endpoints', 'model/Error', 'model/IPythonNotebook', 'model/Image', 'model/ImageName', 'model/ImageName1', 'model/ImageName2', 'model/Job', 'model/JobAttrs', 'model/JobAttrs1', 'model/JobFile', 'model/JobFiles', 'model/JobLog', 'model/JobLogs', 'model/NewJobID', 'model/NgcImage', 'model/Notebook', 'model/NotebookAttrs', 'model/NotebookDetail', 'model/Repository', 'model/RescaleApplication', 'model/RescaleApplicationVersion', 'model/RescaleCoreType', 'model/RescaleCoreTypeResources', 'model/Session', 'model/Version', 'model/Versions', 'model/Workspace', 'model/JobDetail', 'api/AppApi', 'api/AppErrorsApi', 'api/ImageApi', 'api/JobApi', 'api/NotebookApi', 'api/RepositoryApi', 'api/RescaleApi', 'api/WorkspaceApi'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('./ApiClient'), require('./model/AccountInfo'), require('./model/AccountInfo1'), require('./model/Configuration'), require('./model/Endpoints'), require('./model/Error'), require('./model/IPythonNotebook'), require('./model/Image'), require('./model/ImageName'), require('./model/ImageName1'), require('./model/ImageName2'), require('./model/Job'), require('./model/JobAttrs'), require('./model/JobAttrs1'), require('./model/JobFile'), require('./model/JobFiles'), require('./model/JobLog'), require('./model/JobLogs'), require('./model/NewJobID'), require('./model/NgcImage'), require('./model/Notebook'), require('./model/NotebookAttrs'), require('./model/NotebookDetail'), require('./model/Repository'), require('./model/RescaleApplication'), require('./model/RescaleApplicationVersion'), require('./model/RescaleCoreType'), require('./model/RescaleCoreTypeResources'), require('./model/Session'), require('./model/Version'), require('./model/Versions'), require('./model/Workspace'), require('./model/JobDetail'), require('./api/AppApi'), require('./api/ImageApi'), require('./api/JobApi'), require('./api/NotebookApi'), require('./api/RepositoryApi'), require('./api/RescaleApi'), require('./api/WorkspaceApi'));
+    module.exports = factory(require('./ApiClient'), require('./model/AccountInfo'), require('./model/AccountInfo1'), require('./model/AppError'), require('./model/Configuration'), require('./model/Endpoints'), require('./model/Error'), require('./model/IPythonNotebook'), require('./model/Image'), require('./model/ImageName'), require('./model/ImageName1'), require('./model/ImageName2'), require('./model/Job'), require('./model/JobAttrs'), require('./model/JobAttrs1'), require('./model/JobFile'), require('./model/JobFiles'), require('./model/JobLog'), require('./model/JobLogs'), require('./model/NewJobID'), require('./model/NgcImage'), require('./model/Notebook'), require('./model/NotebookAttrs'), require('./model/NotebookDetail'), require('./model/Repository'), require('./model/RescaleApplication'), require('./model/RescaleApplicationVersion'), require('./model/RescaleCoreType'), require('./model/RescaleCoreTypeResources'), require('./model/Session'), require('./model/Version'), require('./model/Versions'), require('./model/Workspace'), require('./model/JobDetail'), require('./api/AppApi'), require('./api/AppErrorsApi'), require('./api/ImageApi'), require('./api/JobApi'), require('./api/NotebookApi'), require('./api/RepositoryApi'), require('./api/RescaleApi'), require('./api/WorkspaceApi'));
   }
-}(function(ApiClient, AccountInfo, AccountInfo1, Configuration, Endpoints, Error, IPythonNotebook, Image, ImageName, ImageName1, ImageName2, Job, JobAttrs, JobAttrs1, JobFile, JobFiles, JobLog, JobLogs, NewJobID, NgcImage, Notebook, NotebookAttrs, NotebookDetail, Repository, RescaleApplication, RescaleApplicationVersion, RescaleCoreType, RescaleCoreTypeResources, Session, Version, Versions, Workspace, JobDetail, AppApi, ImageApi, JobApi, NotebookApi, RepositoryApi, RescaleApi, WorkspaceApi) {
+}(function(ApiClient, AccountInfo, AccountInfo1, AppError, Configuration, Endpoints, Error, IPythonNotebook, Image, ImageName, ImageName1, ImageName2, Job, JobAttrs, JobAttrs1, JobFile, JobFiles, JobLog, JobLogs, NewJobID, NgcImage, Notebook, NotebookAttrs, NotebookDetail, Repository, RescaleApplication, RescaleApplicationVersion, RescaleCoreType, RescaleCoreTypeResources, Session, Version, Versions, Workspace, JobDetail, AppApi, AppErrorsApi, ImageApi, JobApi, NotebookApi, RepositoryApi, RescaleApi, WorkspaceApi) {
   'use strict';
 
   /**
@@ -71,6 +71,11 @@
      * @property {module:model/AccountInfo1}
      */
     AccountInfo1: AccountInfo1,
+    /**
+     * The AppError model constructor.
+     * @property {module:model/AppError}
+     */
+    AppError: AppError,
     /**
      * The Configuration model constructor.
      * @property {module:model/Configuration}
@@ -226,6 +231,11 @@
      * @property {module:api/AppApi}
      */
     AppApi: AppApi,
+    /**
+     * The AppErrorsApi service constructor.
+     * @property {module:api/AppErrorsApi}
+     */
+    AppErrorsApi: AppErrorsApi,
     /**
      * The ImageApi service constructor.
      * @property {module:api/ImageApi}

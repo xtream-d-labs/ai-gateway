@@ -1,0 +1,49 @@
+# ScaleShift.ErrorsApi
+
+All URIs are relative to *http://localhost:9000/api/v1*
+
+Method | HTTP request | Description
+------------- | ------------- | -------------
+[**getAppErrors**](ErrorsApi.md#getAppErrors) | **GET** /errors | 
+
+
+<a name="getAppErrors"></a>
+# **getAppErrors**
+> [AppError] getAppErrors()
+
+
+
+returns the list of application errors 
+
+### Example
+```javascript
+var ScaleShift = require('scale_shift');
+
+var apiInstance = new ScaleShift.ErrorsApi();
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+apiInstance.getAppErrors(callback);
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**[AppError]**](AppError.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+

@@ -144,7 +144,7 @@ func postNewNotebook(params notebook.PostNewNotebookParams) middleware.Responder
 		code := http.StatusInternalServerError
 		return notebook.NewPostNewNotebookDefault(code).WithPayload(newerror(code))
 	}
-	builder := "unknown"
+	builder := auth.Anonymous
 	if sess, err := auth.RetrieveSession(params.HTTPRequest); err == nil && sess != nil {
 		builder = sess.DockerUsername
 	}

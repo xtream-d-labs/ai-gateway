@@ -157,7 +157,7 @@ func postNewImage(params image.PostNewImageParams) middleware.Responder {
 		code := http.StatusInternalServerError
 		return image.NewPostNewImageDefault(code).WithPayload(newerror(code))
 	}
-	if err := queue.SubmitPullImageJob(name, swag.StringValue(dockercfg)); err != nil {
+	if err := queue.SubmitPullImageJob(name, swag.StringValue(dockercfg), username); err != nil {
 		log.Error("SubmitPullImageJob@postNewImage", err, nil)
 		code := http.StatusInternalServerError
 		return image.NewPostNewImageDefault(code).WithPayload(newerror(code))

@@ -19,6 +19,13 @@ js = "system/errors.js"
             </div>
           </div>
           <div class="clear-both"></div>
+          <div class="row">
+            <div class="col s3">
+              <div style="margin: 5px 0 0 2px;line-height: 3rem;">
+                <span id="record-count">0</span>&nbsp;hits
+              </div>
+            </div>
+          </div>
         </form>
       </div>
     </div>
@@ -29,27 +36,28 @@ js = "system/errors.js"
       <div class="col s12" style="margin-bottom: 15px;">
         <div id="data">
           <ul class="collapsible" id="accordion">
-            <li v-for="job in jobs" :key="job.id" :data-id="job.id" >
+            <li v-for="e in errors" :key="e.id" :data-id="e.id" >
               <div class="row row-header" style="padding: 13px 30px 10px 15px;"
-                   :id="job.id" :data-target="'#body-'+job.id"
+                   :id="e.id" :data-target="'#body-'+e.id"
                    data-toggle="collapse" aria-expanded="true"
-                   :aria-controls="'body-'+job.id">
+                   :aria-controls="'body-'+e.id">
                 <div class="col-1">
-                  <i class="material-icons" style="float: right;width: 24px;"
-                     v-if="job.status == 'preparing'">cached</i>
-                  <i class="material-icons" style="float: right;width: 24px;"
-                     v-if="job.status == 'sending'">cloud_upload</i>
-                  <i class="material-icons" style="float: right;width: 24px;"
-                     v-if="job.status == 'running'">fast_forward</i>
-                  <i class="material-icons" style="float: right;width: 24px;"
-                     v-if="job.status == 'done'">done_outline</i>
+                  <i class="material-icons" style="float: right;">chevron_right</i>
                 </div>
-                <div class="col-6 cut-text">{{ job.image }}</div>
-                <div class="col-3 cut-text">{{ job.started }}</div>
-                <div class="col-2" style="text-align: center;">
-                  <div class="label" style="margin-left: 5px;"
-                      :class="job.classObject">{{ job.status }}</div>
+                <div class="col-3">{{ e.occursAt }}</div>
+                <div class="col-6 cut-text">{{ e.caption }}</div>
+                <div class="col-2 cut-text">{{ e.owner }}</div>
+              </div>
+              <div :id="'body-'+e.id" class="row collapse row-body"
+                   :aria-labelledby="e.id"
+                   data-parent="#accordion">
+                <div class="col-12">
+                  <div class="row"><div class="col-12" style="margin-bottom: 20px;">
+                    <h6>Error detail:</h6>
+                    <span>{{ e.detail }}</a>
+                  </div></div>
                 </div>
+                <div class="clear-both"></div>
               </div>
             </li>
           </ul>

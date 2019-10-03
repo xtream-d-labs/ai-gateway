@@ -44,7 +44,7 @@ func Initialize() {
 		impl.LogMode(true)
 	}
 	db = impl
-	db.AutoMigrate(&Image{}, &Job{})
+	db.AutoMigrate(&Image{}, &Job{}, &Error{})
 }
 
 // Shutdown close its connection
