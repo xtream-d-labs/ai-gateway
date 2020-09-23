@@ -57,7 +57,7 @@ js = "ngc-repositories/index.js"
   <section class="container main">
     <div class="row">
       <div class="col s12" style="margin-bottom: 15px;">
-        <div id="data">
+        <div id="data" style="min-height: 400px;">
           <ul class="collapsible" id="accordion">
             <li v-for="image in images" :key="image.code"
                 :data-ns="image.namespace" :data-nm="image.name" >

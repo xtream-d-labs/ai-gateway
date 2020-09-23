@@ -51,6 +51,6 @@ runcmd:
   - systemctl enable scaleshift
   - systemctl start scaleshift
   - docker pull scaleshift/singularity:2.6-d2s
-  - docker pull tensorflow/tensorflow:1.14.0-py3
-  - docker pull mxnet/python:1.4.1_cpu_py3
-  - docker pull chainer/chainer:v6.1.0-intel-python3
+  - docker pull tensorflow/tensorflow:2.3.0
+  - docker pull mxnet/python:1.5.0_cpu_py3
+  - docker pull chainer/chainer:v7.7.0-intel-python3

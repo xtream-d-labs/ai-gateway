@@ -67,37 +67,6 @@ js = "settings/index.js"
                      placeholder="Generate your API Key at https://ngc.nvidia.com/setup/api-key" />
             </div>
           </div>
-          <h5 id="kubernetes" class="form-signin-heading">Kubernetes</h5>
-          <hr/>
-          <div class="form-group">
-            <label for="kubeconfig" class="row control-label">kubeconfig</label>
-            <div class="row">
-              <textarea id="kubeconfig" class="form-control" v-model="k8sConfig"></textarea>
-            </div>
-          </div>
-          <h5 id="rescale" class="form-signin-heading">
-            <a href="https://www.rescale.com/" target="_blank">Rescale</a>
-          </h5>
-          <hr/>
-          <div class="form-group">
-            <label for="input-rescale-platform" class="row control-label">Platform</label>
-            <div class="row">
-              <div class="col-12">
-                <select id="input-rescale-platform">
-                  <option value="https://platform.rescale.com">https://platform.rescale.com</option>
-                  <option value="https://platform.rescale.jp">https://platform.rescale.jp</option>
-                  <option value="https://kr.rescale.com">https://kr.rescale.com</option>
-                  <option value="https://eu.rescale.com">https://eu.rescale.com</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="input-rescale-key" class="row control-label">API Key</label>
-            <div class="row">
-              <input type="text" id="input-rescale-key" class="form-control" v-model="rescaleKey" />
-            </div>
-          </div>
           <div class="btn btn-lg btn-primary btn-block" v-on:click="submit"
                style="margin: 30px 0 25px 0;">Save</div>
           <div class="clear-both"></div>
