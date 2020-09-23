@@ -3,7 +3,7 @@
 # docker run --rm --privileged -v $(pwd):/output \
 #   -v /var/run/docker.sock:/var/run/docker.sock \
 #   scaleshift/singularity:2.6-d2s \
-#   --name app.simg alpine:3.10
+#   --name app.simg alpine:3.12
 
 FROM docker:18.09.3
 

@@ -26,7 +26,7 @@ services:
     container_name: scaleshift_db
 
   db_waiter:
-    image: alpine:3.10
+    image: alpine:3.12
     entrypoint: env
     depends_on:
       db:

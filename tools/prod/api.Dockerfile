@@ -1,6 +1,6 @@
 ARG BASE_IMAGE="libs"
 
-FROM golang:1.13.1-alpine3.10 AS libs
+FROM golang:1.15.2-alpine3.12 AS libs
 RUN apk --no-cache add g++ git
 
 FROM ${BASE_IMAGE} as builder
@@ -14,13 +14,13 @@ WORKDIR /go/src/github.com/rescale-labs/scaleshift/api/src
 RUN go build -o app -mod=vendor -ldflags "-s -w -X github.com/rescale-labs/scaleshift/api/src/config.date=$(date +%Y-%m-%d) -X github.com/rescale-labs/scaleshift/api/src/config.version=${API_VERSION} -X github.com/rescale-labs/scaleshift/api/src/config.commit=${API_COMMIT}"
 RUN mv app /
 
-FROM golang:1.13.1-alpine3.10 as cache
+FROM golang:1.15.2-alpine3.12 as cache
 RUN apk --no-cache add tini
 COPY --from=libs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=libs /usr /usr
 COPY --from=builder /root/.cache /root/.cache
 
-FROM alpine:3.10 as prod
+FROM alpine:3.12 as prod
 RUN apk --no-cache add bash openssl
 COPY --from=libs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY api/templates /go/src/github.com/rescale-labs/scaleshift/api/templates
