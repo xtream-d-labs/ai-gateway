@@ -25,7 +25,7 @@ rebuild: base
 
 run: up
 	-docker exec -t scaleshift_api sh -c $(KILL_PROCESS)
-	docker cp api/src scaleshift_api:/go/src/github.com/rescale-labs/scaleshift/api/
+	docker cp api/src scaleshift_api:/go/src/github.com/scaleshift/scaleshift/api/
 	docker exec -t scaleshift_api go build -mod=vendor -o app main.go
 	docker exec -t scaleshift_api ./app --scheme http --host 0.0.0.0 --port 80
 

@@ -17,9 +17,9 @@ import (
 	"docker.io/go-docker/api/types/mount"
 	"docker.io/go-docker/api/types/strslice"
 	"github.com/go-openapi/swag"
-	"github.com/rescale-labs/scaleshift/api/src/config"
-	"github.com/rescale-labs/scaleshift/api/src/db"
-	"github.com/rescale-labs/scaleshift/api/src/log"
+	"github.com/scaleshift/scaleshift/api/src/config"
+	"github.com/scaleshift/scaleshift/api/src/db"
+	"github.com/scaleshift/scaleshift/api/src/log"
 )
 
 const (

@@ -8,12 +8,12 @@ RUN curl --location --silent --show-error --out /gosu \
 RUN chmod +x /gosu
 
 FROM golang:1.15.2-alpine3.12 AS build-app
-ENV SINGULARITY_VERESION=v3.4.1
+ENV SINGULARITY_VERESION=v3.6.3
 RUN apk --no-cache add build-base linux-headers util-linux-dev \
         openssl-dev cryptsetup gawk git \
     && mkdir -p /go/src/github.com/sylabs \
     && cd /go/src/github.com/sylabs \
-    && git clone --depth=1 -b "${SINGULARITY_VERESION}" https://github.com/sylabs/singularity.git \
+    && git clone --depth=1 -b "${SINGULARITY_VERESION}" https://github.com/hpcng/singularity.git \
     && cd singularity \
     && ./mconfig \
     && cd builddir \

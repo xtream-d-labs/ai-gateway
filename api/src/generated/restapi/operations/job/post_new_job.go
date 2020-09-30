@@ -14,7 +14,7 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 	swag "github.com/go-openapi/swag"
 	validate "github.com/go-openapi/validate"
-	"github.com/rescale-labs/scaleshift/api/src/auth"
+	"github.com/scaleshift/scaleshift/api/src/auth"
 )
 
 // PostNewJobHandlerFunc turns a function with the right signature into a post new job handler

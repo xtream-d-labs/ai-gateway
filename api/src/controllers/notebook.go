@@ -14,15 +14,15 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-	"github.com/rescale-labs/scaleshift/api/src/auth"
-	"github.com/rescale-labs/scaleshift/api/src/config"
-	"github.com/rescale-labs/scaleshift/api/src/db"
-	"github.com/rescale-labs/scaleshift/api/src/generated/models"
-	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations"
-	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations/notebook"
-	"github.com/rescale-labs/scaleshift/api/src/lib"
-	"github.com/rescale-labs/scaleshift/api/src/log"
-	"github.com/rescale-labs/scaleshift/api/src/queue"
+	"github.com/scaleshift/scaleshift/api/src/auth"
+	"github.com/scaleshift/scaleshift/api/src/config"
+	"github.com/scaleshift/scaleshift/api/src/db"
+	"github.com/scaleshift/scaleshift/api/src/generated/models"
+	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations"
+	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations/notebook"
+	"github.com/scaleshift/scaleshift/api/src/lib"
+	"github.com/scaleshift/scaleshift/api/src/log"
+	"github.com/scaleshift/scaleshift/api/src/queue"
 )
 
 func notebookRoute(api *operations.ScaleShiftAPI) {
@@ -57,8 +57,8 @@ func getNotebooks(params notebook.GetNotebooksParams) middleware.Responder {
 			name = container.Names[0]
 		}
 		isJupyter := false
-		if as, ok1 := container.Labels["com.rescale.scaleshift.image.built-as"]; ok1 {
-			if _, ok2 := container.Labels["com.rescale.scaleshift.container.publish"]; ok2 {
+		if as, ok1 := container.Labels["com.scaleshift.image.built-as"]; ok1 {
+			if _, ok2 := container.Labels["com.scaleshift.container.publish"]; ok2 {
 				if strings.EqualFold(as, "jupyter-notebook") {
 					isJupyter = true
 				}
@@ -123,8 +123,8 @@ func postNewNotebook(params notebook.PostNewNotebookParams) middleware.Responder
 	}
 	wrappedImageID := ""
 	for _, image := range images {
-		fromID := image.Labels["com.rescale.scaleshift.image.original"]
-		fromNm := image.Labels["com.rescale.scaleshift.image.built-on"]
+		fromID := image.Labels["com.scaleshift.image.original"]
+		fromNm := image.Labels["com.scaleshift.image.built-on"]
 		if strings.EqualFold(name, fromID) || strings.EqualFold(name, fromNm) {
 			wrappedImageID = image.ID
 			break

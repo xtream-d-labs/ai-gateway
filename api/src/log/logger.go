@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/rescale-labs/scaleshift/api/src/config"
+	"github.com/scaleshift/scaleshift/api/src/config"
 	"github.com/sirupsen/logrus"
 )
 

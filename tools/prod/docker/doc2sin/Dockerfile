@@ -14,7 +14,7 @@ RUN apk --no-cache add "bash=4.4.19-r1" "tar=1.32-r0" "python2=2.7.16-r1" \
        "squashfs-tools=4.3-r5" "curl=7.64.0-r2"
 RUN apk --no-cache add --virtual build-deps "make=4.2.1-r2" "gcc=8.3.0-r0" "g++=8.3.0-r0" \
        "linux-headers=4.18.13-r1" "libarchive-dev=3.3.2-r4" "file=5.36-r0" \
-    && repo=https://github.com/sylabs/singularity/releases/download \
+    && repo=https://github.com/hpcng/singularity/releases/download \
     && curl --location --silent --show-error --out singularity.tar.gz \
        "${repo}/${SINGULARITY_VERESION}/singularity-${SINGULARITY_VERESION}.tar.gz" \
     && tar xvf singularity.tar.gz \

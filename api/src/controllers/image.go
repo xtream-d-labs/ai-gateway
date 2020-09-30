@@ -9,14 +9,14 @@ import (
 	"docker.io/go-docker/api/types"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/swag"
-	"github.com/rescale-labs/scaleshift/api/src/auth"
-	"github.com/rescale-labs/scaleshift/api/src/config"
-	"github.com/rescale-labs/scaleshift/api/src/db"
-	"github.com/rescale-labs/scaleshift/api/src/generated/models"
-	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations"
-	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations/image"
-	"github.com/rescale-labs/scaleshift/api/src/log"
-	"github.com/rescale-labs/scaleshift/api/src/queue"
+	"github.com/scaleshift/scaleshift/api/src/auth"
+	"github.com/scaleshift/scaleshift/api/src/config"
+	"github.com/scaleshift/scaleshift/api/src/db"
+	"github.com/scaleshift/scaleshift/api/src/generated/models"
+	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations"
+	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations/image"
+	"github.com/scaleshift/scaleshift/api/src/log"
+	"github.com/scaleshift/scaleshift/api/src/queue"
 )
 
 func imageRoute(api *operations.ScaleShiftAPI) {

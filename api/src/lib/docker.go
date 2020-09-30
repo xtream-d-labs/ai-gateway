@@ -19,9 +19,9 @@ import (
 	"docker.io/go-docker/api/types/container"
 	"docker.io/go-docker/api/types/network"
 	"github.com/go-openapi/swag"
-	"github.com/rescale-labs/scaleshift/api/src/config"
-	"github.com/rescale-labs/scaleshift/api/src/db"
-	"github.com/rescale-labs/scaleshift/api/src/log"
+	"github.com/scaleshift/scaleshift/api/src/config"
+	"github.com/scaleshift/scaleshift/api/src/db"
+	"github.com/scaleshift/scaleshift/api/src/log"
 )
 
 var (
@@ -256,12 +256,12 @@ func BuildJobImage(ctx context.Context, jobID, builder string, fqdnToPush bool) 
 	options := types.ImageBuildOptions{
 		Tags: []string{name},
 		Labels: map[string]string{
-			"com.rescale.scaleshift.name":            config.ProjectName,
-			"com.rescale.scaleshift.image.built-as":  "job-excutable",
-			"com.rescale.scaleshift.image.built-api": config.Config.APIVersion,
-			"com.rescale.scaleshift.image.built-at":  time.Now().Format(time.RFC3339),
-			"com.rescale.scaleshift.image.built-by":  builder,
-			"com.rescale.scaleshift.image.built-on":  job.DockerImage,
+			"com.scaleshift.name":            config.ProjectName,
+			"com.scaleshift.image.built-as":  "job-excutable",
+			"com.scaleshift.image.built-api": config.Config.APIVersion,
+			"com.scaleshift.image.built-at":  time.Now().Format(time.RFC3339),
+			"com.scaleshift.image.built-by":  builder,
+			"com.scaleshift.image.built-on":  job.DockerImage,
 		},
 		SuppressOutput: true,
 		NoCache:        true,

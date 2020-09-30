@@ -3,7 +3,7 @@ package db
 import (
 	"github.com/go-openapi/swag"
 	"github.com/jinzhu/gorm"
-	"github.com/rescale-labs/scaleshift/api/src/log"
+	"github.com/scaleshift/scaleshift/api/src/log"
 )
 
 // Error represents error information

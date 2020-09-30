@@ -25,7 +25,7 @@ import (
 	flags "github.com/jessevdk/go-flags"
 	"golang.org/x/net/netutil"
 
-	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations"
+	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations"
 )
 
 const (

@@ -11,12 +11,12 @@ import (
 	"docker.io/go-docker/api/types"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/swag"
-	"github.com/rescale-labs/scaleshift/api/src/config"
-	"github.com/rescale-labs/scaleshift/api/src/db"
-	"github.com/rescale-labs/scaleshift/api/src/generated/models"
-	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations"
-	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations/workspace"
-	"github.com/rescale-labs/scaleshift/api/src/log"
+	"github.com/scaleshift/scaleshift/api/src/config"
+	"github.com/scaleshift/scaleshift/api/src/db"
+	"github.com/scaleshift/scaleshift/api/src/generated/models"
+	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations"
+	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations/workspace"
+	"github.com/scaleshift/scaleshift/api/src/log"
 )
 
 func workspaceRoute(api *operations.ScaleShiftAPI) {
@@ -70,8 +70,8 @@ func findNotebooks(path string, containers []types.Container) []string {
 	notebooks := []string{}
 	for _, container := range containers {
 		isJupyter := false
-		if as, ok1 := container.Labels["com.rescale.scaleshift.image.built-as"]; ok1 {
-			if _, ok2 := container.Labels["com.rescale.scaleshift.container.publish"]; ok2 {
+		if as, ok1 := container.Labels["com.scaleshift.image.built-as"]; ok1 {
+			if _, ok2 := container.Labels["com.scaleshift.container.publish"]; ok2 {
 				if strings.EqualFold(as, "jupyter-notebook") {
 					isJupyter = true
 				}

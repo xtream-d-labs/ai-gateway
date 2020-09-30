@@ -9,9 +9,9 @@ ENV CGO_ENABLED=0 \
     GOARCH=amd64
 ARG API_VERSION="dev"
 ARG API_COMMIT="unknown"
-COPY  . /go/src/github.com/rescale-labs/scaleshift/
-WORKDIR /go/src/github.com/rescale-labs/scaleshift/api/src
-RUN go build -o app -mod=vendor -ldflags "-s -w -X github.com/rescale-labs/scaleshift/api/src/config.date=$(date +%Y-%m-%d) -X github.com/rescale-labs/scaleshift/api/src/config.version=${API_VERSION} -X github.com/rescale-labs/scaleshift/api/src/config.commit=${API_COMMIT}"
+COPY  . /go/src/github.com/scaleshift/scaleshift/
+WORKDIR /go/src/github.com/scaleshift/scaleshift/api/src
+RUN go build -o app -mod=vendor -ldflags "-s -w -X github.com/scaleshift/scaleshift/api/src/config.date=$(date +%Y-%m-%d) -X github.com/scaleshift/scaleshift/api/src/config.version=${API_VERSION} -X github.com/scaleshift/scaleshift/api/src/config.commit=${API_COMMIT}"
 RUN mv app /
 
 FROM golang:1.15.2-alpine3.12 as cache
@@ -23,7 +23,7 @@ COPY --from=builder /root/.cache /root/.cache
 FROM alpine:3.12 as prod
 RUN apk --no-cache add bash openssl
 COPY --from=libs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY api/templates /go/src/github.com/rescale-labs/scaleshift/api/templates
+COPY api/templates /go/src/github.com/scaleshift/scaleshift/api/templates
 COPY api/src/entrypoint.sh /
 VOLUME ["/tmp/badger", "/tmp/work", "/tmp/simg"]
 ARG API_VERSION="dev"

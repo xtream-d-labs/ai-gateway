@@ -10,9 +10,9 @@ import (
 	docker "docker.io/go-docker"
 	"docker.io/go-docker/api/types"
 	"github.com/go-openapi/swag"
-	"github.com/rescale-labs/scaleshift/api/src/generated/models"
-	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations"
-	"github.com/rescale-labs/scaleshift/api/src/log"
+	"github.com/scaleshift/scaleshift/api/src/generated/models"
+	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations"
+	"github.com/scaleshift/scaleshift/api/src/log"
 )
 
 // Routes set API handlers

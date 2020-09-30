@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/dgraph-io/badger"
-	"github.com/rescale-labs/scaleshift/api/src/config"
+	"github.com/scaleshift/scaleshift/api/src/config"
 )
 
 var (

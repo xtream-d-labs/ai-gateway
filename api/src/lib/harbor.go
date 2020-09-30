@@ -8,8 +8,8 @@ import (
 	"net/http"
 
 	"docker.io/go-docker/api/types"
-	util "github.com/rescale-labs/scaleshift/api/src/http"
-	"github.com/rescale-labs/scaleshift/api/src/log"
+	util "github.com/scaleshift/scaleshift/api/src/http"
+	"github.com/scaleshift/scaleshift/api/src/log"
 )
 
 /**

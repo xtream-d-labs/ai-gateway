@@ -23,7 +23,7 @@ ScaleShift is a client web application which makes it easier for researchers to 
 
 <img src="https://raw.github.com/wiki/rescale-labs/scaleshift/img/how-it-works-1.png">
 
-With just only [3 steps!](https://github.com/rescale-labs/scaleshift#local-installation)
+With just only [3 steps!](https://github.com/scaleshift/scaleshift#local-installation)
 
 ### 2. Download machine learning software
 
@@ -101,7 +101,7 @@ curl -sX GET -H "Content-Type: application/json" \
 
 ### Contribution
 
-1. Fork ([https://github.com/rescale-labs/scaleshift/fork](https://github.com/rescale-labs/scaleshift/fork))
+1. Fork ([https://github.com/scaleshift/scaleshift/fork](https://github.com/scaleshift/scaleshift/fork))
 2. Create a feature branch
 3. Commit your changes
 4. Rebase your local changes against the master branch
@@ -109,4 +109,4 @@ curl -sX GET -H "Content-Type: application/json" \
 
 ### Copyright and license
 
-Code released under the [MIT license](https://github.com/rescale-labs/scaleshift/blob/master/LICENSE).
+Code released under the [MIT license](https://github.com/scaleshift/scaleshift/blob/master/LICENSE).

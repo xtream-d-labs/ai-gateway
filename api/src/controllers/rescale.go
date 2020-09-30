@@ -6,12 +6,12 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/swag"
-	"github.com/rescale-labs/scaleshift/api/src/auth"
-	"github.com/rescale-labs/scaleshift/api/src/generated/models"
-	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations"
-	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations/rescale"
-	"github.com/rescale-labs/scaleshift/api/src/log"
-	api "github.com/rescale-labs/scaleshift/api/src/rescale"
+	"github.com/scaleshift/scaleshift/api/src/auth"
+	"github.com/scaleshift/scaleshift/api/src/generated/models"
+	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations"
+	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations/rescale"
+	"github.com/scaleshift/scaleshift/api/src/log"
+	api "github.com/scaleshift/scaleshift/api/src/rescale"
 )
 
 func rescaleRoute(api *operations.ScaleShiftAPI) {

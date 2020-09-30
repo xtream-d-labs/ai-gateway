@@ -9,7 +9,7 @@ import (
 	"net/http"
 
 	middleware "github.com/go-openapi/runtime/middleware"
-	"github.com/rescale-labs/scaleshift/api/src/auth"
+	"github.com/scaleshift/scaleshift/api/src/auth"
 )
 
 // GetNgcImagesHandlerFunc turns a function with the right signature into a get ngc images handler

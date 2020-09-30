@@ -13,7 +13,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 
-	models "github.com/rescale-labs/scaleshift/api/src/generated/models"
+	models "github.com/scaleshift/scaleshift/api/src/generated/models"
 )
 
 // NewPostNewSessionParams creates a new PostNewSessionParams object

@@ -6,9 +6,9 @@ services:
     image: supinf/go-swagger:0.17.2
     command: generate server -P auth.Principal -f spec/openapi.yaml -t src/generated
     volumes:
-      - ../../spec:/go/src/github.com/rescale-labs/scaleshift/api/spec
-      - ../../api:/go/src/github.com/rescale-labs/scaleshift/api
-    working_dir: /go/src/github.com/rescale-labs/scaleshift/api
+      - ../../spec:/go/src/github.com/scaleshift/scaleshift/api/spec
+      - ../../api:/go/src/github.com/scaleshift/scaleshift/api
+    working_dir: /go/src/github.com/scaleshift/scaleshift/api
 
   codegen-web:
     image: scaleshift/dev:codegen-20190403
@@ -25,15 +25,15 @@ services:
       target: libs
     command: go mod vendor
     volumes:
-      - ../../api:/go/src/github.com/rescale-labs/scaleshift/api
-    working_dir: /go/src/github.com/rescale-labs/scaleshift/api/src
+      - ../../api:/go/src/github.com/scaleshift/scaleshift/api
+    working_dir: /go/src/github.com/scaleshift/scaleshift/api/src
 
   lint-api:
     image: supinf/golangci-lint:1.16
     command: run --config .golangci.yml
     volumes:
-      - ../../api:/go/src/github.com/rescale-labs/scaleshift/api
-    working_dir: /go/src/github.com/rescale-labs/scaleshift/api/src
+      - ../../api:/go/src/github.com/scaleshift/scaleshift/api
+    working_dir: /go/src/github.com/scaleshift/scaleshift/api/src
 
   test-api:
     image: scaleshift/api:local
@@ -45,8 +45,8 @@ services:
       target: builder
     command: sh -c "go test -cover -bench -benchmem `go list ./... | grep -v /generated/` -v"
     volumes:
-      - ../../api:/go/src/github.com/rescale-labs/scaleshift/api
-    working_dir: /go/src/github.com/rescale-labs/scaleshift/api/src
+      - ../../api:/go/src/github.com/scaleshift/scaleshift/api
+    working_dir: /go/src/github.com/scaleshift/scaleshift/api/src
 
   gen-private-key:
     image: supinf/openssl:1.0

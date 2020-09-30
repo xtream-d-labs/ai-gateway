@@ -31,7 +31,7 @@ services:
       - ./tmp/simg:/tmp/simg
       - ./tmp/work:/tmp/work
       - /var/run/docker.sock:/var/run/docker.sock
-    working_dir: /go/src/github.com/rescale-labs/scaleshift/api/src
+    working_dir: /go/src/github.com/scaleshift/scaleshift/api/src
     networks:
       - services
     restart: always

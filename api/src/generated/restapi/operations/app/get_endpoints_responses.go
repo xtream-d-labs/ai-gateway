@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-openapi/runtime"
 
-	models "github.com/rescale-labs/scaleshift/api/src/generated/models"
+	models "github.com/scaleshift/scaleshift/api/src/generated/models"
 )
 
 // GetEndpointsOKCode is the HTTP code returned for type GetEndpointsOK

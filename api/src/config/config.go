@@ -17,7 +17,7 @@ var (
 // API props
 const (
 	ProjectName = "ScaleShift"
-	ProjectPath = "github.com/rescale-labs/scaleshift/api"
+	ProjectPath = "github.com/scaleshift/scaleshift/api"
 )
 
 // Config can be set via environment variables

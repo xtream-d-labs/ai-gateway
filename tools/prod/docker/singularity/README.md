@@ -6,8 +6,8 @@ https://www.sylabs.io/singularity/
 
 ## Supported tags and respective `Dockerfile` links
 
-・3.4 ([singularity/Dockerfile](https://github.com/rescale-labs/scaleshift/blob/master/tools/prod/docker/singularity/Dockerfile))  
-・2.6-d2s ([doc2sin/Dockerfile](https://github.com/rescale-labs/scaleshift/blob/master/tools/prod/docker/doc2sin/Dockerfile))  
+・3.4 ([singularity/Dockerfile](https://github.com/scaleshift/scaleshift/blob/master/tools/prod/docker/singularity/Dockerfile))  
+・2.6-d2s ([doc2sin/Dockerfile](https://github.com/scaleshift/scaleshift/blob/master/tools/prod/docker/doc2sin/Dockerfile))  
 
 ## Usage
 

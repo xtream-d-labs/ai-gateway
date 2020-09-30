@@ -4,7 +4,7 @@
 
 ## Supported tags and respective `Dockerfile` links
 
-・1.11 ([proxy/Dockerfile](https://github.com/rescale-labs/scaleshift/blob/master/tools/prod/docker/proxy/Dockerfile))  
+・1.11 ([proxy/Dockerfile](https://github.com/scaleshift/scaleshift/blob/master/tools/prod/docker/proxy/Dockerfile))  
 
 ## TLS
 

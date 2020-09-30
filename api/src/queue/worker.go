@@ -12,13 +12,13 @@ import (
 	docker "docker.io/go-docker"
 	"docker.io/go-docker/api/types"
 	"github.com/go-openapi/swag"
-	"github.com/rescale-labs/scaleshift/api/src/auth"
-	"github.com/rescale-labs/scaleshift/api/src/config"
-	"github.com/rescale-labs/scaleshift/api/src/db"
-	"github.com/rescale-labs/scaleshift/api/src/kubernetes"
-	"github.com/rescale-labs/scaleshift/api/src/lib"
-	"github.com/rescale-labs/scaleshift/api/src/log"
-	"github.com/rescale-labs/scaleshift/api/src/rescale"
+	"github.com/scaleshift/scaleshift/api/src/auth"
+	"github.com/scaleshift/scaleshift/api/src/config"
+	"github.com/scaleshift/scaleshift/api/src/db"
+	"github.com/scaleshift/scaleshift/api/src/kubernetes"
+	"github.com/scaleshift/scaleshift/api/src/lib"
+	"github.com/scaleshift/scaleshift/api/src/log"
+	"github.com/scaleshift/scaleshift/api/src/rescale"
 )
 
 func init() {

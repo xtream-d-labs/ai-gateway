@@ -6,10 +6,10 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"github.com/rescale-labs/scaleshift/api/src/db"
-	"github.com/rescale-labs/scaleshift/api/src/generated/restapi"
-	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations"
-	logs "github.com/rescale-labs/scaleshift/api/src/log"
+	"github.com/scaleshift/scaleshift/api/src/db"
+	"github.com/scaleshift/scaleshift/api/src/generated/restapi"
+	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations"
+	logs "github.com/scaleshift/scaleshift/api/src/log"
 
 	"github.com/go-openapi/loads"
 	flags "github.com/jessevdk/go-flags"

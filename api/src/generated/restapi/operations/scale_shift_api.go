@@ -19,15 +19,15 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
-	"github.com/rescale-labs/scaleshift/api/src/auth"
-	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations/app"
-	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations/app_errors"
-	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations/image"
-	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations/job"
-	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations/notebook"
-	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations/repository"
-	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations/rescale"
-	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations/workspace"
+	"github.com/scaleshift/scaleshift/api/src/auth"
+	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations/app"
+	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations/app_errors"
+	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations/image"
+	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations/job"
+	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations/notebook"
+	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations/repository"
+	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations/rescale"
+	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations/workspace"
 )
 
 // NewScaleShiftAPI creates a new ScaleShift instance

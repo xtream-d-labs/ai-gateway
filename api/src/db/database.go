@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/jinzhu/gorm"
-	"github.com/rescale-labs/scaleshift/api/src/config"
-	logs "github.com/rescale-labs/scaleshift/api/src/log"
+	"github.com/scaleshift/scaleshift/api/src/config"
+	logs "github.com/scaleshift/scaleshift/api/src/log"
 	log "github.com/sirupsen/logrus"
 )
 

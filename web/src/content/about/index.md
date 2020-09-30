@@ -15,8 +15,8 @@ js = "about/index.js"
             <div class="row" style="padding: 5px 0;">
               <div class="col-3"></div>
               <div class="col-9">
-                <a href="https://github.com/rescale-labs/scaleshift"
-                   target="_blank">github.com/rescale-labs/scaleshift</a>
+                <a href="https://github.com/scaleshift/scaleshift"
+                   target="_blank">github.com/scaleshift/scaleshift</a>
               </div>
             </div>
           </li>

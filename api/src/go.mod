@@ -1,4 +1,4 @@
-module github.com/rescale-labs/scaleshift/api/src
+module github.com/scaleshift/scaleshift/api/src
 
 go 1.13
 

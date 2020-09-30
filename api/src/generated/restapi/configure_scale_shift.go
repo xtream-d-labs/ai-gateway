@@ -10,10 +10,10 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 
-	"github.com/rescale-labs/scaleshift/api/src/auth"
-	"github.com/rescale-labs/scaleshift/api/src/controllers"
-	"github.com/rescale-labs/scaleshift/api/src/generated/restapi/operations"
-	wrapper "github.com/rescale-labs/scaleshift/api/src/http"
+	"github.com/scaleshift/scaleshift/api/src/auth"
+	"github.com/scaleshift/scaleshift/api/src/controllers"
+	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations"
+	wrapper "github.com/scaleshift/scaleshift/api/src/http"
 )
 
 //go:generate swagger generate server --target ../src/generated --name ScaleShift --spec ../spec/openapi.yaml --principal auth.Principal
