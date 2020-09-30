@@ -46,7 +46,7 @@ services:
     container_name: proxy
 
   db:
-    image: mysql:5.6.44
+    image: mysql:5.6.49
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=scaleshift

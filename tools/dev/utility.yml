@@ -29,8 +29,8 @@ services:
     working_dir: /go/src/github.com/scaleshift/scaleshift/api/src
 
   lint-api:
-    image: supinf/golangci-lint:1.16
-    command: run --config .golangci.yml
+    image: golangci/golangci-lint:v1.29.0-alpine
+    command: golangci-lint run --config .golangci.yml
     volumes:
       - ../../api:/go/src/github.com/scaleshift/scaleshift/api
     working_dir: /go/src/github.com/scaleshift/scaleshift/api/src

@@ -86,7 +86,7 @@ func BuildSingularityImage(jobID, authConfig, builder string) (*string, error) {
 	log.Debug("Singularityfile", nil, &log.Map{
 		"content": sfile,
 	})
-	err = ioutil.WriteFile(filepath.Join(dir, sFileName), []byte(sfile), 0644)
+	err = ioutil.WriteFile(filepath.Join(dir, sFileName), []byte(sfile), 0600)
 	if err != nil {
 		return nil, err
 	}

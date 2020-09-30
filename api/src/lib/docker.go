@@ -209,7 +209,7 @@ func BuildJobImage(ctx context.Context, jobID, builder string, fqdnToPush bool) 
 		builder,
 		lib,
 		setup,
-		"\""+strings.Replace(job.Commands, ",", "\",\"", -1)+"\"")), 0644)
+		"\""+strings.Replace(job.Commands, ",", "\",\"", -1)+"\"")), 0600)
 	if err != nil {
 		return nil, err
 	}

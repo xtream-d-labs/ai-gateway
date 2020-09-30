@@ -48,7 +48,7 @@ func getCoreTypes(params rescale.GetRescaleCoreTypesParams, principal *auth.Prin
 			}
 			app, err := api.Analyses(ctx, creds.Base.RescaleKey, appver[0])
 			if err != nil {
-				log.Error("analyses@getCoreTypes", err, nil)
+				log.Error("analyses@getCoreTypes", err, nil) // nolint:misspell
 				code := http.StatusBadRequest
 				return rescale.NewGetRescaleCoreTypesDefault(code).WithPayload(newerror(code))
 			}
@@ -127,7 +127,7 @@ func getApplication(params rescale.GetRescaleApplicationParams, principal *auth.
 
 	app, err := api.Analyses(ctx, creds.Base.RescaleKey, api.ApplicationSingularity) // params.Code
 	if err != nil {
-		log.Error("analyses@getApplication", err, nil)
+		log.Error("analyses@getApplication", err, nil) // nolint:misspell
 		code := http.StatusBadRequest
 		return rescale.NewGetRescaleApplicationDefault(code).WithPayload(newerror(code))
 	}
@@ -161,7 +161,7 @@ func getApplicationVersion(params rescale.GetRescaleApplicationVersionParams, pr
 
 	app, err := api.Analyses(ctx, creds.Base.RescaleKey, api.ApplicationSingularity) // params.Code
 	if err != nil {
-		log.Error("analyses@getApplicationVersion", err, nil)
+		log.Error("analyses@getApplicationVersion", err, nil) // nolint:misspell
 		code := http.StatusBadRequest
 		return rescale.NewGetRescaleApplicationVersionDefault(code).WithPayload(newerror(code))
 	}

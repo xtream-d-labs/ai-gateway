@@ -49,10 +49,8 @@ func build(cli *http.Client, method, path string, body io.Reader, headers http.H
 	if err != nil {
 		return nil, err
 	}
-	if headers != nil {
-		for key := range headers {
-			req.Header.Set(key, headers.Get(key))
-		}
+	for key := range headers {
+		req.Header.Set(key, headers.Get(key))
 	}
 	if expectedPayload && swag.IsZero(req.Header.Get("Content-Type")) {
 		req.Header.Set("Content-Type", "text/plain")
