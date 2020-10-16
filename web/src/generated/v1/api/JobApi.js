@@ -1,5 +1,5 @@
 /**
- * ScaleShift
+ * AI Gateway
  * A platform for machine learning & high performance computing 
  *
  * OpenAPI spec version: 1.0.0
@@ -22,10 +22,10 @@
     module.exports = factory(require('../ApiClient'), require('../model/Error'), require('../model/Job'), require('../model/JobAttrs'), require('../model/JobAttrs1'), require('../model/JobDetail'), require('../model/JobFiles'), require('../model/JobLogs'), require('../model/NewJobID'));
   } else {
     // Browser globals (root is window)
-    if (!root.ScaleShift) {
-      root.ScaleShift = {};
+    if (!root.AiGateway) {
+      root.AiGateway = {};
     }
-    root.ScaleShift.JobApi = factory(root.ScaleShift.ApiClient, root.ScaleShift.Error, root.ScaleShift.Job, root.ScaleShift.JobAttrs, root.ScaleShift.JobAttrs1, root.ScaleShift.JobDetail, root.ScaleShift.JobFiles, root.ScaleShift.JobLogs, root.ScaleShift.NewJobID);
+    root.AiGateway.JobApi = factory(root.AiGateway.ApiClient, root.AiGateway.Error, root.AiGateway.Job, root.AiGateway.JobAttrs, root.AiGateway.JobAttrs1, root.AiGateway.JobDetail, root.AiGateway.JobFiles, root.AiGateway.JobLogs, root.AiGateway.NewJobID);
   }
 }(this, function(ApiClient, Error, Job, JobAttrs, JobAttrs1, JobDetail, JobFiles, JobLogs, NewJobID) {
   'use strict';

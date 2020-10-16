@@ -1,4 +1,4 @@
-# ScaleShift.JobApi
+# AiGateway.JobApi
 
 All URIs are relative to *http://localhost:9000/api/v1*
 
@@ -23,8 +23,8 @@ delete a job
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
-var defaultClient = ScaleShift.ApiClient.instance;
+var AiGateway = require('ai_gateway');
+var defaultClient = AiGateway.ApiClient.instance;
 
 // Configure API key authorization: api-authorizer
 var api-authorizer = defaultClient.authentications['api-authorizer'];
@@ -32,7 +32,7 @@ api-authorizer.apiKey = 'YOUR API KEY';
 // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
 //api-authorizer.apiKeyPrefix = 'Token';
 
-var apiInstance = new ScaleShift.JobApi();
+var apiInstance = new AiGateway.JobApi();
 
 var id = "id_example"; // String | Job ID
 
@@ -76,8 +76,8 @@ returns the details of a job
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
-var defaultClient = ScaleShift.ApiClient.instance;
+var AiGateway = require('ai_gateway');
+var defaultClient = AiGateway.ApiClient.instance;
 
 // Configure API key authorization: api-authorizer
 var api-authorizer = defaultClient.authentications['api-authorizer'];
@@ -85,7 +85,7 @@ api-authorizer.apiKey = 'YOUR API KEY';
 // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
 //api-authorizer.apiKeyPrefix = 'Token';
 
-var apiInstance = new ScaleShift.JobApi();
+var apiInstance = new AiGateway.JobApi();
 
 var id = "id_example"; // String | Job ID
 
@@ -129,8 +129,8 @@ returns the list of output files
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
-var defaultClient = ScaleShift.ApiClient.instance;
+var AiGateway = require('ai_gateway');
+var defaultClient = AiGateway.ApiClient.instance;
 
 // Configure API key authorization: api-authorizer
 var api-authorizer = defaultClient.authentications['api-authorizer'];
@@ -138,7 +138,7 @@ api-authorizer.apiKey = 'YOUR API KEY';
 // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
 //api-authorizer.apiKeyPrefix = 'Token';
 
-var apiInstance = new ScaleShift.JobApi();
+var apiInstance = new AiGateway.JobApi();
 
 var id = "id_example"; // String | Job ID
 
@@ -182,8 +182,8 @@ returns the logs of a job
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
-var defaultClient = ScaleShift.ApiClient.instance;
+var AiGateway = require('ai_gateway');
+var defaultClient = AiGateway.ApiClient.instance;
 
 // Configure API key authorization: api-authorizer
 var api-authorizer = defaultClient.authentications['api-authorizer'];
@@ -191,7 +191,7 @@ api-authorizer.apiKey = 'YOUR API KEY';
 // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
 //api-authorizer.apiKeyPrefix = 'Token';
 
-var apiInstance = new ScaleShift.JobApi();
+var apiInstance = new AiGateway.JobApi();
 
 var id = "id_example"; // String | Job ID
 
@@ -235,8 +235,8 @@ returns training jobs on cloud
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
-var defaultClient = ScaleShift.ApiClient.instance;
+var AiGateway = require('ai_gateway');
+var defaultClient = AiGateway.ApiClient.instance;
 
 // Configure API key authorization: api-authorizer
 var api-authorizer = defaultClient.authentications['api-authorizer'];
@@ -244,7 +244,7 @@ api-authorizer.apiKey = 'YOUR API KEY';
 // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
 //api-authorizer.apiKeyPrefix = 'Token';
 
-var apiInstance = new ScaleShift.JobApi();
+var apiInstance = new AiGateway.JobApi();
 
 var callback = function(error, data, response) {
   if (error) {
@@ -282,8 +282,8 @@ modify the job status
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
-var defaultClient = ScaleShift.ApiClient.instance;
+var AiGateway = require('ai_gateway');
+var defaultClient = AiGateway.ApiClient.instance;
 
 // Configure API key authorization: api-authorizer
 var api-authorizer = defaultClient.authentications['api-authorizer'];
@@ -291,11 +291,11 @@ api-authorizer.apiKey = 'YOUR API KEY';
 // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
 //api-authorizer.apiKeyPrefix = 'Token';
 
-var apiInstance = new ScaleShift.JobApi();
+var apiInstance = new AiGateway.JobApi();
 
 var id = "id_example"; // String | Job ID
 
-var body = new ScaleShift.JobAttrs1(); // JobAttrs1 | 
+var body = new AiGateway.JobAttrs1(); // JobAttrs1 | 
 
 
 var callback = function(error, data, response) {
@@ -338,8 +338,8 @@ Submit a job with the specified image
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
-var defaultClient = ScaleShift.ApiClient.instance;
+var AiGateway = require('ai_gateway');
+var defaultClient = AiGateway.ApiClient.instance;
 
 // Configure API key authorization: api-authorizer
 var api-authorizer = defaultClient.authentications['api-authorizer'];
@@ -347,9 +347,9 @@ api-authorizer.apiKey = 'YOUR API KEY';
 // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
 //api-authorizer.apiKeyPrefix = 'Token';
 
-var apiInstance = new ScaleShift.JobApi();
+var apiInstance = new AiGateway.JobApi();
 
-var body = new ScaleShift.JobAttrs(); // JobAttrs | 
+var body = new AiGateway.JobAttrs(); // JobAttrs | 
 
 
 var callback = function(error, data, response) {

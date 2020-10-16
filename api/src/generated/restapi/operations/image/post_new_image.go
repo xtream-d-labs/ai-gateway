@@ -8,11 +8,11 @@ package image
 import (
 	"net/http"
 
-	errors "github.com/go-openapi/errors"
-	middleware "github.com/go-openapi/runtime/middleware"
-	strfmt "github.com/go-openapi/strfmt"
-	swag "github.com/go-openapi/swag"
-	validate "github.com/go-openapi/validate"
+	"github.com/go-openapi/errors"
+	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // PostNewImageHandlerFunc turns a function with the right signature into a post new image handler
@@ -63,6 +63,7 @@ func (o *PostNewImage) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 }
 
 // PostNewImageBody ImageName
+//
 // swagger:model PostNewImageBody
 type PostNewImageBody struct {
 

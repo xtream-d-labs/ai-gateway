@@ -2,7 +2,7 @@ version: "2.4"
 
 services:
   api:
-    image: scaleshift/api:%{version}
+    image: aigateway/api:%{version}
     environment:
       - SS_MUST_SIGN_IN=false
       - SS_JUPYTER_MINIMUM_PORT=30000
@@ -13,14 +13,14 @@ services:
       - SS_RESCALE_JOB_WALLTIME=3600
       - SS_LOG_LEVEL=debug
       - SS_LOG_FORMAT=json
-      - SS_IMAGES_TOBE_IGNORED=scaleshift/,ss-jupyter/,<none>
-      - SS_WORKSPACE_HOST_DIR=${PWD}/scaleshift/workspaces
-      - SS_SINGULARITY_HOST_DIR=${PWD}/scaleshift/simages
-      - SS_DATABASE_ENDPOINT=user:pass@tcp(db:3306)/scaleshift?charset=utf8mb4&collation=utf8_unicode_ci&parseTime=true
+      - SS_IMAGES_TOBE_IGNORED=aigateway/,ss-jupyter/,<none>
+      - SS_WORKSPACE_HOST_DIR=${PWD}/aigateway/workspaces
+      - SS_SINGULARITY_HOST_DIR=${PWD}/aigateway/simages
+      - SS_DATABASE_ENDPOINT=user:pass@tcp(db:3306)/aigateway?charset=utf8mb4&collation=utf8_unicode_ci&parseTime=true
       - DOCKER_HOST=unix:///var/run/docker.sock
     volumes:
-      - ${PWD}/scaleshift/workspaces:/tmp/work
-      - ${PWD}/scaleshift/simages:/tmp/simg
+      - ${PWD}/aigateway/workspaces:/tmp/work
+      - ${PWD}/aigateway/simages:/tmp/simg
       - database-cache:/tmp/badger
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
@@ -30,14 +30,14 @@ services:
     container_name: api
 
   web:
-    image: scaleshift/web:%{version}
+    image: aigateway/web:%{version}
     logging:
       driver: none
     restart: always
     container_name: web
 
   proxy:
-    image: scaleshift/proxy:1.11
+    image: aigateway/proxy:1.16
     ports:
       - "%{publish_port}:80"
     logging:
@@ -49,7 +49,7 @@ services:
     image: mysql:5.6.49
     environment:
       - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=scaleshift
+      - MYSQL_DATABASE=aigateway
       - MYSQL_USER=user
       - MYSQL_PASSWORD=pass
     volumes:

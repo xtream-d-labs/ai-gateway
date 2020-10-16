@@ -38,7 +38,7 @@ func (o *GetRemoteImagesURL) SetBasePath(bp string) {
 
 // Build a url path and query string
 func (o *GetRemoteImagesURL) Build() (*url.URL, error) {
-	var result url.URL
+	var _result url.URL
 
 	var _path = "/remote-images/{id}"
 
@@ -46,16 +46,16 @@ func (o *GetRemoteImagesURL) Build() (*url.URL, error) {
 	if id != "" {
 		_path = strings.Replace(_path, "{id}", id, -1)
 	} else {
-		return nil, errors.New("ID is required on GetRemoteImagesURL")
+		return nil, errors.New("id is required on GetRemoteImagesURL")
 	}
 
 	_basePath := o._basePath
 	if _basePath == "" {
 		_basePath = "/api/v1"
 	}
-	result.Path = golangswaggerpaths.Join(_basePath, _path)
+	_result.Path = golangswaggerpaths.Join(_basePath, _path)
 
-	return &result, nil
+	return &_result, nil
 }
 
 // Must is a helper function to panic when the url builder returns an error

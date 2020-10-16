@@ -11,15 +11,15 @@ import (
 	"docker.io/go-docker/api/types"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/swag"
-	"github.com/scaleshift/scaleshift/api/src/config"
-	"github.com/scaleshift/scaleshift/api/src/db"
-	"github.com/scaleshift/scaleshift/api/src/generated/models"
-	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations"
-	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations/workspace"
-	"github.com/scaleshift/scaleshift/api/src/log"
+	"github.com/xtream-d-labs/ai-gateway/api/src/config"
+	"github.com/xtream-d-labs/ai-gateway/api/src/db"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/models"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/restapi/operations"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/restapi/operations/workspace"
+	"github.com/xtream-d-labs/ai-gateway/api/src/log"
 )
 
-func workspaceRoute(api *operations.ScaleShiftAPI) {
+func workspaceRoute(api *operations.AIGatewayAPI) {
 	api.WorkspaceGetWorkspacesHandler = workspace.GetWorkspacesHandlerFunc(getWorkspaces)
 	api.WorkspaceDeleteWorkspaceHandler = workspace.DeleteWorkspaceHandlerFunc(deleteWorkspace)
 }
@@ -70,8 +70,8 @@ func findNotebooks(path string, containers []types.Container) []string {
 	notebooks := []string{}
 	for _, container := range containers {
 		isJupyter := false
-		if as, ok1 := container.Labels["com.scaleshift.image.built-as"]; ok1 {
-			if _, ok2 := container.Labels["com.scaleshift.container.publish"]; ok2 {
+		if as, ok1 := container.Labels["com.aigateway.image.built-as"]; ok1 {
+			if _, ok2 := container.Labels["com.aigateway.container.publish"]; ok2 {
 				if strings.EqualFold(as, "jupyter-notebook") {
 					isJupyter = true
 				}

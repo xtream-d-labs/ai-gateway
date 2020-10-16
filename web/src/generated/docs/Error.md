@@ -1,4 +1,4 @@
-# ScaleShift.Error
+# AiGateway.Error
 
 ## Properties
 Name | Type | Description | Notes

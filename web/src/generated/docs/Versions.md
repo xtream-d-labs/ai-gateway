@@ -1,4 +1,4 @@
-# ScaleShift.Versions
+# AiGateway.Versions
 
 ## Properties
 Name | Type | Description | Notes

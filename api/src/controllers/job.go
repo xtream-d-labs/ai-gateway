@@ -15,22 +15,22 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/google/uuid"
-	"github.com/scaleshift/scaleshift/api/src/auth"
-	"github.com/scaleshift/scaleshift/api/src/config"
-	"github.com/scaleshift/scaleshift/api/src/db"
-	"github.com/scaleshift/scaleshift/api/src/generated/models"
-	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations"
-	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations/job"
-	"github.com/scaleshift/scaleshift/api/src/kubernetes"
-	"github.com/scaleshift/scaleshift/api/src/lib"
-	"github.com/scaleshift/scaleshift/api/src/log"
-	"github.com/scaleshift/scaleshift/api/src/queue"
-	"github.com/scaleshift/scaleshift/api/src/rescale"
+	"github.com/xtream-d-labs/ai-gateway/api/src/auth"
+	"github.com/xtream-d-labs/ai-gateway/api/src/config"
+	"github.com/xtream-d-labs/ai-gateway/api/src/db"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/models"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/restapi/operations"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/restapi/operations/job"
+	"github.com/xtream-d-labs/ai-gateway/api/src/kubernetes"
+	"github.com/xtream-d-labs/ai-gateway/api/src/lib"
+	"github.com/xtream-d-labs/ai-gateway/api/src/log"
+	"github.com/xtream-d-labs/ai-gateway/api/src/queue"
+	"github.com/xtream-d-labs/ai-gateway/api/src/rescale"
 	"golang.org/x/sync/errgroup"
 	coreV1 "k8s.io/api/core/v1"
 )
 
-func jobRoute(api *operations.ScaleShiftAPI) {
+func jobRoute(api *operations.AIGatewayAPI) {
 	api.JobGetJobsHandler = job.GetJobsHandlerFunc(getJobs)
 	api.JobGetJobDetailHandler = job.GetJobDetailHandlerFunc(getJobDetail)
 	api.JobGetJobLogsHandler = job.GetJobLogsHandlerFunc(getJobLogs)
@@ -339,7 +339,7 @@ func postNewJob(params job.PostNewJobParams, principal *auth.Principal) middlewa
 		return job.NewPostNewJobDefault(code).WithPayload(newerror(code))
 	}
 	platform := db.PlatformKubernetes
-	if params.Body.PlatformID == models.PostNewJobParamsBodyPlatformIDRescale {
+	if params.Body.PlatformID == job.PostNewJobBodyPlatformIDRescale {
 		platform = db.PlatformRescale
 	}
 	image, _, _ := lib.ContainerAttrs(container.Config.Labels)
@@ -371,7 +371,7 @@ func postNewJob(params job.PostNewJobParams, principal *auth.Principal) middlewa
 		credential = creds.Base.NgcApikey
 	}
 	switch params.Body.PlatformID {
-	case models.PostNewJobParamsBodyPlatformIDKubernetes:
+	case job.PostNewJobBodyPlatformIDKubernetes:
 		config.Config.DockerRegistryUserName = creds.Base.DockerUsername
 		if err := queue.BuildJobDockerImage(
 			newjob.JobID,
@@ -383,7 +383,7 @@ func postNewJob(params job.PostNewJobParams, principal *auth.Principal) middlewa
 			code := http.StatusInternalServerError
 			return job.NewPostNewJobDefault(code).WithPayload(newerror(code))
 		}
-	case models.PostNewJobParamsBodyPlatformIDRescale:
+	case job.PostNewJobBodyPlatformIDRescale:
 		if err := queue.BuildSingularityImageJob(
 			newjob.JobID,
 			credential,
@@ -411,7 +411,7 @@ func modifyJob(params job.ModifyJobParams, principal *auth.Principal) middleware
 		return job.NewModifyJobDefault(code).WithPayload(newerror(code))
 	}
 	switch params.Body.Status { // nolint:gocritic
-	case models.ModifyJobParamsBodyStatusStopped:
+	case job.ModifyJobBodyStatusStopped:
 		switch db.JobStatus(j.Status) {
 		case db.JobStatusK8sStarted:
 			// There is no proper method

@@ -5,17 +5,17 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/swag"
-	"github.com/scaleshift/scaleshift/api/src/auth"
-	"github.com/scaleshift/scaleshift/api/src/config"
-	"github.com/scaleshift/scaleshift/api/src/generated/models"
-	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations"
-	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations/app"
-	"github.com/scaleshift/scaleshift/api/src/log"
-	"github.com/scaleshift/scaleshift/api/src/reg/registry"
-	"github.com/scaleshift/scaleshift/api/src/reg/repoutils"
+	"github.com/xtream-d-labs/ai-gateway/api/src/auth"
+	"github.com/xtream-d-labs/ai-gateway/api/src/config"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/models"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/restapi/operations"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/restapi/operations/app"
+	"github.com/xtream-d-labs/ai-gateway/api/src/log"
+	"github.com/xtream-d-labs/ai-gateway/api/src/reg/registry"
+	"github.com/xtream-d-labs/ai-gateway/api/src/reg/repoutils"
 )
 
-func sessionRoute(api *operations.ScaleShiftAPI) {
+func sessionRoute(api *operations.AIGatewayAPI) {
 	api.AppPostNewSessionHandler = app.PostNewSessionHandlerFunc(postNewSession)
 }
 

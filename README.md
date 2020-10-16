@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="https://raw.github.com/wiki/rescale-labs/scaleshift/img/logo256.png">
-  <h1>ScaleShift</h1>
+  <img src="https://xtreme-d.net/wp-content/uploads/2020/05/logo.svg">
+  <h1>AI Gateway</h1>
   <span>An Open Source Machine Learning Tool for making & training models.</span>
 </div>
 
@@ -8,7 +8,7 @@
 
 ## Overview
 
-ScaleShift is a client web application which makes it easier for researchers to build machine learning models locally and to train them on premise/cloud!
+AI Gateway is a client web application which makes it easier for researchers to build machine learning models locally and to train them on premise/cloud!
 
 ## Key Capabilities
 
@@ -19,11 +19,11 @@ ScaleShift is a client web application which makes it easier for researchers to 
 
 ## How It Works
 
-### 1. Setup a ScaleShift client
+### 1. Setup an AI Gateway client
 
 <img src="https://raw.github.com/wiki/rescale-labs/scaleshift/img/how-it-works-1.png">
 
-With just only [3 steps!](https://github.com/scaleshift/scaleshift#local-installation)
+With just only [3 steps!](https://github.com/xtream-d-labs/ai-gateway#local-installation)
 
 ### 2. Download machine learning software
 
@@ -35,30 +35,30 @@ You can pull any docker images to the client from NGC, DockerHub or your private
 
 <img src="https://raw.github.com/wiki/rescale-labs/scaleshift/img/how-it-works-3.png">
 
-When you click a `run` button, ScaleShift wraps the image with [Jupyter notebook](https://jupyter.org/) & run it as a docker container. Then you can build your own models on your specified software on it.
+When you click a `run` button, AI Gateway wraps the image with [Jupyter notebook](https://jupyter.org/) & run it as a docker container. Then you can build your own models on your specified software on it.
 
 ### 4. Train your models
 
 <img src="https://raw.github.com/wiki/rescale-labs/scaleshift/img/how-it-works-5.png">
 
-In order to train the models in a parallel and distributed way, you can choose a Kubernetes cluster or Rescale platform. ScaleShift converts the image to [Singularity](https://www.sylabs.io/docs/) automatically if it’s needed.
+In order to train the models in a parallel and distributed way, you can choose a Kubernetes cluster or Rescale platform. AI Gateway converts the image to [Singularity](https://www.sylabs.io/docs/) automatically if it’s needed.
 
 ## Get Started
 
 Official Builds
 
-[![scaleshift/api](http://dockeri.co/image/scaleshift/api)](https://hub.docker.com/r/scaleshift/api/)
+[![aigateway/api](http://dockeri.co/image/aigateway/api)](https://hub.docker.com/r/aigateway/api/)
 
-### Try ScaleShift on AWS
+### Try AI Gateway on AWS
 
 #### 1. Create an EC2 instance with CloudFormation
 
-[![Launch Stack](https://cdn.rawgit.com/buildkite/cloudformation-launch-stack-button-svg/master/launch-stack.svg)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=scaleshift&templateURL=https://s3-ap-northeast-1.amazonaws.com/scaleshift/template.yaml)
+[![Launch Stack](https://cdn.rawgit.com/buildkite/cloudformation-launch-stack-button-svg/master/launch-stack.svg)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=aigateway&templateURL=https://s3-ap-northeast-1.amazonaws.com/ai-gateway/template.yaml)
 
 #### 2. Access the Web UI
 
 ```console
-public_ip=$( sh -c "$( aws cloudformation describe-stacks --stack-name "scaleshift" \
+public_ip=$( sh -c "$( aws cloudformation describe-stacks --stack-name "aigateway" \
   --query 'Stacks[0].Outputs[?OutputKey==`PublicIPs`].OutputValue' \
   --output text )" )
 open "http://${public_ip}"
@@ -74,7 +74,7 @@ open "http://${public_ip}"
 #### 2. Download the latest configuration
 
 ```console
-curl -so docker-compose.yml https://s3-ap-northeast-1.amazonaws.com/scaleshift/docker-compose-8080.yml
+curl -so docker-compose.yml https://s3-ap-northeast-1.amazonaws.com/ai-gateway/docker-compose-8080.yml
 ```
 
 #### 3. Start services
@@ -101,7 +101,7 @@ curl -sX GET -H "Content-Type: application/json" \
 
 ### Contribution
 
-1. Fork ([https://github.com/scaleshift/scaleshift/fork](https://github.com/scaleshift/scaleshift/fork))
+1. Fork ([https://github.com/xtream-d-labs/ai-gateway/fork](https://github.com/xtream-d-labs/ai-gateway/fork))
 2. Create a feature branch
 3. Commit your changes
 4. Rebase your local changes against the master branch
@@ -109,4 +109,4 @@ curl -sX GET -H "Content-Type: application/json" \
 
 ### Copyright and license
 
-Code released under the [MIT license](https://github.com/scaleshift/scaleshift/blob/master/LICENSE).
+Code released under the [MIT license](https://github.com/xtream-d-labs/ai-gateway/blob/master/LICENSE).

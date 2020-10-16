@@ -3,7 +3,7 @@ package db
 import (
 	"github.com/go-openapi/swag"
 	"github.com/jinzhu/gorm"
-	"github.com/scaleshift/scaleshift/api/src/generated/models"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/models"
 )
 
 // Job represents cached job information

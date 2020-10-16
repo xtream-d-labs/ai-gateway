@@ -16,8 +16,8 @@ var (
 
 // API props
 const (
-	ProjectName = "ScaleShift"
-	ProjectPath = "github.com/scaleshift/scaleshift/api"
+	ProjectName = "AI Gateway"
+	ProjectPath = "github.com/xtream-d-labs/ai-gateway/api"
 )
 
 // Config can be set via environment variables
@@ -26,7 +26,7 @@ type config struct { // nolint:maligned
 	APIEndpoint            string   `envconfig:"API_ENDPOINT" default:"http://localhost:9000"`
 	MustSignIn             bool     `envconfig:"MUST_SIGN_IN" default:"false"`
 	JwtIssuer              string   `envconfig:"JWT_ISSUER" default:"owner"`
-	JwtAudience            string   `envconfig:"JWT_AUDIENCE" default:"scaleshift.io"`
+	JwtAudience            string   `envconfig:"JWT_AUDIENCE" default:"ai-gateway.io"`
 	JwtExpiration          int      `envconfig:"JWT_EXPIRATION" default:"86400"`
 	JwsPrivateKey          string   `envconfig:"JWS_PRIVATE_KEY" default:"/certs/private.pem"`
 	JwsPublicKey           string   `envconfig:"JWS_PUBLIC_KEY" default:"/certs/public.pem"`
@@ -58,8 +58,8 @@ type config struct { // nolint:maligned
 	DatabaseDir            string   `envconfig:"DATABASE_CNTR_DIR" default:"/tmp/badger"`
 	WorkspaceHostDir       string   `envconfig:"WORKSPACE_HOST_DIR"`
 	WorkspaceContainerDir  string   `envconfig:"WORKSPACE_CNTR_DIR" default:"/tmp/work"`
-	SingImg                string   `envconfig:"SINGULARITY_IMAGE" default:"scaleshift/singularity:3.4"`
-	DocToSinImg            string   `envconfig:"SINGULARITY_IMAGE" default:"scaleshift/singularity:2.6-d2s"`
+	SingImg                string   `envconfig:"SINGULARITY_IMAGE" default:"aigateway/singularity:3.4"`
+	DocToSinImg            string   `envconfig:"SINGULARITY_IMAGE" default:"aigateway/singularity:2.6-d2s"`
 	SingImgHostPath        string   `envconfig:"SINGULARITY_HOST_DIR"`
 	SingImgContainerDir    string   `envconfig:"SINGULARITY_CNTR_DIR" default:"/tmp/simg"`
 }

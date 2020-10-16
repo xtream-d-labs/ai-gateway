@@ -1,4 +1,4 @@
-# ScaleShift.RescaleApi
+# AiGateway.RescaleApi
 
 All URIs are relative to *http://localhost:9000/api/v1*
 
@@ -19,8 +19,8 @@ returns a Rescale application
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
-var defaultClient = ScaleShift.ApiClient.instance;
+var AiGateway = require('ai_gateway');
+var defaultClient = AiGateway.ApiClient.instance;
 
 // Configure API key authorization: api-authorizer
 var api-authorizer = defaultClient.authentications['api-authorizer'];
@@ -28,7 +28,7 @@ api-authorizer.apiKey = 'YOUR API KEY';
 // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
 //api-authorizer.apiKeyPrefix = 'Token';
 
-var apiInstance = new ScaleShift.RescaleApi();
+var apiInstance = new AiGateway.RescaleApi();
 
 var code = "code_example"; // String | application code
 
@@ -72,8 +72,8 @@ returns version information of a specified Rescale application
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
-var defaultClient = ScaleShift.ApiClient.instance;
+var AiGateway = require('ai_gateway');
+var defaultClient = AiGateway.ApiClient.instance;
 
 // Configure API key authorization: api-authorizer
 var api-authorizer = defaultClient.authentications['api-authorizer'];
@@ -81,7 +81,7 @@ api-authorizer.apiKey = 'YOUR API KEY';
 // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
 //api-authorizer.apiKeyPrefix = 'Token';
 
-var apiInstance = new ScaleShift.RescaleApi();
+var apiInstance = new AiGateway.RescaleApi();
 
 var code = "code_example"; // String | Rescale application code
 
@@ -128,8 +128,8 @@ returns Rescale CoreTypes
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
-var defaultClient = ScaleShift.ApiClient.instance;
+var AiGateway = require('ai_gateway');
+var defaultClient = AiGateway.ApiClient.instance;
 
 // Configure API key authorization: api-authorizer
 var api-authorizer = defaultClient.authentications['api-authorizer'];
@@ -137,7 +137,7 @@ api-authorizer.apiKey = 'YOUR API KEY';
 // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
 //api-authorizer.apiKeyPrefix = 'Token';
 
-var apiInstance = new ScaleShift.RescaleApi();
+var apiInstance = new AiGateway.RescaleApi();
 
 var opts = { 
   'appVer': "appVer_example", // String | Rescale Application version

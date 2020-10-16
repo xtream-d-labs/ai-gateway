@@ -27,7 +27,7 @@ gulp.task("sass", function() {
 
 gulp.task("default", function() {
   gulp.watch("/monitor/web/src/static/js/**/*.vue", ["js"]).on("change", function(file) {
-    gulp.src(file.path).pipe(shell(['docker restart scaleshift_web'], {ignoreErrors: true}));
+    gulp.src(file.path).pipe(shell(['docker restart aigateway_web'], {ignoreErrors: true}));
   });
   gulp.watch("/monitor/web/src/static/scss/**/*.scss", ["sass"]);
 });

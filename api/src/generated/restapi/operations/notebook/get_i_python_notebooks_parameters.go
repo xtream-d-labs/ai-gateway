@@ -10,22 +10,21 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
-
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/strfmt"
 )
 
-// NewGetIpythonNotebooksParams creates a new GetIpythonNotebooksParams object
+// NewGetIPythonNotebooksParams creates a new GetIPythonNotebooksParams object
 // no default values defined in spec.
-func NewGetIpythonNotebooksParams() GetIpythonNotebooksParams {
+func NewGetIPythonNotebooksParams() GetIPythonNotebooksParams {
 
-	return GetIpythonNotebooksParams{}
+	return GetIPythonNotebooksParams{}
 }
 
-// GetIpythonNotebooksParams contains all the bound params for the get ipython notebooks operation
+// GetIPythonNotebooksParams contains all the bound params for the get i python notebooks operation
 // typically these are obtained from a http.Request
 //
 // swagger:parameters getIPythonNotebooks
-type GetIpythonNotebooksParams struct {
+type GetIPythonNotebooksParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
@@ -40,8 +39,8 @@ type GetIpythonNotebooksParams struct {
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewGetIpythonNotebooksParams() beforehand.
-func (o *GetIpythonNotebooksParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewGetIPythonNotebooksParams() beforehand.
+func (o *GetIPythonNotebooksParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r
@@ -58,7 +57,7 @@ func (o *GetIpythonNotebooksParams) BindRequest(r *http.Request, route *middlewa
 }
 
 // bindID binds and validates parameter ID from path.
-func (o *GetIpythonNotebooksParams) bindID(rawData []string, hasKey bool, formats strfmt.Registry) error {
+func (o *GetIPythonNotebooksParams) bindID(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]

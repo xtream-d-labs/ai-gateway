@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	"github.com/jinzhu/gorm"
-	"github.com/scaleshift/scaleshift/api/src/config"
-	logs "github.com/scaleshift/scaleshift/api/src/log"
 	log "github.com/sirupsen/logrus"
+	"github.com/xtream-d-labs/ai-gateway/api/src/config"
+	logs "github.com/xtream-d-labs/ai-gateway/api/src/log"
 )
 
 var (

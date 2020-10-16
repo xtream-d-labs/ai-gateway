@@ -38,7 +38,7 @@ func (o *GetRescaleApplicationURL) SetBasePath(bp string) {
 
 // Build a url path and query string
 func (o *GetRescaleApplicationURL) Build() (*url.URL, error) {
-	var result url.URL
+	var _result url.URL
 
 	var _path = "/rescale/applications/{code}/"
 
@@ -46,16 +46,16 @@ func (o *GetRescaleApplicationURL) Build() (*url.URL, error) {
 	if code != "" {
 		_path = strings.Replace(_path, "{code}", code, -1)
 	} else {
-		return nil, errors.New("Code is required on GetRescaleApplicationURL")
+		return nil, errors.New("code is required on GetRescaleApplicationURL")
 	}
 
 	_basePath := o._basePath
 	if _basePath == "" {
 		_basePath = "/api/v1"
 	}
-	result.Path = golangswaggerpaths.Join(_basePath, _path)
+	_result.Path = golangswaggerpaths.Join(_basePath, _path)
 
-	return &result, nil
+	return &_result, nil
 }
 
 // Must is a helper function to panic when the url builder returns an error

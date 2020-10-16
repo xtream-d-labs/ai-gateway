@@ -5,7 +5,7 @@ import (
 
 	"docker.io/go-docker/api/types"
 	"github.com/docker/distribution/reference"
-	"github.com/scaleshift/scaleshift/api/src/log"
+	"github.com/xtream-d-labs/ai-gateway/api/src/log"
 )
 
 const (

@@ -1,4 +1,4 @@
-# ScaleShift.Repository
+# AiGateway.Repository
 
 ## Properties
 Name | Type | Description | Notes

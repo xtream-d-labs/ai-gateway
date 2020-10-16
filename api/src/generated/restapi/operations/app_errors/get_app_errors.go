@@ -8,7 +8,7 @@ package app_errors
 import (
 	"net/http"
 
-	middleware "github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/runtime/middleware"
 )
 
 // GetAppErrorsHandlerFunc turns a function with the right signature into a get app errors handler

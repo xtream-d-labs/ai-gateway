@@ -1,4 +1,4 @@
-# ScaleShift.WorkspaceApi
+# AiGateway.WorkspaceApi
 
 All URIs are relative to *http://localhost:9000/api/v1*
 
@@ -18,11 +18,11 @@ delete user&#39;s workspace
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
+var AiGateway = require('ai_gateway');
 
-var apiInstance = new ScaleShift.WorkspaceApi();
+var apiInstance = new AiGateway.WorkspaceApi();
 
-var body = new ScaleShift.Workspace(); // Workspace | 
+var body = new AiGateway.Workspace(); // Workspace | 
 
 
 var callback = function(error, data, response) {
@@ -64,9 +64,9 @@ returns user&#39;s workspaces
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
+var AiGateway = require('ai_gateway');
 
-var apiInstance = new ScaleShift.WorkspaceApi();
+var apiInstance = new AiGateway.WorkspaceApi();
 
 var callback = function(error, data, response) {
   if (error) {

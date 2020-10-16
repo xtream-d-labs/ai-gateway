@@ -1,4 +1,4 @@
-# ScaleShift.NewJobID
+# AiGateway.NewJobID
 
 ## Properties
 Name | Type | Description | Notes

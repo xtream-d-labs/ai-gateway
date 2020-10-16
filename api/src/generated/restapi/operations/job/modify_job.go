@@ -9,12 +9,13 @@ import (
 	"encoding/json"
 	"net/http"
 
-	errors "github.com/go-openapi/errors"
-	middleware "github.com/go-openapi/runtime/middleware"
-	strfmt "github.com/go-openapi/strfmt"
-	swag "github.com/go-openapi/swag"
-	validate "github.com/go-openapi/validate"
-	"github.com/scaleshift/scaleshift/api/src/auth"
+	"github.com/go-openapi/errors"
+	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
+
+	"github.com/xtream-d-labs/ai-gateway/api/src/auth"
 )
 
 // ModifyJobHandlerFunc turns a function with the right signature into a modify job handler
@@ -78,6 +79,7 @@ func (o *ModifyJob) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 }
 
 // ModifyJobBody JobAttrs
+//
 // swagger:model ModifyJobBody
 type ModifyJobBody struct {
 
@@ -120,7 +122,7 @@ const (
 
 // prop value enum
 func (o *ModifyJobBody) validateStatusEnum(path, location string, value string) error {
-	if err := validate.Enum(path, location, value, modifyJobBodyTypeStatusPropEnum); err != nil {
+	if err := validate.EnumCase(path, location, value, modifyJobBodyTypeStatusPropEnum, true); err != nil {
 		return err
 	}
 	return nil

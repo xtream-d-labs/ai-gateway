@@ -1,4 +1,4 @@
-# ScaleShift.ImageApi
+# AiGateway.ImageApi
 
 All URIs are relative to *http://localhost:9000/api/v1*
 
@@ -19,11 +19,11 @@ delete a specified local image
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
+var AiGateway = require('ai_gateway');
 
-var apiInstance = new ScaleShift.ImageApi();
+var apiInstance = new AiGateway.ImageApi();
 
-var body = new ScaleShift.ImageName1(); // ImageName1 | 
+var body = new AiGateway.ImageName1(); // ImageName1 | 
 
 
 var callback = function(error, data, response) {
@@ -65,9 +65,9 @@ returns local images
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
+var AiGateway = require('ai_gateway');
 
-var apiInstance = new ScaleShift.ImageApi();
+var apiInstance = new AiGateway.ImageApi();
 
 var callback = function(error, data, response) {
   if (error) {
@@ -105,11 +105,11 @@ pull a specified image from Docker registry
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
+var AiGateway = require('ai_gateway');
 
-var apiInstance = new ScaleShift.ImageApi();
+var apiInstance = new AiGateway.ImageApi();
 
-var body = new ScaleShift.ImageName(); // ImageName | 
+var body = new AiGateway.ImageName(); // ImageName | 
 
 
 var callback = function(error, data, response) {

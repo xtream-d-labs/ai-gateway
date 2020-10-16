@@ -6,24 +6,24 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
-// IpythonNotebook .ipynb file attributes
+// IPythonNotebook .ipynb file attributes
+//
 // swagger:model IPythonNotebook
-type IpythonNotebook struct {
+type IPythonNotebook struct {
 
 	// file name
 	// Required: true
 	Name *string `json:"name"`
 }
 
-// Validate validates this ipython notebook
-func (m *IpythonNotebook) Validate(formats strfmt.Registry) error {
+// Validate validates this i python notebook
+func (m *IPythonNotebook) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateName(formats); err != nil {
@@ -36,7 +36,7 @@ func (m *IpythonNotebook) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *IpythonNotebook) validateName(formats strfmt.Registry) error {
+func (m *IPythonNotebook) validateName(formats strfmt.Registry) error {
 
 	if err := validate.Required("name", "body", m.Name); err != nil {
 		return err
@@ -46,7 +46,7 @@ func (m *IpythonNotebook) validateName(formats strfmt.Registry) error {
 }
 
 // MarshalBinary interface implementation
-func (m *IpythonNotebook) MarshalBinary() ([]byte, error) {
+func (m *IPythonNotebook) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -54,8 +54,8 @@ func (m *IpythonNotebook) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *IpythonNotebook) UnmarshalBinary(b []byte) error {
-	var res IpythonNotebook
+func (m *IPythonNotebook) UnmarshalBinary(b []byte) error {
+	var res IPythonNotebook
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

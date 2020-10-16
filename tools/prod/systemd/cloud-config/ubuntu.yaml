@@ -16,11 +16,11 @@ write_files:
         "insecure-registry": "localhost"
       }
 
-  - path: /etc/systemd/system/scaleshift.service
+  - path: /etc/systemd/system/aigateway.service
     permissions: '0666'
     content: |
       [Unit]
-      Description=ScaleShift services
+      Description=AI Gateway services
       After=docker.service
       Requires=docker.service
 
@@ -50,10 +50,10 @@ runcmd:
   - systemctl enable docker
   - systemctl start docker
   - echo 'SS_API_ENDPOINT=http://'$( curl -s http://169.254.169.254/latest/meta-data/public-ipv4 ) >> /home/ubuntu/.env
-  - curl -L https://s3-ap-northeast-1.amazonaws.com/scaleshift/docker-compose.yml -o /home/ubuntu/docker-compose.yml
-  - systemctl enable scaleshift
-  - systemctl start scaleshift
-  - docker pull scaleshift/singularity:2.6-d2s
+  - curl -L https://s3-ap-northeast-1.amazonaws.com/ai-gateway/docker-compose.yml -o /home/ubuntu/docker-compose.yml
+  - systemctl enable aigateway
+  - systemctl start aigateway
+  - docker pull aigateway/singularity:2.6-d2s
   - docker pull tensorflow/tensorflow:2.3.0
   - docker pull mxnet/python:1.5.0_cpu_py3
   - docker pull chainer/chainer:v7.7.0-intel-python3

@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: "ScaleShift"
+Description: "aigateway"
 
 Outputs:
   PublicIPs:
@@ -232,11 +232,11 @@ Resources:
                   OPTIONS="--default-ulimit nofile=1024:4096 --insecure-registry ${InsecureRegistry}"
                   DAEMON_PIDFILE_TIMEOUT=10
 
-              - path: /etc/systemd/system/scaleshift.service
+              - path: /etc/systemd/system/aigateway.service
                 permissions: '0666'
                 content: |
                   [Unit]
-                  Description=ScaleShift services
+                  Description=AI Gateway services
                   After=docker.service
                   Requires=docker.service
 
@@ -259,10 +259,10 @@ Resources:
               - systemctl enable docker
               - systemctl start docker
               - echo 'SS_API_ENDPOINT=http://'$( curl -s http://169.254.169.254/latest/meta-data/public-ipv4 ) >> /home/ec2-user/.env
-              - curl -L https://s3-ap-northeast-1.amazonaws.com/scaleshift/docker-compose.yml -o /home/ec2-user/docker-compose.yml
-              - systemctl enable scaleshift
-              - systemctl start scaleshift
-              - docker pull scaleshift/singularity:2.6-d2s
+              - curl -L https://s3-ap-northeast-1.amazonaws.com/ai-gateway/docker-compose.yml -o /home/ec2-user/docker-compose.yml
+              - systemctl enable aigateway
+              - systemctl start aigateway
+              - docker pull aigateway/singularity:2.6-d2s
               - docker pull tensorflow/tensorflow:2.3.0
               - docker pull mxnet/python:1.5.0_cpu_py3
               - docker pull chainer/chainer:v7.7.0-intel-python3

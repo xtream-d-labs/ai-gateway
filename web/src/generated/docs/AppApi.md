@@ -1,4 +1,4 @@
-# ScaleShift.AppApi
+# AiGateway.AppApi
 
 All URIs are relative to *http://localhost:9000/api/v1*
 
@@ -21,9 +21,9 @@ returns app configurations
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
+var AiGateway = require('ai_gateway');
 
-var apiInstance = new ScaleShift.AppApi();
+var apiInstance = new AiGateway.AppApi();
 
 var callback = function(error, data, response) {
   if (error) {
@@ -61,9 +61,9 @@ returns third-party endpoints
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
+var AiGateway = require('ai_gateway');
 
-var apiInstance = new ScaleShift.AppApi();
+var apiInstance = new AiGateway.AppApi();
 
 var callback = function(error, data, response) {
   if (error) {
@@ -101,9 +101,9 @@ returns application versions
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
+var AiGateway = require('ai_gateway');
 
-var apiInstance = new ScaleShift.AppApi();
+var apiInstance = new AiGateway.AppApi();
 
 var callback = function(error, data, response) {
   if (error) {
@@ -141,11 +141,11 @@ set app configurations
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
+var AiGateway = require('ai_gateway');
 
-var apiInstance = new ScaleShift.AppApi();
+var apiInstance = new AiGateway.AppApi();
 
-var body = new ScaleShift.AccountInfo(); // AccountInfo | 
+var body = new AiGateway.AccountInfo(); // AccountInfo | 
 
 
 var callback = function(error, data, response) {
@@ -187,11 +187,11 @@ login
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
+var AiGateway = require('ai_gateway');
 
-var apiInstance = new ScaleShift.AppApi();
+var apiInstance = new AiGateway.AppApi();
 
-var body = new ScaleShift.AccountInfo1(); // AccountInfo1 | 
+var body = new AiGateway.AccountInfo1(); // AccountInfo1 | 
 
 
 var callback = function(error, data, response) {

@@ -1,4 +1,4 @@
-# ScaleShift.RescaleCoreType
+# AiGateway.RescaleCoreType
 
 ## Properties
 Name | Type | Description | Notes

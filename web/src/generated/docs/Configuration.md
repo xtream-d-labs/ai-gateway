@@ -1,4 +1,4 @@
-# ScaleShift.Configuration
+# AiGateway.Configuration
 
 ## Properties
 Name | Type | Description | Notes

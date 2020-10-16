@@ -1,5 +1,5 @@
 /**
- * ScaleShift
+ * AI Gateway
  * A platform for machine learning & high performance computing 
  *
  * OpenAPI spec version: 1.0.0
@@ -22,10 +22,10 @@
     module.exports = factory(require('../ApiClient'), require('./RescaleCoreTypeResources'));
   } else {
     // Browser globals (root is window)
-    if (!root.ScaleShift) {
-      root.ScaleShift = {};
+    if (!root.AiGateway) {
+      root.AiGateway = {};
     }
-    root.ScaleShift.RescaleCoreType = factory(root.ScaleShift.ApiClient, root.ScaleShift.RescaleCoreTypeResources);
+    root.AiGateway.RescaleCoreType = factory(root.AiGateway.ApiClient, root.AiGateway.RescaleCoreTypeResources);
   }
 }(this, function(ApiClient, RescaleCoreTypeResources) {
   'use strict';

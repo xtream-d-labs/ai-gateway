@@ -7,7 +7,7 @@ if [ ! -d "${wk_dir}/.git" ]; then
   exit 1
 fi
 
-DOCKER_REPO="scaleshift"
+DOCKER_REPO="aigateway"
 tag=$( git describe --tags --abbrev=0 2>/dev/null )
 version="${tag:-$( git rev-parse --abbrev-ref @ )}"
 commit=$( git rev-parse --short --verify HEAD )

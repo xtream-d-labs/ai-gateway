@@ -8,9 +8,9 @@ import (
 
 	"github.com/SermoDigital/jose/crypto"
 	"github.com/SermoDigital/jose/jws"
-	"github.com/scaleshift/scaleshift/api/src/db"
-	"github.com/scaleshift/scaleshift/api/src/generated/models"
-	"github.com/scaleshift/scaleshift/api/src/log"
+	"github.com/xtream-d-labs/ai-gateway/api/src/db"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/models"
+	"github.com/xtream-d-labs/ai-gateway/api/src/log"
 )
 
 // Session defines JWT payload

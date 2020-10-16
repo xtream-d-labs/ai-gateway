@@ -1,4 +1,4 @@
-# ScaleShift.ImageName2
+# AiGateway.ImageName2
 
 ## Properties
 Name | Type | Description | Notes

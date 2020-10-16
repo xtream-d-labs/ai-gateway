@@ -51,7 +51,7 @@ func (o *PostNewSessionParams) BindRequest(r *http.Request, route *middleware.Ma
 		var body PostNewSessionBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			if err == io.EOF {
-				res = append(res, errors.Required("body", "body"))
+				res = append(res, errors.Required("body", "body", ""))
 			} else {
 				res = append(res, errors.NewParseError("body", "body", "", err))
 			}
@@ -66,7 +66,7 @@ func (o *PostNewSessionParams) BindRequest(r *http.Request, route *middleware.Ma
 			}
 		}
 	} else {
-		res = append(res, errors.Required("body", "body"))
+		res = append(res, errors.Required("body", "body", ""))
 	}
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)

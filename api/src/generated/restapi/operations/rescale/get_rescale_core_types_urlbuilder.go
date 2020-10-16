@@ -40,7 +40,7 @@ func (o *GetRescaleCoreTypesURL) SetBasePath(bp string) {
 
 // Build a url path and query string
 func (o *GetRescaleCoreTypesURL) Build() (*url.URL, error) {
-	var result url.URL
+	var _result url.URL
 
 	var _path = "/rescale/coretypes"
 
@@ -48,29 +48,29 @@ func (o *GetRescaleCoreTypesURL) Build() (*url.URL, error) {
 	if _basePath == "" {
 		_basePath = "/api/v1"
 	}
-	result.Path = golangswaggerpaths.Join(_basePath, _path)
+	_result.Path = golangswaggerpaths.Join(_basePath, _path)
 
 	qs := make(url.Values)
 
-	var appVer string
+	var appVerQ string
 	if o.AppVer != nil {
-		appVer = *o.AppVer
+		appVerQ = *o.AppVer
 	}
-	if appVer != "" {
-		qs.Set("app_ver", appVer)
+	if appVerQ != "" {
+		qs.Set("app_ver", appVerQ)
 	}
 
-	var minGpus string
+	var minGpusQ string
 	if o.MinGpus != nil {
-		minGpus = swag.FormatInt64(*o.MinGpus)
+		minGpusQ = swag.FormatInt64(*o.MinGpus)
 	}
-	if minGpus != "" {
-		qs.Set("min_gpus", minGpus)
+	if minGpusQ != "" {
+		qs.Set("min_gpus", minGpusQ)
 	}
 
-	result.RawQuery = qs.Encode()
+	_result.RawQuery = qs.Encode()
 
-	return &result, nil
+	return &_result, nil
 }
 
 // Must is a helper function to panic when the url builder returns an error

@@ -1,4 +1,4 @@
-# ScaleShift.Workspace
+# AiGateway.Workspace
 
 ## Properties
 Name | Type | Description | Notes

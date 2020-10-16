@@ -10,19 +10,19 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	ngc "github.com/pottava/ngc-registry-api/app/ngc/registry"
-	"github.com/scaleshift/scaleshift/api/src/auth"
-	"github.com/scaleshift/scaleshift/api/src/config"
-	"github.com/scaleshift/scaleshift/api/src/db"
-	"github.com/scaleshift/scaleshift/api/src/generated/models"
-	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations"
-	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations/repository"
-	"github.com/scaleshift/scaleshift/api/src/lib"
-	"github.com/scaleshift/scaleshift/api/src/log"
-	"github.com/scaleshift/scaleshift/api/src/reg/registry"
-	"github.com/scaleshift/scaleshift/api/src/reg/repoutils"
+	"github.com/xtream-d-labs/ai-gateway/api/src/auth"
+	"github.com/xtream-d-labs/ai-gateway/api/src/config"
+	"github.com/xtream-d-labs/ai-gateway/api/src/db"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/models"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/restapi/operations"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/restapi/operations/repository"
+	"github.com/xtream-d-labs/ai-gateway/api/src/lib"
+	"github.com/xtream-d-labs/ai-gateway/api/src/log"
+	"github.com/xtream-d-labs/ai-gateway/api/src/reg/registry"
+	"github.com/xtream-d-labs/ai-gateway/api/src/reg/repoutils"
 )
 
-func repositoryRoute(api *operations.ScaleShiftAPI) {
+func repositoryRoute(api *operations.AIGatewayAPI) {
 	api.RepositoryGetRemoteRepositoriesHandler = repository.GetRemoteRepositoriesHandlerFunc(getRepositories)
 	api.RepositoryGetRemoteImagesHandler = repository.GetRemoteImagesHandlerFunc(getRemoteImages)
 	api.RepositoryGetNgcRepositoriesHandler = repository.GetNgcRepositoriesHandlerFunc(getNgcRepositories)
@@ -121,25 +121,25 @@ func getNgcRepositories(params repository.GetNgcRepositoriesParams, principal *a
 	creds := auth.FindCredentials(principal.Username)
 	if swag.IsZero(creds.NgcSession) {
 		code := http.StatusUnauthorized
-		return repository.NewGetRepositoriesDefault(code).WithPayload(newerror(code))
+		return repository.NewGetNgcRepositoriesDefault(code).WithPayload(newerror(code))
 	}
 	result := []*models.Repository{}
 	if bytes, _ := db.GetCache(repositriesNgcCacheKey); bytes != nil {
 		if json.Unmarshal(bytes, &result) == nil && len(result) > 0 {
-			return repository.NewGetRepositoriesOK().WithPayload(result)
+			return repository.NewGetNgcRepositoriesOK().WithPayload(result)
 		}
 	}
 	my, err := ngc.Me(creds.NgcSession)
 	if err != nil {
 		log.Error("Me@getRepositories", err, nil)
 		code := http.StatusBadRequest
-		return repository.NewGetRepositoriesDefault(code).WithPayload(newerror(code))
+		return repository.NewGetNgcRepositoriesDefault(code).WithPayload(newerror(code))
 	}
 	repositries, err := ngc.Repositries(creds.NgcSession, my.PriorNamespace(), true, true, true)
 	if err != nil {
 		log.Error("Repositries@getRepositories", err, nil)
 		code := http.StatusBadRequest
-		return repository.NewGetRepositoriesDefault(code).WithPayload(newerror(code))
+		return repository.NewGetNgcRepositoriesDefault(code).WithPayload(newerror(code))
 	}
 	for _, repositry := range repositries {
 		result = append(result, &models.Repository{
@@ -151,14 +151,14 @@ func getNgcRepositories(params repository.GetNgcRepositoriesParams, principal *a
 	bytes, err := json.Marshal(result)
 	if err != nil {
 		code := http.StatusInternalServerError
-		return repository.NewGetRepositoriesDefault(code).WithPayload(newerror(code))
+		return repository.NewGetNgcRepositoriesDefault(code).WithPayload(newerror(code))
 	}
 	duration := 1 * time.Hour
 	if db.SetCache(repositriesNgcCacheKey, bytes, &duration) != nil {
 		code := http.StatusInternalServerError
-		return repository.NewGetRepositoriesDefault(code).WithPayload(newerror(code))
+		return repository.NewGetNgcRepositoriesDefault(code).WithPayload(newerror(code))
 	}
-	return repository.NewGetRepositoriesOK().WithPayload(result)
+	return repository.NewGetNgcRepositoriesOK().WithPayload(result)
 }
 
 func getNgcImages(params repository.GetNgcImagesParams, principal *auth.Principal) middleware.Responder {

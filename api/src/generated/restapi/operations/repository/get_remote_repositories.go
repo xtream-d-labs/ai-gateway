@@ -8,8 +8,9 @@ package repository
 import (
 	"net/http"
 
-	middleware "github.com/go-openapi/runtime/middleware"
-	"github.com/scaleshift/scaleshift/api/src/auth"
+	"github.com/go-openapi/runtime/middleware"
+
+	"github.com/xtream-d-labs/ai-gateway/api/src/auth"
 )
 
 // GetRemoteRepositoriesHandlerFunc turns a function with the right signature into a get remote repositories handler

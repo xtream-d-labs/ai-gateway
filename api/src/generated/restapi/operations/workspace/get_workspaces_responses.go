@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-openapi/runtime"
 
-	models "github.com/scaleshift/scaleshift/api/src/generated/models"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/models"
 )
 
 // GetWorkspacesOKCode is the HTTP code returned for type GetWorkspacesOK
@@ -51,13 +51,13 @@ func (o *GetWorkspacesOK) WriteResponse(rw http.ResponseWriter, producer runtime
 	rw.WriteHeader(200)
 	payload := o.Payload
 	if payload == nil {
+		// return empty array
 		payload = make([]*models.Workspace, 0, 50)
 	}
 
 	if err := producer.Produce(rw, payload); err != nil {
 		panic(err) // let the recovery middleware deal with this
 	}
-
 }
 
 /*GetWorkspacesDefault Unexpected error

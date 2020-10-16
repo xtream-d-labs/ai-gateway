@@ -1,4 +1,4 @@
-# ScaleShift.NotebookAttrs
+# AiGateway.NotebookAttrs
 
 ## Properties
 Name | Type | Description | Notes

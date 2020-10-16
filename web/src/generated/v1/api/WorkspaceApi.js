@@ -1,5 +1,5 @@
 /**
- * ScaleShift
+ * AI Gateway
  * A platform for machine learning & high performance computing 
  *
  * OpenAPI spec version: 1.0.0
@@ -22,10 +22,10 @@
     module.exports = factory(require('../ApiClient'), require('../model/Error'), require('../model/Workspace'));
   } else {
     // Browser globals (root is window)
-    if (!root.ScaleShift) {
-      root.ScaleShift = {};
+    if (!root.AiGateway) {
+      root.AiGateway = {};
     }
-    root.ScaleShift.WorkspaceApi = factory(root.ScaleShift.ApiClient, root.ScaleShift.Error, root.ScaleShift.Workspace);
+    root.AiGateway.WorkspaceApi = factory(root.AiGateway.ApiClient, root.AiGateway.Error, root.AiGateway.Workspace);
   }
 }(this, function(ApiClient, Error, Workspace) {
   'use strict';

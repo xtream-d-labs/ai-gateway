@@ -10,9 +10,8 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/validate"
-
-	strfmt "github.com/go-openapi/strfmt"
 )
 
 // NewGetRescaleApplicationParams creates a new GetRescaleApplicationParams object
@@ -80,7 +79,7 @@ func (o *GetRescaleApplicationParams) bindCode(rawData []string, hasKey bool, fo
 // validateCode carries on validations for parameter Code
 func (o *GetRescaleApplicationParams) validateCode(formats strfmt.Registry) error {
 
-	if err := validate.Enum("code", "path", o.Code, []interface{}{"singularity"}); err != nil {
+	if err := validate.EnumCase("code", "path", o.Code, []interface{}{"singularity"}, true); err != nil {
 		return err
 	}
 

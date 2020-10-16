@@ -8,11 +8,11 @@ services:
       - 3306:3306
     environment:
       - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=scaleshift
+      - MYSQL_DATABASE=aigateway
       - MYSQL_USER=user
       - MYSQL_PASSWORD=pass
     volumes:
-      - scaleshift_database:/var/lib/mysql
+      - aigateway_database:/var/lib/mysql
       - ../database/conf:/etc/mysql/conf.d
     healthcheck:
       test: ["CMD-SHELL", "mysqlshow -u root -proot"]
@@ -21,9 +21,9 @@ services:
     logging:
       driver: none
     networks:
-      - scaleshift_network
+      - aigateway_network
     restart: always
-    container_name: scaleshift_db
+    container_name: aigateway_db
 
   db_waiter:
     image: alpine:3.12
@@ -32,11 +32,11 @@ services:
       db:
         condition: service_healthy
     networks:
-      - scaleshift_network
-    container_name: scaleshift_db_waiter
+      - aigateway_network
+    container_name: aigateway_db_waiter
 
 volumes:
-  scaleshift_database:
+  aigateway_database:
 
 networks:
-  scaleshift_network:
+  aigateway_network:

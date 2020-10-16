@@ -8,14 +8,14 @@ package models
 import (
 	"encoding/json"
 
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // Job Rescale Job information
+//
 // swagger:model Job
 type Job struct {
 
@@ -122,7 +122,7 @@ const (
 
 // prop value enum
 func (m *Job) validatePlatformEnum(path, location string, value string) error {
-	if err := validate.Enum(path, location, value, jobTypePlatformPropEnum); err != nil {
+	if err := validate.EnumCase(path, location, value, jobTypePlatformPropEnum, true); err != nil {
 		return err
 	}
 	return nil

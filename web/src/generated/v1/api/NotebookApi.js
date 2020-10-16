@@ -1,5 +1,5 @@
 /**
- * ScaleShift
+ * AI Gateway
  * A platform for machine learning & high performance computing 
  *
  * OpenAPI spec version: 1.0.0
@@ -22,10 +22,10 @@
     module.exports = factory(require('../ApiClient'), require('../model/Error'), require('../model/IPythonNotebook'), require('../model/ImageName2'), require('../model/Notebook'), require('../model/NotebookAttrs'), require('../model/NotebookDetail'));
   } else {
     // Browser globals (root is window)
-    if (!root.ScaleShift) {
-      root.ScaleShift = {};
+    if (!root.AiGateway) {
+      root.AiGateway = {};
     }
-    root.ScaleShift.NotebookApi = factory(root.ScaleShift.ApiClient, root.ScaleShift.Error, root.ScaleShift.IPythonNotebook, root.ScaleShift.ImageName2, root.ScaleShift.Notebook, root.ScaleShift.NotebookAttrs, root.ScaleShift.NotebookDetail);
+    root.AiGateway.NotebookApi = factory(root.AiGateway.ApiClient, root.AiGateway.Error, root.AiGateway.IPythonNotebook, root.AiGateway.ImageName2, root.AiGateway.Notebook, root.AiGateway.NotebookAttrs, root.AiGateway.NotebookDetail);
   }
 }(this, function(ApiClient, Error, IPythonNotebook, ImageName2, Notebook, NotebookAttrs, NotebookDetail) {
   'use strict';

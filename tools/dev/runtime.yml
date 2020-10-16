@@ -3,12 +3,12 @@ version: "2.4"
 services:
 
   api:
-    image: scaleshift/api:local
+    image: aigateway/api:local
     build:
       context: ../../
       dockerfile: tools/prod/api.Dockerfile
       args:
-        BASE_IMAGE: scaleshift/api:cache
+        BASE_IMAGE: aigateway/api:cache
       target: builder
     entrypoint: tini -- sleep 31536000
     ports:
@@ -20,10 +20,10 @@ services:
       - SS_LOG_FORMAT=json
       - SS_MAX_WORKERS=4
       - SS_MUST_SIGN_IN=false
-      - SS_IMAGES_TOBE_IGNORED=scaleshift/,ss-jupyter/,supinf/,<none>
+      - SS_IMAGES_TOBE_IGNORED=aigateway/,ss-jupyter/,supinf/,<none>
       - SS_WORKSPACE_HOST_DIR=${PWD}/tools/dev/tmp/work
       - SS_SINGULARITY_HOST_DIR=${PWD}/tools/dev/tmp/simg
-      - SS_DATABASE_ENDPOINT=user:pass@tcp(scaleshift_db:3306)/scaleshift?charset=utf8mb4&collation=utf8_unicode_ci&parseTime=true
+      - SS_DATABASE_ENDPOINT=user:pass@tcp(aigateway_db:3306)/aigateway?charset=utf8mb4&collation=utf8_unicode_ci&parseTime=true
       - DOCKER_HOST=unix:///var/run/docker.sock
     volumes:
       - ../../api/certs:/certs
@@ -31,11 +31,11 @@ services:
       - ./tmp/simg:/tmp/simg
       - ./tmp/work:/tmp/work
       - /var/run/docker.sock:/var/run/docker.sock
-    working_dir: /go/src/github.com/scaleshift/scaleshift/api/src
+    working_dir: /go/src/github.com/xtream-d-labs/ai-gateway/api/src
     networks:
       - services
     restart: always
-    container_name: scaleshift_api
+    container_name: aigateway_api
 
   web:
     image: supinf/hugo:0.x
@@ -47,10 +47,10 @@ services:
     networks:
       - services
     restart: always
-    container_name: scaleshift_web
+    container_name: aigateway_web
 
   proxy:
-    image: scaleshift/proxy:1.10
+    image: aigateway/proxy:1.11
     ports:
       - 8080:80
     logging:
@@ -58,10 +58,10 @@ services:
     networks:
       - services
     restart: always
-    container_name: scaleshift_proxy
+    container_name: aigateway_proxy
 
   gulp:
-    image: scaleshift/gulp:local-20191003
+    image: aigateway/gulp:local-20191003
     build: docker/gulp
     volumes:
       - ../../web:/monitor/web
@@ -78,9 +78,9 @@ services:
     networks:
       - services
     restart: always
-    container_name: scaleshift_gulp
+    container_name: aigateway_gulp
 
 networks:
   services:
     external:
-      name: dev_scaleshift_network
+      name: dev_aigateway_network

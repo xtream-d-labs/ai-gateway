@@ -9,12 +9,13 @@ import (
 	"encoding/json"
 	"net/http"
 
-	errors "github.com/go-openapi/errors"
-	middleware "github.com/go-openapi/runtime/middleware"
-	strfmt "github.com/go-openapi/strfmt"
-	swag "github.com/go-openapi/swag"
-	validate "github.com/go-openapi/validate"
-	"github.com/scaleshift/scaleshift/api/src/auth"
+	"github.com/go-openapi/errors"
+	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
+
+	"github.com/xtream-d-labs/ai-gateway/api/src/auth"
 )
 
 // PostNewJobHandlerFunc turns a function with the right signature into a post new job handler
@@ -78,6 +79,7 @@ func (o *PostNewJob) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 }
 
 // PostNewJobBody JobAttrs
+//
 // swagger:model PostNewJobBody
 type PostNewJobBody struct {
 
@@ -147,7 +149,7 @@ const (
 
 // prop value enum
 func (o *PostNewJobBody) validatePlatformIDEnum(path, location string, value string) error {
-	if err := validate.Enum(path, location, value, postNewJobBodyTypePlatformIDPropEnum); err != nil {
+	if err := validate.EnumCase(path, location, value, postNewJobBodyTypePlatformIDPropEnum, true); err != nil {
 		return err
 	}
 	return nil
@@ -186,6 +188,7 @@ func (o *PostNewJobBody) UnmarshalBinary(b []byte) error {
 }
 
 // PostNewJobCreatedBody newJobID
+//
 // swagger:model PostNewJobCreatedBody
 type PostNewJobCreatedBody struct {
 

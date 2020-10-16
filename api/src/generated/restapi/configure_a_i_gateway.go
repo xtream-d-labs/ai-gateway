@@ -10,25 +10,29 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 
-	"github.com/scaleshift/scaleshift/api/src/auth"
-	"github.com/scaleshift/scaleshift/api/src/controllers"
-	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations"
-	wrapper "github.com/scaleshift/scaleshift/api/src/http"
+	"github.com/xtream-d-labs/ai-gateway/api/src/auth"
+	"github.com/xtream-d-labs/ai-gateway/api/src/controllers"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/restapi/operations"
+	wrapper "github.com/xtream-d-labs/ai-gateway/api/src/http"
 )
 
-//go:generate swagger generate server --target ../src/generated --name ScaleShift --spec ../spec/openapi.yaml --principal auth.Principal
+//go:generate swagger generate server --target ../../generated --name AIGateway --spec ../../../spec/openapi.yaml --principal auth.Principal
 
-func configureFlags(api *operations.ScaleShiftAPI) {
+func configureFlags(api *operations.AIGatewayAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
 }
 
-func configureAPI(api *operations.ScaleShiftAPI) http.Handler {
+func configureAPI(api *operations.AIGatewayAPI) http.Handler {
 	// configure the api here
 	api.ServeError = errors.ServeError
 
 	// Set your custom logger if needed. Default one is log.Printf
 	// Expected interface func(string, ...interface{})
 	api.Logger = log.Printf
+
+	api.UseSwaggerUI()
+	// To continue using redoc as your UI, uncomment the following line
+	// api.UseRedoc()
 
 	api.JSONConsumer = runtime.JSONConsumer()
 	api.JSONProducer = runtime.JSONProducer()
@@ -38,6 +42,7 @@ func configureAPI(api *operations.ScaleShiftAPI) http.Handler {
 
 	controllers.Routes(api)
 
+	api.PreServerShutdown = func() {}
 	api.ServerShutdown = func() {}
 
 	return setupGlobalMiddleware(api.Serve(setupMiddlewares))

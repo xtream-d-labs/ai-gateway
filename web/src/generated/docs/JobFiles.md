@@ -1,4 +1,4 @@
-# ScaleShift.JobFiles
+# AiGateway.JobFiles
 
 ## Properties
 Name | Type | Description | Notes

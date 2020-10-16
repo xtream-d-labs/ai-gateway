@@ -8,13 +8,13 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/swag"
-	"github.com/scaleshift/scaleshift/api/src/config"
-	"github.com/scaleshift/scaleshift/api/src/generated/models"
-	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations"
-	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations/app"
+	"github.com/xtream-d-labs/ai-gateway/api/src/config"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/models"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/restapi/operations"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/restapi/operations/app"
 )
 
-func appRoute(api *operations.ScaleShiftAPI) {
+func appRoute(api *operations.AIGatewayAPI) {
 	api.AppGetVersionsHandler = app.GetVersionsHandlerFunc(getVersions)
 	api.AppGetEndpointsHandler = app.GetEndpointsHandlerFunc(getEndpoints)
 }
@@ -29,7 +29,7 @@ type AppVersion struct {
 func getVersions(params app.GetVersionsParams) middleware.Responder {
 	version := swag.String(config.BuildVersion())
 	date := config.BuildDate()
-	if resp, err := http.Get("https://s3-ap-northeast-1.amazonaws.com/scaleshift/latest-version.json"); err == nil {
+	if resp, err := http.Get("https://s3-ap-northeast-1.amazonaws.com/ai-gateway/latest-version.json"); err == nil {
 		defer resp.Body.Close()
 		if bytes, err := ioutil.ReadAll(resp.Body); err == nil {
 			latest := &AppVersion{}

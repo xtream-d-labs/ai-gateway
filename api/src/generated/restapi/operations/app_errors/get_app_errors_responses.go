@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-openapi/runtime"
 
-	models "github.com/scaleshift/scaleshift/api/src/generated/models"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/models"
 )
 
 // GetAppErrorsOKCode is the HTTP code returned for type GetAppErrorsOK
@@ -51,13 +51,13 @@ func (o *GetAppErrorsOK) WriteResponse(rw http.ResponseWriter, producer runtime.
 	rw.WriteHeader(200)
 	payload := o.Payload
 	if payload == nil {
+		// return empty array
 		payload = make([]*models.AppError, 0, 50)
 	}
 
 	if err := producer.Produce(rw, payload); err != nil {
 		panic(err) // let the recovery middleware deal with this
 	}
-
 }
 
 /*GetAppErrorsDefault Unexpected error

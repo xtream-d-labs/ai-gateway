@@ -19,9 +19,9 @@ import (
 	"docker.io/go-docker/api/types/container"
 	"docker.io/go-docker/api/types/network"
 	"github.com/go-openapi/swag"
-	"github.com/scaleshift/scaleshift/api/src/config"
-	"github.com/scaleshift/scaleshift/api/src/db"
-	"github.com/scaleshift/scaleshift/api/src/log"
+	"github.com/xtream-d-labs/ai-gateway/api/src/config"
+	"github.com/xtream-d-labs/ai-gateway/api/src/db"
+	"github.com/xtream-d-labs/ai-gateway/api/src/log"
 )
 
 var (
@@ -256,12 +256,12 @@ func BuildJobImage(ctx context.Context, jobID, builder string, fqdnToPush bool) 
 	options := types.ImageBuildOptions{
 		Tags: []string{name},
 		Labels: map[string]string{
-			"com.scaleshift.name":            config.ProjectName,
-			"com.scaleshift.image.built-as":  "job-excutable",
-			"com.scaleshift.image.built-api": config.Config.APIVersion,
-			"com.scaleshift.image.built-at":  time.Now().Format(time.RFC3339),
-			"com.scaleshift.image.built-by":  builder,
-			"com.scaleshift.image.built-on":  job.DockerImage,
+			"com.aigateway.name":            config.ProjectName,
+			"com.aigateway.image.built-as":  "job-excutable",
+			"com.aigateway.image.built-api": config.Config.APIVersion,
+			"com.aigateway.image.built-at":  time.Now().Format(time.RFC3339),
+			"com.aigateway.image.built-by":  builder,
+			"com.aigateway.image.built-on":  job.DockerImage,
 		},
 		SuppressOutput: true,
 		NoCache:        true,

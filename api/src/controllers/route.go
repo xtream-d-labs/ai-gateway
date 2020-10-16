@@ -10,13 +10,13 @@ import (
 	docker "docker.io/go-docker"
 	"docker.io/go-docker/api/types"
 	"github.com/go-openapi/swag"
-	"github.com/scaleshift/scaleshift/api/src/generated/models"
-	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations"
-	"github.com/scaleshift/scaleshift/api/src/log"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/models"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/restapi/operations"
+	"github.com/xtream-d-labs/ai-gateway/api/src/log"
 )
 
 // Routes set API handlers
-func Routes(api *operations.ScaleShiftAPI) {
+func Routes(api *operations.AIGatewayAPI) {
 	appRoute(api)
 	configRoute(api)
 	sessionRoute(api)

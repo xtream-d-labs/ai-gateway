@@ -1,10 +1,10 @@
 # proxy
 
-[![scaleshift/proxy](http://dockeri.co/image/scaleshift/proxy)](https://hub.docker.com/r/scaleshift/proxy)
+[![aigateway/proxy](http://dockeri.co/image/aigateway/proxy)](https://hub.docker.com/r/aigateway/proxy)
 
 ## Supported tags and respective `Dockerfile` links
 
-・1.11 ([proxy/Dockerfile](https://github.com/scaleshift/scaleshift/blob/master/tools/prod/docker/proxy/Dockerfile))  
+・1.16 ([proxy/Dockerfile](https://github.com/xtream-d-labs/ai-gateway/blob/master/tools/prod/docker/proxy/Dockerfile))  
 
 ## TLS
 

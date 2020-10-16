@@ -1,4 +1,4 @@
-# ScaleShift.NotebookDetail
+# AiGateway.NotebookDetail
 
 ## Properties
 Name | Type | Description | Notes

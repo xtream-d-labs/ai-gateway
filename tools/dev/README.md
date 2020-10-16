@@ -4,7 +4,7 @@
 
 Codegen with the OpenAPI spec file, resolve dependencies & generate RSA keys.
 
-Using [openapi.yaml](https://github.com/scaleshift/scaleshift/blob/master/spec/openapi.yaml), you can generate its source code.
+Using [openapi.yaml](https://github.com/xtream-d-labs/ai-gateway/blob/master/spec/openapi.yaml), you can generate its source code.
 
 ```console
 make init

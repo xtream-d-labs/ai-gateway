@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-openapi/runtime"
 
-	models "github.com/scaleshift/scaleshift/api/src/generated/models"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/models"
 )
 
 // PostNewImageCreatedCode is the HTTP code returned for type PostNewImageCreated

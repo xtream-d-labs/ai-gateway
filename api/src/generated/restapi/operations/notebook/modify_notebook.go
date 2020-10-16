@@ -9,11 +9,11 @@ import (
 	"encoding/json"
 	"net/http"
 
-	errors "github.com/go-openapi/errors"
-	middleware "github.com/go-openapi/runtime/middleware"
-	strfmt "github.com/go-openapi/strfmt"
-	swag "github.com/go-openapi/swag"
-	validate "github.com/go-openapi/validate"
+	"github.com/go-openapi/errors"
+	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // ModifyNotebookHandlerFunc turns a function with the right signature into a modify notebook handler
@@ -64,6 +64,7 @@ func (o *ModifyNotebook) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 }
 
 // ModifyNotebookBody NotebookAttrs
+//
 // swagger:model ModifyNotebookBody
 type ModifyNotebookBody struct {
 
@@ -109,7 +110,7 @@ const (
 
 // prop value enum
 func (o *ModifyNotebookBody) validateStatusEnum(path, location string, value string) error {
-	if err := validate.Enum(path, location, value, modifyNotebookBodyTypeStatusPropEnum); err != nil {
+	if err := validate.EnumCase(path, location, value, modifyNotebookBodyTypeStatusPropEnum, true); err != nil {
 		return err
 	}
 	return nil

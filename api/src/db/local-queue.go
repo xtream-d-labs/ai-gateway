@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-msgqueue/msgqueue"
 	"github.com/go-msgqueue/msgqueue/memqueue"
-	"github.com/scaleshift/scaleshift/api/src/config"
+	"github.com/xtream-d-labs/ai-gateway/api/src/config"
 )
 
 var q *memqueue.Queue

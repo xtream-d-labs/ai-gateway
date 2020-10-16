@@ -1,4 +1,4 @@
-# ScaleShift.Session
+# AiGateway.Session
 
 ## Properties
 Name | Type | Description | Notes

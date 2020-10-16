@@ -1,4 +1,4 @@
-# ScaleShift.RescaleApplicationVersion
+# AiGateway.RescaleApplicationVersion
 
 ## Properties
 Name | Type | Description | Notes

@@ -1,4 +1,4 @@
-# ScaleShift.AccountInfo1
+# AiGateway.AccountInfo1
 
 ## Properties
 Name | Type | Description | Notes

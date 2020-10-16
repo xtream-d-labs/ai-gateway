@@ -39,7 +39,7 @@ func (o *GetNgcImagesURL) SetBasePath(bp string) {
 
 // Build a url path and query string
 func (o *GetNgcImagesURL) Build() (*url.URL, error) {
-	var result url.URL
+	var _result url.URL
 
 	var _path = "/nvidia/repositories/{namespace}/images/{id}"
 
@@ -47,23 +47,23 @@ func (o *GetNgcImagesURL) Build() (*url.URL, error) {
 	if id != "" {
 		_path = strings.Replace(_path, "{id}", id, -1)
 	} else {
-		return nil, errors.New("ID is required on GetNgcImagesURL")
+		return nil, errors.New("id is required on GetNgcImagesURL")
 	}
 
 	namespace := o.Namespace
 	if namespace != "" {
 		_path = strings.Replace(_path, "{namespace}", namespace, -1)
 	} else {
-		return nil, errors.New("Namespace is required on GetNgcImagesURL")
+		return nil, errors.New("namespace is required on GetNgcImagesURL")
 	}
 
 	_basePath := o._basePath
 	if _basePath == "" {
 		_basePath = "/api/v1"
 	}
-	result.Path = golangswaggerpaths.Join(_basePath, _path)
+	_result.Path = golangswaggerpaths.Join(_basePath, _path)
 
-	return &result, nil
+	return &_result, nil
 }
 
 // Must is a helper function to panic when the url builder returns an error

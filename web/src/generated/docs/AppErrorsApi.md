@@ -1,4 +1,4 @@
-# ScaleShift.AppErrorsApi
+# AiGateway.AppErrorsApi
 
 All URIs are relative to *http://localhost:9000/api/v1*
 
@@ -17,9 +17,9 @@ returns the list of application errors
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
+var AiGateway = require('ai_gateway');
 
-var apiInstance = new ScaleShift.AppErrorsApi();
+var apiInstance = new AiGateway.AppErrorsApi();
 
 var callback = function(error, data, response) {
   if (error) {

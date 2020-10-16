@@ -1,4 +1,4 @@
-# ScaleShift.IPythonNotebook
+# AiGateway.IPythonNotebook
 
 ## Properties
 Name | Type | Description | Notes

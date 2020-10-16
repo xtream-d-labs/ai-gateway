@@ -6,15 +6,15 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/swag"
-	"github.com/scaleshift/scaleshift/api/src/auth"
-	"github.com/scaleshift/scaleshift/api/src/generated/models"
-	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations"
-	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations/rescale"
-	"github.com/scaleshift/scaleshift/api/src/log"
-	api "github.com/scaleshift/scaleshift/api/src/rescale"
+	"github.com/xtream-d-labs/ai-gateway/api/src/auth"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/models"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/restapi/operations"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/restapi/operations/rescale"
+	"github.com/xtream-d-labs/ai-gateway/api/src/log"
+	api "github.com/xtream-d-labs/ai-gateway/api/src/rescale"
 )
 
-func rescaleRoute(api *operations.ScaleShiftAPI) {
+func rescaleRoute(api *operations.AIGatewayAPI) {
 	api.RescaleGetRescaleCoreTypesHandler = rescale.GetRescaleCoreTypesHandlerFunc(getCoreTypes)
 	api.RescaleGetRescaleApplicationHandler = rescale.GetRescaleApplicationHandlerFunc(getApplication)
 	api.RescaleGetRescaleApplicationVersionHandler = rescale.GetRescaleApplicationVersionHandlerFunc(getApplicationVersion)

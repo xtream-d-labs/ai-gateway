@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-openapi/runtime"
 
-	models "github.com/scaleshift/scaleshift/api/src/generated/models"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/models"
 )
 
 // GetRemoteRepositoriesOKCode is the HTTP code returned for type GetRemoteRepositoriesOK
@@ -51,13 +51,13 @@ func (o *GetRemoteRepositoriesOK) WriteResponse(rw http.ResponseWriter, producer
 	rw.WriteHeader(200)
 	payload := o.Payload
 	if payload == nil {
+		// return empty array
 		payload = make([]*models.Repository, 0, 50)
 	}
 
 	if err := producer.Produce(rw, payload); err != nil {
 		panic(err) // let the recovery middleware deal with this
 	}
-
 }
 
 /*GetRemoteRepositoriesDefault Unexpected error

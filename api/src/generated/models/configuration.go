@@ -8,14 +8,14 @@ package models
 import (
 	"encoding/json"
 
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // Configuration app's configurations
+//
 // swagger:model Configuration
 type Configuration struct {
 
@@ -134,7 +134,7 @@ const (
 
 // prop value enum
 func (m *Configuration) validateMustSignedInEnum(path, location string, value string) error {
-	if err := validate.Enum(path, location, value, configurationTypeMustSignedInPropEnum); err != nil {
+	if err := validate.EnumCase(path, location, value, configurationTypeMustSignedInPropEnum, true); err != nil {
 		return err
 	}
 	return nil
@@ -196,7 +196,7 @@ const (
 
 // prop value enum
 func (m *Configuration) validateRescalePlatformEnum(path, location string, value string) error {
-	if err := validate.Enum(path, location, value, configurationTypeRescalePlatformPropEnum); err != nil {
+	if err := validate.EnumCase(path, location, value, configurationTypeRescalePlatformPropEnum, true); err != nil {
 		return err
 	}
 	return nil
@@ -239,7 +239,7 @@ const (
 
 // prop value enum
 func (m *Configuration) validateUseK8sEnum(path, location string, value string) error {
-	if err := validate.Enum(path, location, value, configurationTypeUseK8sPropEnum); err != nil {
+	if err := validate.EnumCase(path, location, value, configurationTypeUseK8sPropEnum, true); err != nil {
 		return err
 	}
 	return nil
@@ -282,7 +282,7 @@ const (
 
 // prop value enum
 func (m *Configuration) validateUseNgcEnum(path, location string, value string) error {
-	if err := validate.Enum(path, location, value, configurationTypeUseNgcPropEnum); err != nil {
+	if err := validate.EnumCase(path, location, value, configurationTypeUseNgcPropEnum, true); err != nil {
 		return err
 	}
 	return nil
@@ -325,7 +325,7 @@ const (
 
 // prop value enum
 func (m *Configuration) validateUsePrivateRegistryEnum(path, location string, value string) error {
-	if err := validate.Enum(path, location, value, configurationTypeUsePrivateRegistryPropEnum); err != nil {
+	if err := validate.EnumCase(path, location, value, configurationTypeUsePrivateRegistryPropEnum, true); err != nil {
 		return err
 	}
 	return nil
@@ -368,7 +368,7 @@ const (
 
 // prop value enum
 func (m *Configuration) validateUseRescaleEnum(path, location string, value string) error {
-	if err := validate.Enum(path, location, value, configurationTypeUseRescalePropEnum); err != nil {
+	if err := validate.EnumCase(path, location, value, configurationTypeUseRescalePropEnum, true); err != nil {
 		return err
 	}
 	return nil

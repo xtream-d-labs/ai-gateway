@@ -1,4 +1,4 @@
-# ScaleShift.NotebookApi
+# AiGateway.NotebookApi
 
 All URIs are relative to *http://localhost:9000/api/v1*
 
@@ -22,9 +22,9 @@ delete a specified notebook
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
+var AiGateway = require('ai_gateway');
 
-var apiInstance = new ScaleShift.NotebookApi();
+var apiInstance = new AiGateway.NotebookApi();
 
 var id = "id_example"; // String | Notebook container ID
 
@@ -68,9 +68,9 @@ returns ipynb files on the specified notebook
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
+var AiGateway = require('ai_gateway');
 
-var apiInstance = new ScaleShift.NotebookApi();
+var apiInstance = new AiGateway.NotebookApi();
 
 var id = "id_example"; // String | Notebook container ID
 
@@ -114,9 +114,9 @@ returns Jupyter notebook detail information
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
+var AiGateway = require('ai_gateway');
 
-var apiInstance = new ScaleShift.NotebookApi();
+var apiInstance = new AiGateway.NotebookApi();
 
 var id = "id_example"; // String | Notebook container ID
 
@@ -160,9 +160,9 @@ returns Jupyter notebook information
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
+var AiGateway = require('ai_gateway');
 
-var apiInstance = new ScaleShift.NotebookApi();
+var apiInstance = new AiGateway.NotebookApi();
 
 var callback = function(error, data, response) {
   if (error) {
@@ -200,13 +200,13 @@ modify the notebook status
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
+var AiGateway = require('ai_gateway');
 
-var apiInstance = new ScaleShift.NotebookApi();
+var apiInstance = new AiGateway.NotebookApi();
 
 var id = "id_example"; // String | Notebook container ID
 
-var body = new ScaleShift.NotebookAttrs(); // NotebookAttrs | 
+var body = new AiGateway.NotebookAttrs(); // NotebookAttrs | 
 
 
 var callback = function(error, data, response) {
@@ -249,11 +249,11 @@ creates Jupyter notebook container
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
+var AiGateway = require('ai_gateway');
 
-var apiInstance = new ScaleShift.NotebookApi();
+var apiInstance = new AiGateway.NotebookApi();
 
-var body = new ScaleShift.ImageName2(); // ImageName2 | 
+var body = new AiGateway.ImageName2(); // ImageName2 | 
 
 
 var callback = function(error, data, response) {

@@ -3,50 +3,50 @@ version: "2.4"
 services:
 
   codegen-api:
-    image: supinf/go-swagger:0.17.2
-    command: generate server -P auth.Principal -f spec/openapi.yaml -t src/generated
+    image: supinf/go-swagger:0.25.0
+    command: generate server -P github.com/xtream-d-labs/ai-gateway/api/src/auth.Principal -f spec/openapi.yaml -t src/generated
     volumes:
-      - ../../spec:/go/src/github.com/scaleshift/scaleshift/api/spec
-      - ../../api:/go/src/github.com/scaleshift/scaleshift/api
-    working_dir: /go/src/github.com/scaleshift/scaleshift/api
+      - ../../spec:/go/src/github.com/xtream-d-labs/ai-gateway/api/spec
+      - ../../api:/go/src/github.com/xtream-d-labs/ai-gateway/api
+    working_dir: /go/src/github.com/xtream-d-labs/ai-gateway/api
 
   codegen-web:
-    image: scaleshift/dev:codegen-20190403
+    image: aigateway/dev:codegen-20190403
     build: docker/codegen
     volumes:
       - ../../spec:/work/spec
       - ../../web/src:/work/src
 
   deps-api:
-    image: scaleshift/dev:libs
+    image: aigateway/dev:libs
     build:
       context: .
       dockerfile: ../prod/api.Dockerfile
       target: libs
     command: go mod vendor
     volumes:
-      - ../../api:/go/src/github.com/scaleshift/scaleshift/api
-    working_dir: /go/src/github.com/scaleshift/scaleshift/api/src
+      - ../../api:/go/src/github.com/xtream-d-labs/ai-gateway/api
+    working_dir: /go/src/github.com/xtream-d-labs/ai-gateway/api/src
 
   lint-api:
     image: golangci/golangci-lint:v1.29.0-alpine
     command: golangci-lint run --config .golangci.yml
     volumes:
-      - ../../api:/go/src/github.com/scaleshift/scaleshift/api
-    working_dir: /go/src/github.com/scaleshift/scaleshift/api/src
+      - ../../api:/go/src/github.com/xtream-d-labs/ai-gateway/api
+    working_dir: /go/src/github.com/xtream-d-labs/ai-gateway/api/src
 
   test-api:
-    image: scaleshift/api:local
+    image: aigateway/api:local
     build:
       context: .
       dockerfile: ../prod/api.Dockerfile
       args:
-        BASE_IMAGE: scaleshift/api:cache
+        BASE_IMAGE: aigateway/api:cache
       target: builder
     command: sh -c "go test -cover -bench -benchmem `go list ./... | grep -v /generated/` -v"
     volumes:
-      - ../../api:/go/src/github.com/scaleshift/scaleshift/api
-    working_dir: /go/src/github.com/scaleshift/scaleshift/api/src
+      - ../../api:/go/src/github.com/xtream-d-labs/ai-gateway/api
+    working_dir: /go/src/github.com/xtream-d-labs/ai-gateway/api/src
 
   gen-private-key:
     image: supinf/openssl:1.0

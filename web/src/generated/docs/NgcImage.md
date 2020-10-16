@@ -1,4 +1,4 @@
-# ScaleShift.NgcImage
+# AiGateway.NgcImage
 
 ## Properties
 Name | Type | Description | Notes

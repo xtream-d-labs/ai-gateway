@@ -1,4 +1,4 @@
-# ScaleShift.RepositoryApi
+# AiGateway.RepositoryApi
 
 All URIs are relative to *http://localhost:9000/api/v1*
 
@@ -20,8 +20,8 @@ returns NGC images
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
-var defaultClient = ScaleShift.ApiClient.instance;
+var AiGateway = require('ai_gateway');
+var defaultClient = AiGateway.ApiClient.instance;
 
 // Configure API key authorization: api-authorizer
 var api-authorizer = defaultClient.authentications['api-authorizer'];
@@ -29,7 +29,7 @@ api-authorizer.apiKey = 'YOUR API KEY';
 // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
 //api-authorizer.apiKeyPrefix = 'Token';
 
-var apiInstance = new ScaleShift.RepositoryApi();
+var apiInstance = new AiGateway.RepositoryApi();
 
 var namespace = "namespace_example"; // String | Docker repositry namespace
 
@@ -76,8 +76,8 @@ returns NGC repositories
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
-var defaultClient = ScaleShift.ApiClient.instance;
+var AiGateway = require('ai_gateway');
+var defaultClient = AiGateway.ApiClient.instance;
 
 // Configure API key authorization: api-authorizer
 var api-authorizer = defaultClient.authentications['api-authorizer'];
@@ -85,7 +85,7 @@ api-authorizer.apiKey = 'YOUR API KEY';
 // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
 //api-authorizer.apiKeyPrefix = 'Token';
 
-var apiInstance = new ScaleShift.RepositoryApi();
+var apiInstance = new AiGateway.RepositoryApi();
 
 var callback = function(error, data, response) {
   if (error) {
@@ -123,8 +123,8 @@ returns remote images
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
-var defaultClient = ScaleShift.ApiClient.instance;
+var AiGateway = require('ai_gateway');
+var defaultClient = AiGateway.ApiClient.instance;
 
 // Configure API key authorization: api-authorizer
 var api-authorizer = defaultClient.authentications['api-authorizer'];
@@ -132,7 +132,7 @@ api-authorizer.apiKey = 'YOUR API KEY';
 // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
 //api-authorizer.apiKeyPrefix = 'Token';
 
-var apiInstance = new ScaleShift.RepositoryApi();
+var apiInstance = new AiGateway.RepositoryApi();
 
 var id = "id_example"; // String | Docker image name
 
@@ -176,8 +176,8 @@ returns remote repositories
 
 ### Example
 ```javascript
-var ScaleShift = require('scale_shift');
-var defaultClient = ScaleShift.ApiClient.instance;
+var AiGateway = require('ai_gateway');
+var defaultClient = AiGateway.ApiClient.instance;
 
 // Configure API key authorization: api-authorizer
 var api-authorizer = defaultClient.authentications['api-authorizer'];
@@ -185,7 +185,7 @@ api-authorizer.apiKey = 'YOUR API KEY';
 // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
 //api-authorizer.apiKeyPrefix = 'Token';
 
-var apiInstance = new ScaleShift.RepositoryApi();
+var apiInstance = new AiGateway.RepositoryApi();
 
 var callback = function(error, data, response) {
   if (error) {

@@ -1,5 +1,5 @@
 # Singularity v3.4
-# docker run --rm -it scaleshift/singularity:3.4
+# docker run --rm -it aigateway/singularity:3.4
 
 FROM alpine:3.12 AS build-gosu
 RUN apk --no-cache add curl

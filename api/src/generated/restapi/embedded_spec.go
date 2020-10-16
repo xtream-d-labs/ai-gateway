@@ -30,7 +30,7 @@ func init() {
   "swagger": "2.0",
   "info": {
     "description": "A platform for machine learning \u0026 high performance computing\n",
-    "title": "ScaleShift",
+    "title": "AI Gateway",
     "version": "1.0.0"
   },
   "host": "localhost:9000",
@@ -1904,7 +1904,7 @@ func init() {
   "swagger": "2.0",
   "info": {
     "description": "A platform for machine learning \u0026 high performance computing\n",
-    "title": "ScaleShift",
+    "title": "AI Gateway",
     "version": "1.0.0"
   },
   "host": "localhost:9000",

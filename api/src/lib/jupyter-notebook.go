@@ -23,8 +23,8 @@ import (
 	"docker.io/go-docker/api/types/strslice"
 	"github.com/docker/go-connections/nat"
 	"github.com/go-openapi/swag"
-	"github.com/scaleshift/scaleshift/api/src/config"
-	"github.com/scaleshift/scaleshift/api/src/log"
+	"github.com/xtream-d-labs/ai-gateway/api/src/config"
+	"github.com/xtream-d-labs/ai-gateway/api/src/log"
 )
 
 const (
@@ -296,13 +296,13 @@ func buildJupyterNotebookImage(ctx context.Context, cfg []byte, id, image, build
 	options := types.ImageBuildOptions{
 		Tags: []string{name},
 		Labels: map[string]string{
-			"com.scaleshift.name":            config.ProjectName,
-			"com.scaleshift.image.original":  id,
-			"com.scaleshift.image.built-as":  "jupyter-notebook",
-			"com.scaleshift.image.built-api": config.Config.APIVersion,
-			"com.scaleshift.image.built-at":  time.Now().Format(time.RFC3339),
-			"com.scaleshift.image.built-by":  builder,
-			"com.scaleshift.image.built-on":  image,
+			"com.aigateway.name":            config.ProjectName,
+			"com.aigateway.image.original":  id,
+			"com.aigateway.image.built-as":  "jupyter-notebook",
+			"com.aigateway.image.built-api": config.Config.APIVersion,
+			"com.aigateway.image.built-at":  time.Now().Format(time.RFC3339),
+			"com.aigateway.image.built-by":  builder,
+			"com.aigateway.image.built-on":  image,
 		},
 		NoCache:     true,
 		ForceRemove: true,
@@ -338,10 +338,10 @@ func RunJupyterNotebook(ctx context.Context, originalImage, wrappedImage, workdi
 		ExposedPorts: exposed,
 		WorkingDir:   workdir,
 		Labels: map[string]string{
-			"com.scaleshift.container.run-api": config.Config.APIVersion,
-			"com.scaleshift.container.started": time.Now().Format(time.RFC3339),
-			"com.scaleshift.container.publish": port,
-			"com.scaleshift.container.mounted": workdirHost,
+			"com.aigateway.container.run-api": config.Config.APIVersion,
+			"com.aigateway.container.started": time.Now().Format(time.RFC3339),
+			"com.aigateway.container.publish": port,
+			"com.aigateway.container.mounted": workdirHost,
 		},
 	}
 	host := &container.HostConfig{
@@ -394,13 +394,13 @@ func ContainerAttrs(labels map[string]string) (string, int64, time.Time) {
 	started := time.Now()
 	for key, value := range labels {
 		switch key {
-		case "com.scaleshift.image.built-on":
+		case "com.aigateway.image.built-on":
 			image = value
-		case "com.scaleshift.container.publish":
+		case "com.aigateway.container.publish":
 			if candidate, err := strconv.ParseInt(value, 10, 64); err == nil {
 				port = candidate
 			}
-		case "com.scaleshift.container.started":
+		case "com.aigateway.container.started":
 			if candidate, err := time.Parse(time.RFC3339, value); err == nil {
 				started = candidate
 			}

@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  title: ScaleShift
+  title: AI Gateway
   version: 1.0.0
   description: |
     A platform for machine learning & high performance computing

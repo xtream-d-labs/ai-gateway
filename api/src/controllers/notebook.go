@@ -14,24 +14,24 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-	"github.com/scaleshift/scaleshift/api/src/auth"
-	"github.com/scaleshift/scaleshift/api/src/config"
-	"github.com/scaleshift/scaleshift/api/src/db"
-	"github.com/scaleshift/scaleshift/api/src/generated/models"
-	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations"
-	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations/notebook"
-	"github.com/scaleshift/scaleshift/api/src/lib"
-	"github.com/scaleshift/scaleshift/api/src/log"
-	"github.com/scaleshift/scaleshift/api/src/queue"
+	"github.com/xtream-d-labs/ai-gateway/api/src/auth"
+	"github.com/xtream-d-labs/ai-gateway/api/src/config"
+	"github.com/xtream-d-labs/ai-gateway/api/src/db"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/models"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/restapi/operations"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/restapi/operations/notebook"
+	"github.com/xtream-d-labs/ai-gateway/api/src/lib"
+	"github.com/xtream-d-labs/ai-gateway/api/src/log"
+	"github.com/xtream-d-labs/ai-gateway/api/src/queue"
 )
 
-func notebookRoute(api *operations.ScaleShiftAPI) {
+func notebookRoute(api *operations.AIGatewayAPI) {
 	api.NotebookGetNotebooksHandler = notebook.GetNotebooksHandlerFunc(getNotebooks)
 	api.NotebookPostNewNotebookHandler = notebook.PostNewNotebookHandlerFunc(postNewNotebook)
 	api.NotebookGetNotebookDetailsHandler = notebook.GetNotebookDetailsHandlerFunc(getNotebookDetails)
 	api.NotebookModifyNotebookHandler = notebook.ModifyNotebookHandlerFunc(modifyNewNotebook)
 	api.NotebookDeleteNotebookHandler = notebook.DeleteNotebookHandlerFunc(deleteNewNotebook)
-	api.NotebookGetIpythonNotebooksHandler = notebook.GetIpythonNotebooksHandlerFunc(getIpythonNotebooks)
+	api.NotebookGetIPythonNotebooksHandler = notebook.GetIPythonNotebooksHandlerFunc(getIpythonNotebooks)
 }
 
 func getNotebooks(params notebook.GetNotebooksParams) middleware.Responder {
@@ -57,8 +57,8 @@ func getNotebooks(params notebook.GetNotebooksParams) middleware.Responder {
 			name = container.Names[0]
 		}
 		isJupyter := false
-		if as, ok1 := container.Labels["com.scaleshift.image.built-as"]; ok1 {
-			if _, ok2 := container.Labels["com.scaleshift.container.publish"]; ok2 {
+		if as, ok1 := container.Labels["com.aigateway.image.built-as"]; ok1 {
+			if _, ok2 := container.Labels["com.aigateway.container.publish"]; ok2 {
 				if strings.EqualFold(as, "jupyter-notebook") {
 					isJupyter = true
 				}
@@ -123,8 +123,8 @@ func postNewNotebook(params notebook.PostNewNotebookParams) middleware.Responder
 	}
 	wrappedImageID := ""
 	for _, image := range images {
-		fromID := image.Labels["com.scaleshift.image.original"]
-		fromNm := image.Labels["com.scaleshift.image.built-on"]
+		fromID := image.Labels["com.aigateway.image.original"]
+		fromNm := image.Labels["com.aigateway.image.built-on"]
 		if strings.EqualFold(name, fromID) || strings.EqualFold(name, fromNm) {
 			wrappedImageID = image.ID
 			break
@@ -220,14 +220,14 @@ func modifyNewNotebook(params notebook.ModifyNotebookParams) middleware.Responde
 
 	ctx := context.Background()
 	switch params.Body.Status {
-	case models.ModifyNotebookParamsBodyStatusStarted:
+	case notebook.ModifyNotebookBodyStatusStarted:
 		// TODO implement client side
 		if err := cli.ContainerStart(ctx, params.ID, types.ContainerStartOptions{}); err != nil {
 			log.Error("ContainerStart@modifyNewNotebook", err, nil)
 			code := http.StatusBadRequest
 			return notebook.NewModifyNotebookDefault(code).WithPayload(newerror(code))
 		}
-	case models.ModifyNotebookParamsBodyStatusStopped:
+	case notebook.ModifyNotebookBodyStatusStopped:
 		timeout := 15 * time.Second
 		if err := cli.ContainerStop(ctx, params.ID, &timeout); err != nil {
 			log.Error("ContainerStop@modifyNewNotebook", err, nil)
@@ -262,10 +262,10 @@ var (
 	ipynbs   = regexp.MustCompile(`.*\.ipynb`)
 )
 
-func getIpythonNotebooks(params notebook.GetIpythonNotebooksParams) middleware.Responder {
+func getIpythonNotebooks(params notebook.GetIPythonNotebooksParams) middleware.Responder {
 	cli, _, code := dockerClient(nil)
 	if code != 0 {
-		return notebook.NewGetIpythonNotebooksDefault(code).WithPayload(newerror(code))
+		return notebook.NewGetIPythonNotebooksDefault(code).WithPayload(newerror(code))
 	}
 	defer cli.Close()
 
@@ -274,21 +274,21 @@ func getIpythonNotebooks(params notebook.GetIpythonNotebooksParams) middleware.R
 	if err != nil {
 		log.Error("ContainerInspect@getIpythonNotebooks", err, nil)
 		code := http.StatusBadRequest
-		return notebook.NewGetIpythonNotebooksDefault(code).WithPayload(newerror(code))
+		return notebook.NewGetIPythonNotebooksDefault(code).WithPayload(newerror(code))
 	}
 	src := ""
 	for _, mnt := range container.Mounts {
 		src = strings.Replace(mnt.Source, config.Config.WorkspaceHostDir,
 			config.Config.WorkspaceContainerDir, -1)
 	}
-	result := []*models.IpythonNotebook{}
+	result := []*models.IPythonNotebook{}
 	for _, file := range fildFiles(src) {
 		name := nonascii.ReplaceAllString(strings.Replace(file, src, "", -1), "")
-		result = append(result, &models.IpythonNotebook{
+		result = append(result, &models.IPythonNotebook{
 			Name: swag.String(strings.TrimLeft(name, "/")),
 		})
 	}
-	return notebook.NewGetIpythonNotebooksOK().WithPayload(result)
+	return notebook.NewGetIPythonNotebooksOK().WithPayload(result)
 }
 
 func fildFiles(dir string) []string {

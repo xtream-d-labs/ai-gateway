@@ -1,5 +1,5 @@
 /**
- * ScaleShift
+ * AI Gateway
  * A platform for machine learning & high performance computing 
  *
  * OpenAPI spec version: 1.0.0
@@ -30,9 +30,9 @@
    * <p>
    * An AMD (recommended!) or CommonJS application will generally do something equivalent to the following:
    * <pre>
-   * var ScaleShift = require('index'); // See note below*.
-   * var xxxSvc = new ScaleShift.XxxApi(); // Allocate the API class we're going to use.
-   * var yyyModel = new ScaleShift.Yyy(); // Construct a model instance.
+   * var AiGateway = require('index'); // See note below*.
+   * var xxxSvc = new AiGateway.XxxApi(); // Allocate the API class we're going to use.
+   * var yyyModel = new AiGateway.Yyy(); // Construct a model instance.
    * yyyModel.someProperty = 'someValue';
    * ...
    * var zzz = xxxSvc.doSomething(yyyModel); // Invoke the service.
@@ -44,8 +44,8 @@
    * <p>
    * A non-AMD browser application (discouraged) might do something like this:
    * <pre>
-   * var xxxSvc = new ScaleShift.XxxApi(); // Allocate the API class we're going to use.
-   * var yyy = new ScaleShift.Yyy(); // Construct a model instance.
+   * var xxxSvc = new AiGateway.XxxApi(); // Allocate the API class we're going to use.
+   * var yyy = new AiGateway.Yyy(); // Construct a model instance.
    * yyyModel.someProperty = 'someValue';
    * ...
    * var zzz = xxxSvc.doSomething(yyyModel); // Invoke the service.

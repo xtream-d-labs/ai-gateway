@@ -6,17 +6,17 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"github.com/scaleshift/scaleshift/api/src/db"
-	"github.com/scaleshift/scaleshift/api/src/generated/restapi"
-	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations"
-	logs "github.com/scaleshift/scaleshift/api/src/log"
+	"github.com/xtream-d-labs/ai-gateway/api/src/db"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/restapi"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/restapi/operations"
+	logs "github.com/xtream-d-labs/ai-gateway/api/src/log"
 
 	"github.com/go-openapi/loads"
 	flags "github.com/jessevdk/go-flags"
 )
 
 func main() {
-	logs.Debug("start scaleshift", nil, nil)
+	logs.Debug("start aigateway", nil, nil)
 	db.Initialize()
 
 	// ----------------------------------------------------------------------------------------
@@ -27,14 +27,13 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	api := operations.NewScaleShiftAPI(swaggerSpec)
+	api := operations.NewAIGatewayAPI(swaggerSpec)
 	server := restapi.NewServer(api)
 	defer server.Shutdown()
 
 	parser := flags.NewParser(server, flags.Default)
-	parser.ShortDescription = "ScaleShift"
+	parser.ShortDescription = "AI Gateway"
 	parser.LongDescription = "A platform for machine learning & high performance computing\n"
-
 	server.ConfigureFlags()
 	for _, optsGroup := range api.CommandLineOptionsGroups {
 		_, err := parser.AddGroup(optsGroup.ShortDescription, optsGroup.LongDescription, optsGroup.Options)

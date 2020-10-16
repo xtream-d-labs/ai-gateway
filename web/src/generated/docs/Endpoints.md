@@ -1,4 +1,4 @@
-# ScaleShift.Endpoints
+# AiGateway.Endpoints
 
 ## Properties
 Name | Type | Description | Notes

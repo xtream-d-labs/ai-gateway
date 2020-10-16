@@ -1,7 +1,7 @@
 {
-  "name": "scaleshift",
+  "name": "ap-gateway",
   "description": "A tool which assists us in making deep learning models locally or on cloud.",
-  "repository": "https://github.com/scaleshift/scaleshift/",
+  "repository": "https://github.com/xtream-d-labs/ai-gateway/",
   "license": "UNLICENSED",
   "private": true,
   "main": "src/index.js",

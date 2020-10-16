@@ -1,4 +1,4 @@
-# ScaleShift.RescaleApplication
+# AiGateway.RescaleApplication
 
 ## Properties
 Name | Type | Description | Notes

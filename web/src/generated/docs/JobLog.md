@@ -1,4 +1,4 @@
-# ScaleShift.JobLog
+# AiGateway.JobLog
 
 ## Properties
 Name | Type | Description | Notes

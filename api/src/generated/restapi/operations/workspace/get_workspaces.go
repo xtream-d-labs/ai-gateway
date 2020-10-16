@@ -8,7 +8,7 @@ package workspace
 import (
 	"net/http"
 
-	middleware "github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/runtime/middleware"
 )
 
 // GetWorkspacesHandlerFunc turns a function with the right signature into a get workspaces handler

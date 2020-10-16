@@ -18,10 +18,10 @@ import (
 	"time"
 
 	"github.com/go-openapi/swag"
-	"github.com/scaleshift/scaleshift/api/src/config"
-	"github.com/scaleshift/scaleshift/api/src/db"
-	util "github.com/scaleshift/scaleshift/api/src/http"
-	"github.com/scaleshift/scaleshift/api/src/log"
+	"github.com/xtream-d-labs/ai-gateway/api/src/config"
+	"github.com/xtream-d-labs/ai-gateway/api/src/db"
+	util "github.com/xtream-d-labs/ai-gateway/api/src/http"
+	"github.com/xtream-d-labs/ai-gateway/api/src/log"
 	"golang.org/x/net/context/ctxhttp"
 )
 

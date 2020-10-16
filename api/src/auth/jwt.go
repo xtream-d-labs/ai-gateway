@@ -11,7 +11,7 @@ import (
 	"github.com/SermoDigital/jose/crypto"
 	"github.com/SermoDigital/jose/jws"
 	"github.com/SermoDigital/jose/jwt"
-	"github.com/scaleshift/scaleshift/api/src/config"
+	"github.com/xtream-d-labs/ai-gateway/api/src/config"
 )
 
 var (

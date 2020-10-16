@@ -6,8 +6,8 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/scaleshift/scaleshift/api/src/config"
 	"github.com/sirupsen/logrus"
+	"github.com/xtream-d-labs/ai-gateway/api/src/config"
 )
 
 func init() {

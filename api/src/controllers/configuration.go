@@ -11,15 +11,15 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/swag"
 	ngc "github.com/pottava/ngc-registry-api/app/ngc/registry"
-	"github.com/scaleshift/scaleshift/api/src/auth"
-	"github.com/scaleshift/scaleshift/api/src/config"
-	"github.com/scaleshift/scaleshift/api/src/generated/models"
-	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations"
-	"github.com/scaleshift/scaleshift/api/src/generated/restapi/operations/app"
-	"github.com/scaleshift/scaleshift/api/src/log"
-	"github.com/scaleshift/scaleshift/api/src/reg/registry"
-	"github.com/scaleshift/scaleshift/api/src/reg/repoutils"
-	"github.com/scaleshift/scaleshift/api/src/rescale"
+	"github.com/xtream-d-labs/ai-gateway/api/src/auth"
+	"github.com/xtream-d-labs/ai-gateway/api/src/config"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/models"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/restapi/operations"
+	"github.com/xtream-d-labs/ai-gateway/api/src/generated/restapi/operations/app"
+	"github.com/xtream-d-labs/ai-gateway/api/src/log"
+	"github.com/xtream-d-labs/ai-gateway/api/src/reg/registry"
+	"github.com/xtream-d-labs/ai-gateway/api/src/reg/repoutils"
+	"github.com/xtream-d-labs/ai-gateway/api/src/rescale"
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/xerrors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -27,7 +27,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-func configRoute(api *operations.ScaleShiftAPI) {
+func configRoute(api *operations.AIGatewayAPI) {
 	api.AppGetConfigurationsHandler = app.GetConfigurationsHandlerFunc(getConfigurations)
 	api.AppPostConfigurationsHandler = app.PostConfigurationsHandlerFunc(postConfigurations)
 }
