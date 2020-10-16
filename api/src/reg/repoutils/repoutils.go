@@ -3,8 +3,8 @@ package repoutils
 import (
 	"strings"
 
-	"docker.io/go-docker/api/types"
 	"github.com/docker/distribution/reference"
+	"github.com/docker/docker/api/types"
 	"github.com/xtream-d-labs/ai-gateway/api/src/log"
 )
 

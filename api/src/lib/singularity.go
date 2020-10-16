@@ -11,11 +11,11 @@ import (
 	"strings"
 	"time"
 
-	docker "docker.io/go-docker"
-	"docker.io/go-docker/api/types"
-	"docker.io/go-docker/api/types/container"
-	"docker.io/go-docker/api/types/mount"
-	"docker.io/go-docker/api/types/strslice"
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/mount"
+	"github.com/docker/docker/api/types/strslice"
+	docker "github.com/docker/docker/client"
 	"github.com/go-openapi/swag"
 	"github.com/xtream-d-labs/ai-gateway/api/src/config"
 	"github.com/xtream-d-labs/ai-gateway/api/src/db"
@@ -110,7 +110,7 @@ func BuildSingularityImage(jobID, authConfig, builder string) (*string, error) {
 		WorkingDir: "/home/singularity/image",
 	}
 	mounts := []mount.Mount{
-		mount.Mount{
+		{
 			Type:   mount.TypeBind,
 			Source: filepath.Join(config.Config.SingImgHostPath, job.JobID),
 			Target: "/home/singularity/image",
@@ -166,12 +166,12 @@ func ConvertToSingularityImage(id, name string) (*string, error) {
 		return nil, err
 	}
 	mounts := []mount.Mount{
-		mount.Mount{
+		{
 			Type:   mount.TypeBind,
 			Source: filepath.Join(config.Config.SingImgHostPath, id),
 			Target: "/output",
 		},
-		mount.Mount{
+		{
 			Type:   mount.TypeBind,
 			Source: "/var/run/docker.sock",
 			Target: "/var/run/docker.sock",

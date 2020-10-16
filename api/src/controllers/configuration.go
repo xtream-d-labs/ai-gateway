@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-	docker "docker.io/go-docker"
-	"docker.io/go-docker/api/types"
+	"github.com/docker/docker/api/types"
+	docker "github.com/docker/docker/client"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/swag"
 	ngc "github.com/pottava/ngc-registry-api/app/ngc/registry"

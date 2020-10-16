@@ -37,7 +37,7 @@ services:
     container_name: web
 
   proxy:
-    image: aigateway/proxy:1.16
+    image: aigateway/proxy:1.11
     ports:
       - "%{publish_port}:80"
     logging:

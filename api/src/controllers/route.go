@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"net/http"
 
-	docker "docker.io/go-docker"
-	"docker.io/go-docker/api/types"
+	"github.com/docker/docker/api/types"
+	docker "github.com/docker/docker/client"
 	"github.com/go-openapi/swag"
 	"github.com/xtream-d-labs/ai-gateway/api/src/generated/models"
 	"github.com/xtream-d-labs/ai-gateway/api/src/generated/restapi/operations"

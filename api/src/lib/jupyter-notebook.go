@@ -15,12 +15,12 @@ import (
 	"strings"
 	"time"
 
-	docker "docker.io/go-docker"
-	"docker.io/go-docker/api/types"
-	"docker.io/go-docker/api/types/container"
-	"docker.io/go-docker/api/types/mount"
-	"docker.io/go-docker/api/types/network"
-	"docker.io/go-docker/api/types/strslice"
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/mount"
+	"github.com/docker/docker/api/types/network"
+	"github.com/docker/docker/api/types/strslice"
+	docker "github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
 	"github.com/go-openapi/swag"
 	"github.com/xtream-d-labs/ai-gateway/api/src/config"
@@ -346,13 +346,11 @@ func RunJupyterNotebook(ctx context.Context, originalImage, wrappedImage, workdi
 	}
 	host := &container.HostConfig{
 		PortBindings: bindings,
-		Mounts: []mount.Mount{
-			mount.Mount{
-				Type:   mount.TypeBind,
-				Source: filepath.Join(config.Config.WorkspaceHostDir, workdirHost), // Host machine
-				Target: fmt.Sprintf("%s/workspace", workdir),
-			},
-		},
+		Mounts: []mount.Mount{{
+			Type:   mount.TypeBind,
+			Source: filepath.Join(config.Config.WorkspaceHostDir, workdirHost), // Host machine
+			Target: fmt.Sprintf("%s/workspace", workdir),
+		}},
 	}
 	log.Debug(fmt.Sprintf("RunJupyterNotebook: %+v, %+v", cfg, host), nil, nil)
 

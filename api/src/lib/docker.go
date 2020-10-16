@@ -14,10 +14,10 @@ import (
 	"strings"
 	"time"
 
-	docker "docker.io/go-docker"
-	"docker.io/go-docker/api/types"
-	"docker.io/go-docker/api/types/container"
-	"docker.io/go-docker/api/types/network"
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/network"
+	docker "github.com/docker/docker/client"
 	"github.com/go-openapi/swag"
 	"github.com/xtream-d-labs/ai-gateway/api/src/config"
 	"github.com/xtream-d-labs/ai-gateway/api/src/db"
@@ -130,12 +130,9 @@ func waitforExitDockerContainer(ctx context.Context, id string) (*string, error)
 	}
 	defer cli.Close()
 
-	resultC, errC := cli.ContainerWait(ctx, id, container.WaitConditionNotRunning)
-	select {
-	case <-resultC:
-	case err = <-errC:
+	if _, e := cli.ContainerWait(ctx, id); e != nil {
 		removeDockerContainer(ctx, cli, id)
-		return nil, err
+		return nil, e
 	}
 	out, err := LogsOfDockerContainer(ctx, cli, id)
 	if err != nil {

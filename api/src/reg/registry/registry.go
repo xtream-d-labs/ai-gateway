@@ -9,9 +9,9 @@ import (
 	"regexp"
 	"strings"
 
-	"docker.io/go-docker/api/types"
 	"github.com/docker/distribution/manifest/manifestlist"
 	"github.com/docker/distribution/manifest/schema2"
+	"github.com/docker/docker/api/types"
 )
 
 // Registry defines the client for retrieving information from the registry API.

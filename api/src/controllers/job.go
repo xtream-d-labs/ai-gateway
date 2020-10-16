@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"docker.io/go-docker/api/types/mount"
+	"github.com/docker/docker/api/types/mount"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"

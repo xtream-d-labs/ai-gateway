@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"docker.io/go-docker/api/types/container"
-	"docker.io/go-docker/api/types/mount"
-	"docker.io/go-docker/api/types/strslice"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/mount"
+	"github.com/docker/docker/api/types/strslice"
 )
 
 // IPython defines a notebook
