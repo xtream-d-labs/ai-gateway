@@ -36,7 +36,7 @@ type config struct { // nolint:maligned
 	NgcRegistryEndpoint    string   `envconfig:"NGC_REGISTRY_ENDPOINT" default:"https://registry.nvidia.com"`
 	NgcRegistryHostName    string   `envconfig:"NGC_REGISTRY_HOST_NAME" default:"nvcr.io"`
 	NgcRegistryUserName    string   `envconfig:"NGC_REGISTRY_USER_NAME" default:"$oauthtoken"`
-	JupyterImageNamespace  string   `envconfig:"JUPYTER_IMAGE_NAMESPACE" default:"ss-jupyter"`
+	JupyterImageNamespace  string   `envconfig:"JUPYTER_IMAGE_NAMESPACE" default:"aig-jupyter"`
 	JupyterMinimumPort     uint16   `envconfig:"JUPYTER_MINIMUM_PORT" default:"30000"`
 	KubernetesAPIEndpoint  string   `envconfig:"KUBERNETES_API_ENDPOINT"`
 	KubernetesConfig       string   `envconfig:"KUBERNETES_CONFIG"`
@@ -83,7 +83,7 @@ var (
 
 func init() {
 	Config = &config{}
-	envconfig.MustProcess("ss", Config)
+	envconfig.MustProcess("aig", Config)
 	Config.APIVersion = version
 	if len(commit) > 0 && len(date) > 0 {
 		Config.APIVersion = fmt.Sprintf("%s-%s (built at %s)", version, commit, date)

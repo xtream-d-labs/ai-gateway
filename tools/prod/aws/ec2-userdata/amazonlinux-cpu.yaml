@@ -9,7 +9,7 @@ write_files:
   - path: /home/ec2-user/.env
     permissions: '0666'
     content: |
-      SS_LOG_LEVEL=info
+      AIG_LOG_LEVEL=info
       PWD=/home/ec2-user
 
   - path: /etc/sysconfig/docker
@@ -46,7 +46,7 @@ runcmd:
   - usermod -aG docker ec2-user
   - systemctl enable docker
   - systemctl start docker
-  - echo 'SS_API_ENDPOINT=http://'$( curl -s http://169.254.169.254/latest/meta-data/public-ipv4 ) >> /home/ec2-user/.env
+  - echo 'AIG_API_ENDPOINT=http://'$( curl -s http://169.254.169.254/latest/meta-data/public-ipv4 ) >> /home/ec2-user/.env
   - curl -L https://s3-ap-northeast-1.amazonaws.com/ai-gateway/docker-compose.yml -o /home/ec2-user/docker-compose.yml
   - systemctl enable aigateway
   - systemctl start aigateway

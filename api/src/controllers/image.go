@@ -47,7 +47,7 @@ func getImages(params image.GetImagesParams) middleware.Responder {
 			tobeSkippedImages := []string{
 				"aigateway/",
 				config.Config.JupyterImageNamespace,
-				":ss-built",
+				":aig-built",
 				"amazon-ecs-",
 				"<none>",
 			}

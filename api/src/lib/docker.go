@@ -130,17 +130,15 @@ func waitforExitDockerContainer(ctx context.Context, id string) (*string, error)
 	}
 	defer cli.Close()
 
-	if _, e := cli.ContainerWait(ctx, id); e != nil {
-		removeDockerContainer(ctx, cli, id)
-		return nil, e
-	}
-	out, err := LogsOfDockerContainer(ctx, cli, id)
-	if err != nil {
-		removeDockerContainer(ctx, cli, id)
+	resultC, errC := cli.ContainerWait(ctx, id, container.WaitConditionNotRunning)
+	select {
+	case <-resultC:
+	case err = <-errC:
 		return nil, err
 	}
+	out, err := LogsOfDockerContainer(ctx, cli, id)
 	removeDockerContainer(ctx, cli, id)
-	return out, nil
+	return out, err
 }
 
 var (

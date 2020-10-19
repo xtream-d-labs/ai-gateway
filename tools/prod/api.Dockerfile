@@ -27,7 +27,7 @@ COPY api/templates /go/src/github.com/xtream-d-labs/ai-gateway/api/templates
 COPY api/src/entrypoint.sh /
 VOLUME ["/tmp/badger", "/tmp/work", "/tmp/simg"]
 ARG API_VERSION="dev"
-ENV SS_API_VERSION=${API_VERSION} \
+ENV AIG_API_VERSION=${API_VERSION} \
     DOCKER_HOST=unix:///var/run/docker.sock \
     GOPATH=/go
 COPY --from=builder /app /

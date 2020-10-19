@@ -6,7 +6,7 @@ write_files:
   - path: /home/ubuntu/.env
     permissions: '0666'
     content: |
-      SS_LOG_LEVEL=debug
+      AIG_LOG_LEVEL=debug
       PWD=/home/ubuntu
 
   - path: /etc/docker/config.json
@@ -49,7 +49,7 @@ runcmd:
   - usermod -aG docker ubuntu
   - systemctl enable docker
   - systemctl start docker
-  - echo 'SS_API_ENDPOINT=http://'$( curl -s http://169.254.169.254/latest/meta-data/public-ipv4 ) >> /home/ubuntu/.env
+  - echo 'AIG_API_ENDPOINT=http://'$( curl -s http://169.254.169.254/latest/meta-data/public-ipv4 ) >> /home/ubuntu/.env
   - curl -L https://s3-ap-northeast-1.amazonaws.com/ai-gateway/docker-compose.yml -o /home/ubuntu/docker-compose.yml
   - systemctl enable aigateway
   - systemctl start aigateway

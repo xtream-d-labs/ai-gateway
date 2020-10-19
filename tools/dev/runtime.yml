@@ -14,16 +14,16 @@ services:
     ports:
       - 9000:80
     environment:
-      - SS_RESCALE_ENDPOINT=https://platform.rescale.jp
-      - SS_RESCALE_API_TOKEN
-      - SS_LOG_LEVEL=debug
-      - SS_LOG_FORMAT=json
-      - SS_MAX_WORKERS=4
-      - SS_MUST_SIGN_IN=false
-      - SS_IMAGES_TOBE_IGNORED=aigateway/,ss-jupyter/,supinf/,<none>
-      - SS_WORKSPACE_HOST_DIR=${PWD}/tools/dev/tmp/work
-      - SS_SINGULARITY_HOST_DIR=${PWD}/tools/dev/tmp/simg
-      - SS_DATABASE_ENDPOINT=user:pass@tcp(aigateway_db:3306)/aigateway?charset=utf8mb4&collation=utf8_unicode_ci&parseTime=true
+      - AIG_RESCALE_ENDPOINT=https://platform.rescale.jp
+      - AIG_RESCALE_API_TOKEN
+      - AIG_LOG_LEVEL=debug
+      - AIG_LOG_FORMAT=json
+      - AIG_MAX_WORKERS=4
+      - AIG_MUST_SIGN_IN=false
+      - AIG_IMAGES_TOBE_IGNORED=aigateway/,aig-jupyter/,supinf/,<none>
+      - AIG_WORKSPACE_HOST_DIR=${PWD}/tools/dev/tmp/work
+      - AIG_SINGULARITY_HOST_DIR=${PWD}/tools/dev/tmp/simg
+      - AIG_DATABASE_ENDPOINT=user:pass@tcp(aigateway_db:3306)/aigateway?charset=utf8mb4&collation=utf8_unicode_ci&parseTime=true
       - DOCKER_HOST=unix:///var/run/docker.sock
     volumes:
       - ../../api/certs:/certs

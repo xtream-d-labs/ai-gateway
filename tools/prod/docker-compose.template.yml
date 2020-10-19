@@ -4,19 +4,19 @@ services:
   api:
     image: aigateway/api:%{version}
     environment:
-      - SS_MUST_SIGN_IN=false
-      - SS_JUPYTER_MINIMUM_PORT=30000
-      - SS_MAX_WORKERS=2
-      - SS_DOCKER_REGISTRY_ENDPOINT
-      - SS_DOCKER_REGISTRY_HOST_NAME
-      - SS_RESCALE_SINGULARITY_VERSION=3.2.0
-      - SS_RESCALE_JOB_WALLTIME=3600
-      - SS_LOG_LEVEL=debug
-      - SS_LOG_FORMAT=json
-      - SS_IMAGES_TOBE_IGNORED=aigateway/,ss-jupyter/,<none>
-      - SS_WORKSPACE_HOST_DIR=${PWD}/aigateway/workspaces
-      - SS_SINGULARITY_HOST_DIR=${PWD}/aigateway/simages
-      - SS_DATABASE_ENDPOINT=user:pass@tcp(db:3306)/aigateway?charset=utf8mb4&collation=utf8_unicode_ci&parseTime=true
+      - AIG_MUST_SIGN_IN=false
+      - AIG_JUPYTER_MINIMUM_PORT=30000
+      - AIG_MAX_WORKERS=2
+      - AIG_DOCKER_REGISTRY_ENDPOINT
+      - AIG_DOCKER_REGISTRY_HOST_NAME
+      - AIG_RESCALE_SINGULARITY_VERSION=3.2.0
+      - AIG_RESCALE_JOB_WALLTIME=3600
+      - AIG_LOG_LEVEL=debug
+      - AIG_LOG_FORMAT=json
+      - AIG_IMAGES_TOBE_IGNORED=aigateway/,aig-jupyter/,<none>
+      - AIG_WORKSPACE_HOST_DIR=${PWD}/aigateway/workspaces
+      - AIG_SINGULARITY_HOST_DIR=${PWD}/aigateway/simages
+      - AIG_DATABASE_ENDPOINT=user:pass@tcp(db:3306)/aigateway?charset=utf8mb4&collation=utf8_unicode_ci&parseTime=true
       - DOCKER_HOST=unix:///var/run/docker.sock
     volumes:
       - ${PWD}/aigateway/workspaces:/tmp/work
@@ -46,7 +46,7 @@ services:
     container_name: proxy
 
   db:
-    image: mysql:5.6.49
+    image: mysql:5.7.31
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=aigateway
