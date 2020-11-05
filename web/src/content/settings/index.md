@@ -13,6 +13,7 @@ js = "settings/index.js"
               <span v-if="message != ''">{{ message }}</span>
             </transition></p>
           </div>
+          <!-- Docker Registry -->
           <h5 id="docker-registry" class="form-signin-heading"
               style="margin-top: 0;">Docker Registry</h5>
           <hr/>
@@ -42,6 +43,7 @@ js = "settings/index.js"
               <input type="password" id="input-password" class="form-control" v-model="password" />
             </div>
           </div>
+          <!-- NVIDIA GPU Cloud -->
           <h5 id="nvidia-gpu-cloud" class="form-signin-heading">
             <a href="https://ngc.nvidia.com/" target="_blank">NVIDIA GPU Cloud</a>&nbsp;(NGC)
           </h5>
@@ -65,6 +67,16 @@ js = "settings/index.js"
             <div class="row">
               <input type="text" id="input-ngc-key" class="form-control" v-model="ngcKey" 
                      placeholder="Generate your API Key at https://ngc.nvidia.com/setup/api-key" />
+            </div>
+          </div>
+          <!-- Local settings -->
+          <h5 id="local-settings" class="form-signin-heading">Local settings</h5>
+          <hr/>
+          <div class="form-group">
+            <label for="input-gpus" class="row control-label">GPUs</label>
+            <div class="row">
+              <input type="text" id="input-gpus" class="form-control" v-model="localGPUs"
+                     placeholder="1" readonly="readonly" />
             </div>
           </div>
           <div class="btn btn-lg btn-primary btn-block" v-on:click="submit"

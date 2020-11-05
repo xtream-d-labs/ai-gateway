@@ -838,6 +838,8 @@ definitions:
     description: app's configurations
     required:
       - must_signed_in
+      - local_gpus
+      - local_gpus_per_container
     properties:
       must_signed_in:
         description: Users should be signed in
@@ -904,6 +906,14 @@ definitions:
       rescale_key:
         description: Fist 5 chars of Rescal API Key
         type: string
+      local_gpus:
+        description: Number of the host GPUs
+        type: integer
+        format: int64
+      local_gpus_per_container:
+        description: Number of GPUs per container
+        type: integer
+        format: int64
   Session:
     description: docker image information
     required:
@@ -1004,6 +1014,9 @@ definitions:
         description: the container published port
         type: integer
         format: int64
+      gpus:
+        description: the number of NVIDIA GPUs
+        type: string
       started:
         description: started unix timestamp
         type: string

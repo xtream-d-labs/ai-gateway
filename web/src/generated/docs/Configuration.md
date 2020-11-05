@@ -18,6 +18,8 @@ Name | Type | Description | Notes
 **k8sConfig** | **String** | kubecfg | [optional] 
 **rescalePlatform** | **String** |  | [optional] 
 **rescaleKey** | **String** | Fist 5 chars of Rescal API Key | [optional] 
+**localGpus** | **Number** | Number of the host GPUs | 
+**localGpusPerContainer** | **Number** | Number of GPUs per container | 
 
 
 <a name="MustSignedInEnum"></a>

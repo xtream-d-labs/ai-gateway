@@ -36,21 +36,23 @@ func getConfigurations(params app.GetConfigurationsParams) middleware.Responder 
 	if sess, err := auth.RetrieveSession(params.HTTPRequest); err == nil && sess != nil {
 		creds := auth.FindCredentials(sess.DockerUsername)
 		return app.NewGetConfigurationsOK().WithPayload(&models.Configuration{
-			MustSignedIn:       config.MustSignInToDockerRegistry(),
-			UsePrivateRegistry: creds.Base.UsePrivateRegistry,
-			DockerRegistry:     config.Config.DockerRegistryEndpoint,
-			DockerHostname:     config.Config.DockerRegistryHostName,
-			DockerUsername:     creds.Base.DockerUsername,
-			DockerPassword:     hideChars(creds.Base.DockerPassword, 3),
-			UseNgc:             creds.Base.UseNgc,
-			NgcEmail:           creds.Base.NgcEmail,
-			NgcPassword:        hideChars(creds.Base.NgcPassword, 3),
-			NgcApikey:          hideChars(creds.Base.NgcApikey, 5),
-			UseRescale:         creds.Base.UseRescale,
-			RescalePlatform:    config.Config.RescaleEndpoint,
-			RescaleKey:         hideChars(config.Config.RescaleAPIToken, 5),
-			UseK8s:             creds.Base.UseK8s,
-			K8sConfig:          creds.Base.K8sConfig,
+			MustSignedIn:          config.MustSignInToDockerRegistry(),
+			UsePrivateRegistry:    creds.Base.UsePrivateRegistry,
+			DockerRegistry:        config.Config.DockerRegistryEndpoint,
+			DockerHostname:        config.Config.DockerRegistryHostName,
+			DockerUsername:        creds.Base.DockerUsername,
+			DockerPassword:        hideChars(creds.Base.DockerPassword, 3),
+			UseNgc:                creds.Base.UseNgc,
+			NgcEmail:              creds.Base.NgcEmail,
+			NgcPassword:           hideChars(creds.Base.NgcPassword, 3),
+			NgcApikey:             hideChars(creds.Base.NgcApikey, 5),
+			UseRescale:            creds.Base.UseRescale,
+			RescalePlatform:       config.Config.RescaleEndpoint,
+			RescaleKey:            hideChars(config.Config.RescaleAPIToken, 5),
+			UseK8s:                creds.Base.UseK8s,
+			K8sConfig:             creds.Base.K8sConfig,
+			LocalGpus:             swag.Int64(config.Config.NvidiaGPUs),
+			LocalGpusPerContainer: swag.Int64(config.Config.NvidiaGPUsPerContainer),
 		})
 	}
 	registry := ""
@@ -62,14 +64,16 @@ func getConfigurations(params app.GetConfigurationsParams) middleware.Responder 
 		hostname = config.Config.DockerRegistryHostName
 	}
 	return app.NewGetConfigurationsOK().WithPayload(&models.Configuration{
-		MustSignedIn:       config.MustSignInToDockerRegistry(),
-		DockerRegistry:     registry,
-		DockerHostname:     hostname,
-		UsePrivateRegistry: "no",
-		UseNgc:             "no",
-		UseRescale:         "no",
-		RescalePlatform:    config.Config.RescaleEndpoint,
-		UseK8s:             "no",
+		MustSignedIn:          config.MustSignInToDockerRegistry(),
+		DockerRegistry:        registry,
+		DockerHostname:        hostname,
+		UsePrivateRegistry:    "no",
+		UseNgc:                "no",
+		UseRescale:            "no",
+		RescalePlatform:       config.Config.RescaleEndpoint,
+		UseK8s:                "no",
+		LocalGpus:             swag.Int64(config.Config.NvidiaGPUs),
+		LocalGpusPerContainer: swag.Int64(config.Config.NvidiaGPUsPerContainer),
 	})
 }
 

@@ -342,7 +342,7 @@ func postNewJob(params job.PostNewJobParams, principal *auth.Principal) middlewa
 	if params.Body.PlatformID == job.PostNewJobBodyPlatformIDRescale {
 		platform = db.PlatformRescale
 	}
-	image, _, _ := lib.ContainerAttrs(container.Config.Labels)
+	image, _, _, _ := lib.ContainerAttrs(container.Config.Labels)
 	newjob := &db.Job{
 		Platform:    int(platform),
 		JobID:       uuid.New().String(),

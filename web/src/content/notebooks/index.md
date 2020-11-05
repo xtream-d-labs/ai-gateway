@@ -100,6 +100,7 @@ js = "notebooks/index.js"
                     <table class="table highlight">
                       <tbody>
                         <tr><td>Container name:</td><td class="notebook-name"></td></tr>
+                        <tr><td>GPUs:</td><td>{{ notebook.gpus }}</td></tr>
                         <tr><td>Started time:</td><td class="notebook-started"></td></tr>
                         <tr><td>Ended time:</td><td class="notebook-ended"></td></tr>
                         <tr><td>Mounted volumes:</td><td class="notebook-volumes"></td></tr>

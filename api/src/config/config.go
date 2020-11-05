@@ -36,6 +36,9 @@ type config struct { // nolint:maligned
 	NgcRegistryEndpoint    string   `envconfig:"NGC_REGISTRY_ENDPOINT" default:"https://registry.nvidia.com"`
 	NgcRegistryHostName    string   `envconfig:"NGC_REGISTRY_HOST_NAME" default:"nvcr.io"`
 	NgcRegistryUserName    string   `envconfig:"NGC_REGISTRY_USER_NAME" default:"$oauthtoken"`
+	NvidiaSmiContainer     string   `envconfig:"NVIDIA_SMI_CONTAINER" default:"nvidia/cuda:11.0-base"`
+	NvidiaGPUs             int64    `ignored:"true"`
+	NvidiaGPUsPerContainer int64    `envconfig:"NVIDIA_GPUS_PER_CONTAINER" default:"1"`
 	JupyterImageNamespace  string   `envconfig:"JUPYTER_IMAGE_NAMESPACE" default:"aig-jupyter"`
 	JupyterMinimumPort     uint16   `envconfig:"JUPYTER_MINIMUM_PORT" default:"30000"`
 	KubernetesAPIEndpoint  string   `envconfig:"KUBERNETES_API_ENDPOINT"`

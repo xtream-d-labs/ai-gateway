@@ -45,8 +45,10 @@
    * @alias module:model/Configuration
    * @class
    * @param mustSignedIn {module:model/Configuration.MustSignedInEnum} Users should be signed in
+   * @param localGpus {Number} Number of the host GPUs
+   * @param localGpusPerContainer {Number} Number of GPUs per container
    */
-  var exports = function(mustSignedIn) {
+  var exports = function(mustSignedIn, localGpus, localGpusPerContainer) {
     var _this = this;
 
     _this['must_signed_in'] = mustSignedIn;
@@ -64,6 +66,8 @@
 
 
 
+    _this['local_gpus'] = localGpus;
+    _this['local_gpus_per_container'] = localGpusPerContainer;
   };
 
   /**
@@ -121,6 +125,12 @@
       }
       if (data.hasOwnProperty('rescale_key')) {
         obj['rescale_key'] = ApiClient.convertToType(data['rescale_key'], 'String');
+      }
+      if (data.hasOwnProperty('local_gpus')) {
+        obj['local_gpus'] = ApiClient.convertToType(data['local_gpus'], 'Number');
+      }
+      if (data.hasOwnProperty('local_gpus_per_container')) {
+        obj['local_gpus_per_container'] = ApiClient.convertToType(data['local_gpus_per_container'], 'Number');
       }
     }
     return obj;
@@ -200,6 +210,16 @@
    * @member {String} rescale_key
    */
   exports.prototype['rescale_key'] = undefined;
+  /**
+   * Number of the host GPUs
+   * @member {Number} local_gpus
+   */
+  exports.prototype['local_gpus'] = undefined;
+  /**
+   * Number of GPUs per container
+   * @member {Number} local_gpus_per_container
+   */
+  exports.prototype['local_gpus_per_container'] = undefined;
 
 
   /**

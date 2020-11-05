@@ -14,9 +14,9 @@ API('App').getConfigurations(function (err, _, res) {
   vue.ngcEmail    = res.body.ngc_email;
   vue.ngcPassword = res.body.ngc_password;
   vue.ngcKey      = res.body.ngc_apikey;
-  vue.ngcKey      = res.body.ngc_apikey;
   vue.k8sConfig   = res.body.k8s_config;
   vue.rescaleKey  = res.body.rescale_key;
+  vue.localGPUs   = res.body.local_gpus;
 
   config.set(res.body);
   app.refreshMenus(res.body);

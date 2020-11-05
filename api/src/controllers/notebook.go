@@ -41,10 +41,7 @@ func getNotebooks(params notebook.GetNotebooksParams) middleware.Responder {
 	}
 	defer cli.Close()
 
-	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{
-		Quiet: true,
-		All:   true,
-	})
+	containers, err := lib.RunningNotebooks(context.Background(), cli)
 	if err != nil {
 		log.Error("ContainerList@getNotebooks", err, nil)
 		code := http.StatusBadRequest
@@ -56,26 +53,19 @@ func getNotebooks(params notebook.GetNotebooksParams) middleware.Responder {
 		if len(container.Names) > 0 {
 			name = container.Names[0]
 		}
-		isJupyter := false
-		if as, ok1 := container.Labels["com.aigateway.image.built-as"]; ok1 {
-			if _, ok2 := container.Labels["com.aigateway.container.publish"]; ok2 {
-				if strings.EqualFold(as, "jupyter-notebook") {
-					isJupyter = true
-				}
-			}
-		}
-		if !isJupyter {
-			continue
-		}
-		image, port, started := lib.ContainerAttrs(container.Labels)
-		result = append(result, &models.Notebook{
+		image, port, gpus, started := lib.ContainerAttrs(container.Labels)
+		notebook := &models.Notebook{
 			ID:      swag.String(container.ID),
 			Name:    swag.String(name),
 			Image:   swag.String(image),
 			State:   container.State,
 			Port:    port,
 			Started: strfmt.DateTime(started),
-		})
+		}
+		if 0 < config.Config.NvidiaGPUs {
+			notebook.Gpus = fmt.Sprintf("%d", gpus)
+		}
+		result = append(result, notebook)
 	}
 	// building Images
 	if images, err := db.FindImages(db.ImageActionBuilding); err == nil {
@@ -176,7 +166,7 @@ func getNotebookDetails(params notebook.GetNotebookDetailsParams) middleware.Res
 		code := http.StatusBadRequest
 		return notebook.NewGetNotebookDetailsDefault(code).WithPayload(newerror(code))
 	}
-	_, port, started := lib.ContainerAttrs(container.Config.Labels)
+	_, port, _, started := lib.ContainerAttrs(container.Config.Labels)
 	mounts := []string{}
 	for _, mount := range container.Mounts {
 		mounts = append(mounts, fmt.Sprintf("%s:%s",

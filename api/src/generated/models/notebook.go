@@ -17,6 +17,9 @@ import (
 // swagger:model Notebook
 type Notebook struct {
 
+	// the number of NVIDIA GPUs
+	Gpus string `json:"gpus,omitempty"`
+
 	// the container ID
 	// Required: true
 	ID *string `json:"id"`

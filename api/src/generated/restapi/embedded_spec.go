@@ -1264,7 +1264,9 @@ func init() {
     "Configuration": {
       "description": "app's configurations",
       "required": [
-        "must_signed_in"
+        "must_signed_in",
+        "local_gpus",
+        "local_gpus_per_container"
       ],
       "properties": {
         "docker_hostname": {
@@ -1286,6 +1288,16 @@ func init() {
         "k8s_config": {
           "description": "kubecfg",
           "type": "string"
+        },
+        "local_gpus": {
+          "description": "Number of the host GPUs",
+          "type": "integer",
+          "format": "int64"
+        },
+        "local_gpus_per_container": {
+          "description": "Number of GPUs per container",
+          "type": "integer",
+          "format": "int64"
         },
         "must_signed_in": {
           "description": "Users should be signed in",
@@ -1619,6 +1631,10 @@ func init() {
         "image"
       ],
       "properties": {
+        "gpus": {
+          "description": "the number of NVIDIA GPUs",
+          "type": "string"
+        },
         "id": {
           "description": "the container ID",
           "type": "string"
@@ -3138,7 +3154,9 @@ func init() {
     "Configuration": {
       "description": "app's configurations",
       "required": [
-        "must_signed_in"
+        "must_signed_in",
+        "local_gpus",
+        "local_gpus_per_container"
       ],
       "properties": {
         "docker_hostname": {
@@ -3160,6 +3178,16 @@ func init() {
         "k8s_config": {
           "description": "kubecfg",
           "type": "string"
+        },
+        "local_gpus": {
+          "description": "Number of the host GPUs",
+          "type": "integer",
+          "format": "int64"
+        },
+        "local_gpus_per_container": {
+          "description": "Number of GPUs per container",
+          "type": "integer",
+          "format": "int64"
         },
         "must_signed_in": {
           "description": "Users should be signed in",
@@ -3493,6 +3521,10 @@ func init() {
         "image"
       ],
       "properties": {
+        "gpus": {
+          "description": "the number of NVIDIA GPUs",
+          "type": "string"
+        },
         "id": {
           "description": "the container ID",
           "type": "string"

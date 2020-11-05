@@ -316,7 +316,13 @@ func buildJupyterNotebookImage(ctx context.Context, cfg []byte, id, image, build
 
 // RunJupyterNotebook runs the specified image as a jupter notebook
 func RunJupyterNotebook(ctx context.Context, originalImage, wrappedImage, workdirHost, workdir string) (*string, error) {
-	port, err := findAvailablePort(ctx)
+	cli, err := docker.NewEnvClient()
+	if err != nil {
+		return nil, err
+	}
+	defer cli.Close()
+
+	port, notebooks, err := availablePortAndNotebooks(ctx, cli)
 	if err != nil {
 		return nil, err
 	}
@@ -352,6 +358,19 @@ func RunJupyterNotebook(ctx context.Context, originalImage, wrappedImage, workdi
 			Target: fmt.Sprintf("%s/workspace", workdir),
 		}},
 	}
+	gpus := int(config.Config.NvidiaGPUsPerContainer)
+	if 0 < config.Config.NvidiaGPUs && (notebooks+1)*gpus <= int(config.Config.NvidiaGPUs) {
+		cfg.Labels["com.aigateway.container.gpus"] = fmt.Sprintf("%d", gpus)
+
+		capabilities := [][]string{}
+		capabilities = append(capabilities, []string{"gpu"})
+		host.Resources = container.Resources{
+			DeviceRequests: []container.DeviceRequest{{
+				Count:        int(gpus),
+				Capabilities: capabilities,
+			}},
+		}
+	}
 	log.Debug(fmt.Sprintf("RunJupyterNotebook: %+v, %+v", cfg, host), nil, nil)
 
 	net := &network.NetworkingConfig{}
@@ -360,35 +379,63 @@ func RunJupyterNotebook(ctx context.Context, originalImage, wrappedImage, workdi
 	return ID, err
 }
 
-func findAvailablePort(ctx context.Context) (string, error) {
-	cli, err := docker.NewEnvClient()
-	if err != nil {
-		return "", err
-	}
-	defer cli.Close()
-
+func availablePortAndNotebooks(ctx context.Context, cli *docker.Client) (string, int, error) {
 	var available uint16
-	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{})
+	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{
+		Quiet: true,
+		All:   true,
+	})
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
+	count := 0
 	for _, container := range containers {
 		for _, port := range container.Ports {
 			if port.PublicPort >= available {
 				available = port.PublicPort + 1
 			}
 		}
+		if as, ok1 := container.Labels["com.aigateway.image.built-as"]; ok1 {
+			if _, ok2 := container.Labels["com.aigateway.container.publish"]; ok2 {
+				if strings.EqualFold(as, "jupyter-notebook") {
+					count++
+				}
+			}
+		}
 	}
 	if available < minimalJupyterPort {
 		available = minimalJupyterPort
 	}
-	return fmt.Sprintf("%d", available), nil
+	return fmt.Sprintf("%d", available), count, nil
+}
+
+// RunningNotebooks returns containers which was build by this app
+func RunningNotebooks(ctx context.Context, cli *docker.Client) ([]types.Container, error) {
+	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{
+		Quiet: true,
+		All:   true,
+	})
+	if err != nil {
+		return nil, err
+	}
+	result := []types.Container{}
+	for _, container := range containers {
+		if as, ok1 := container.Labels["com.aigateway.image.built-as"]; ok1 {
+			if _, ok2 := container.Labels["com.aigateway.container.publish"]; ok2 {
+				if strings.EqualFold(as, "jupyter-notebook") {
+					result = append(result, container)
+				}
+			}
+		}
+	}
+	return result, nil
 }
 
 // ContainerAttrs returns original image, published port & started time
-func ContainerAttrs(labels map[string]string) (string, int64, time.Time) {
+func ContainerAttrs(labels map[string]string) (string, int64, int64, time.Time) {
 	var image string
 	var port int64
+	var gpus int64
 	started := time.Now()
 	for key, value := range labels {
 		switch key {
@@ -398,11 +445,15 @@ func ContainerAttrs(labels map[string]string) (string, int64, time.Time) {
 			if candidate, err := strconv.ParseInt(value, 10, 64); err == nil {
 				port = candidate
 			}
+		case "com.aigateway.container.gpus":
+			if candidate, err := strconv.ParseInt(value, 10, 64); err == nil {
+				gpus = candidate
+			}
 		case "com.aigateway.container.started":
 			if candidate, err := time.Parse(time.RFC3339, value); err == nil {
 				started = candidate
 			}
 		}
 	}
-	return image, port, started
+	return image, port, gpus, started
 }

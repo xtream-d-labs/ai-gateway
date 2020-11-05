@@ -8,6 +8,7 @@ Name | Type | Description | Notes
 **image** | **String** | the image ID | 
 **state** | **String** | state of the container | [optional] 
 **port** | **Number** | the container published port | [optional] 
+**gpus** | **String** | the number of NVIDIA GPUs | [optional] 
 **started** | **Date** | started unix timestamp | [optional] 
 
 

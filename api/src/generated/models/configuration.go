@@ -34,6 +34,14 @@ type Configuration struct {
 	// kubecfg
 	K8sConfig string `json:"k8s_config,omitempty"`
 
+	// Number of the host GPUs
+	// Required: true
+	LocalGpus *int64 `json:"local_gpus"`
+
+	// Number of GPUs per container
+	// Required: true
+	LocalGpusPerContainer *int64 `json:"local_gpus_per_container"`
+
 	// Users should be signed in
 	// Required: true
 	// Enum: [yes no]
@@ -77,6 +85,14 @@ type Configuration struct {
 func (m *Configuration) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateLocalGpus(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateLocalGpusPerContainer(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateMustSignedIn(formats); err != nil {
 		res = append(res, err)
 	}
@@ -108,6 +124,24 @@ func (m *Configuration) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *Configuration) validateLocalGpus(formats strfmt.Registry) error {
+
+	if err := validate.Required("local_gpus", "body", m.LocalGpus); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Configuration) validateLocalGpusPerContainer(formats strfmt.Registry) error {
+
+	if err := validate.Required("local_gpus_per_container", "body", m.LocalGpusPerContainer); err != nil {
+		return err
+	}
+
 	return nil
 }
 

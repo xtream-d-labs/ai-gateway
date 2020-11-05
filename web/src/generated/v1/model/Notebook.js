@@ -57,6 +57,7 @@
 
 
 
+
   };
 
   /**
@@ -84,6 +85,9 @@
       }
       if (data.hasOwnProperty('port')) {
         obj['port'] = ApiClient.convertToType(data['port'], 'Number');
+      }
+      if (data.hasOwnProperty('gpus')) {
+        obj['gpus'] = ApiClient.convertToType(data['gpus'], 'String');
       }
       if (data.hasOwnProperty('started')) {
         obj['started'] = ApiClient.convertToType(data['started'], 'Date');
@@ -117,6 +121,11 @@
    * @member {Number} port
    */
   exports.prototype['port'] = undefined;
+  /**
+   * the number of NVIDIA GPUs
+   * @member {String} gpus
+   */
+  exports.prototype['gpus'] = undefined;
   /**
    * started unix timestamp
    * @member {Date} started

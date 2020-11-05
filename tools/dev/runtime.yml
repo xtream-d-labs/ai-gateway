@@ -20,7 +20,7 @@ services:
       - AIG_LOG_FORMAT=json
       - AIG_MAX_WORKERS=4
       - AIG_MUST_SIGN_IN=false
-      - AIG_IMAGES_TOBE_IGNORED=aigateway/,aig-jupyter/,supinf/,<none>
+      - AIG_IMAGES_TOBE_IGNORED=aigateway/,aig-jupyter/,mysql:,<none>
       - AIG_WORKSPACE_HOST_DIR=${PWD}/tools/dev/tmp/work
       - AIG_SINGULARITY_HOST_DIR=${PWD}/tools/dev/tmp/simg
       - AIG_DATABASE_ENDPOINT=user:pass@tcp(aigateway_db:3306)/aigateway?charset=utf8mb4&collation=utf8_unicode_ci&parseTime=true
