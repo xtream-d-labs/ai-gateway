@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://xtreme-d.net/wp-content/uploads/2020/05/logo.svg">
+  <img src="https://raw.github.com/wiki/xtream-d-labs/ai-gateway/img/logo.png">
   <h1>AI Gateway</h1>
   <span>An Open Source Machine Learning Tool for making & training models.</span>
 </div>
@@ -21,27 +21,21 @@ AI Gateway is a client web application which makes it easier for researchers to 
 
 ### 1. Setup an AI Gateway client
 
-<img src="https://raw.github.com/wiki/rescale-labs/scaleshift/img/how-it-works-1.png">
+<img src="https://raw.github.com/wiki/xtream-d-labs/ai-gateway/img/how-it-works-1.png">
 
 With just only [3 steps!](https://github.com/xtream-d-labs/ai-gateway#local-installation)
 
 ### 2. Download machine learning software
 
-<img src="https://raw.github.com/wiki/rescale-labs/scaleshift/img/how-it-works-2.png">
+<img src="https://raw.github.com/wiki/xtream-d-labs/ai-gateway/img/how-it-works-2.png">
 
 You can pull any docker images to the client from NGC, DockerHub or your private registry with **just one click**.
 
 ### 3. Create a new workspace
 
-<img src="https://raw.github.com/wiki/rescale-labs/scaleshift/img/how-it-works-3.png">
+<img src="https://raw.github.com/wiki/xtream-d-labs/ai-gateway/img/how-it-works-3.png">
 
 When you click a `run` button, AI Gateway wraps the image with [Jupyter notebook](https://jupyter.org/) & run it as a docker container. Then you can build your own models on your specified software on it.
-
-### 4. Train your models
-
-<img src="https://raw.github.com/wiki/rescale-labs/scaleshift/img/how-it-works-5.png">
-
-In order to train the models in a parallel and distributed way, you can choose a Kubernetes cluster or Rescale platform. AI Gateway converts the image to [Singularity](https://www.sylabs.io/docs/) automatically if it’s needed.
 
 ## Get Started
 
