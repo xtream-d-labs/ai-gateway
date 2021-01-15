@@ -3,7 +3,7 @@ version: "2.4"
 services:
 
   db:
-    image: mysql:5.7.31
+    image: mysql:5.7.32
     ports:
       - 3306:3306
     environment:

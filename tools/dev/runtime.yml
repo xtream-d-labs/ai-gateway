@@ -10,12 +10,12 @@ services:
       args:
         BASE_IMAGE: aigateway/api:cache
       target: builder
-    entrypoint: tini -- sleep 31536000
+    entrypoint: tini -- air -c .air.toml
     ports:
-      - 9000:80
+      - 2345:2345
     environment:
-      - AIG_RESCALE_ENDPOINT=https://platform.rescale.jp
-      - AIG_RESCALE_API_TOKEN
+      - AIG_API_ENDPOINT=http://localhost:8080
+      - PORT=80
       - AIG_LOG_LEVEL=debug
       - AIG_LOG_FORMAT=json
       - AIG_MAX_WORKERS=4
@@ -23,9 +23,10 @@ services:
       - AIG_IMAGES_TOBE_IGNORED=aigateway/,aig-jupyter/,mysql:,<none>
       - AIG_WORKSPACE_HOST_DIR=${PWD}/tools/dev/tmp/work
       - AIG_SINGULARITY_HOST_DIR=${PWD}/tools/dev/tmp/simg
-      - AIG_DATABASE_ENDPOINT=user:pass@tcp(aigateway_db:3306)/aigateway?charset=utf8mb4&collation=utf8_unicode_ci&parseTime=true
+      - AIG_DATABASE_ENDPOINT=user:pass@tcp(host.docker.internal:3306)/aigateway?charset=utf8mb4&collation=utf8_unicode_ci&parseTime=true
       - DOCKER_HOST=unix:///var/run/docker.sock
     volumes:
+      - ../../api/src:/go/src/github.com/xtream-d-labs/ai-gateway/api/src
       - ../../api/certs:/certs
       - ./tmp/db:/tmp/badger
       - ./tmp/simg:/tmp/simg
@@ -34,12 +35,16 @@ services:
     working_dir: /go/src/github.com/xtream-d-labs/ai-gateway/api/src
     networks:
       - services
+    security_opt:
+      - apparmor:unconfined
+    cap_add:
+      - SYS_PTRACE
     restart: always
     container_name: aigateway_api
 
   web:
     image: supinf/hugo:0.x
-    command: server --bind=0.0.0.0 -p=80 -b=http://localhost:8080/ --appendPort=false --disableLiveReload
+    command: server --bind=0.0.0.0 -p=80 -b=http://localhost:8080 --appendPort=false --disableLiveReload
     volumes:
       - ../../web/src:/app
     logging:

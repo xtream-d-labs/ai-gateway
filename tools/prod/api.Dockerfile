@@ -1,9 +1,12 @@
 ARG BASE_IMAGE="libs"
 
-FROM golang:1.15.3-alpine3.12 AS libs
+FROM golang:1.15.6-alpine3.12 AS libs
 RUN apk --no-cache add g++ git
 
 FROM ${BASE_IMAGE} as builder
+ENV GO111MODULE=on
+RUN go get -u "github.com/cosmtrek/air@v1.15.1"
+RUN go get -u "github.com/go-delve/delve/cmd/dlv@v1.5.1"
 ENV CGO_ENABLED=0 \
     GOOS=linux \
     GOARCH=amd64
@@ -14,7 +17,7 @@ WORKDIR /go/src/github.com/xtream-d-labs/ai-gateway/api/src
 RUN go build -o app -mod=vendor -ldflags "-s -w -X github.com/xtream-d-labs/ai-gateway/api/src/config.date=$(date +%Y-%m-%d) -X github.com/xtream-d-labs/ai-gateway/api/src/config.version=${API_VERSION} -X github.com/xtream-d-labs/ai-gateway/api/src/config.commit=${API_COMMIT}"
 RUN mv app /
 
-FROM golang:1.15.3-alpine3.12 as cache
+FROM golang:1.15.6-alpine3.12 as cache
 RUN apk --no-cache add tini
 COPY --from=libs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=libs /usr /usr

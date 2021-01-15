@@ -3,7 +3,7 @@ version: "2.4"
 services:
 
   codegen-api:
-    image: supinf/go-swagger:0.25.0
+    image: ghcr.io/supinf/go-swagger:0.25
     command: generate server -P github.com/xtream-d-labs/ai-gateway/api/src/auth.Principal -f spec/openapi.yaml -t src/generated
     volumes:
       - ../../spec:/go/src/github.com/xtream-d-labs/ai-gateway/api/spec
@@ -29,7 +29,7 @@ services:
     working_dir: /go/src/github.com/xtream-d-labs/ai-gateway/api/src
 
   lint-api:
-    image: golangci/golangci-lint:v1.29.0-alpine
+    image: golangci/golangci-lint:v1.33.0-alpine
     command: golangci-lint run --config .golangci.yml
     volumes:
       - ../../api:/go/src/github.com/xtream-d-labs/ai-gateway/api

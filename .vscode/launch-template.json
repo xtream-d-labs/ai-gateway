@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "ai-gateway",
+            "type": "go",
+            "request": "launch",
+            "mode": "remote",
+            "remotePath": "/go/src/github.com/xtream-d-labs/ai-gateway/api/src",
+            "program": "<replace-your-absolute-path>/api/src",
+            "host": "localhost",
+            "port": 2345
+        }
+    ]
+}

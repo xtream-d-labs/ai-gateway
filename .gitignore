@@ -1,3 +1,4 @@
+.vscode/launch.json
 api/certs
 api/src/vendor
 doc/backup
