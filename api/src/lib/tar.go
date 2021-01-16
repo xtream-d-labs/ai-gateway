@@ -77,7 +77,7 @@ func archive(dirName, outName string) error {
 			defer file.Close()
 
 			header := new(tar.Header)
-			header.Name = strings.Replace(file.Name(), dirName, "", -1)
+			header.Name = strings.ReplaceAll(file.Name(), dirName, "")
 			header.Size = info.Size()
 			header.Mode = int64(info.Mode())
 			header.ModTime = info.ModTime()

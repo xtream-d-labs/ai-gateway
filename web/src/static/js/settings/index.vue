@@ -40,6 +40,7 @@ var vue = new Vue({
     ngcKey: '',
     k8sConfig: '',
     rescaleKey: '',
+    localGPUs: 0,
     message: ''
   },
   methods: {

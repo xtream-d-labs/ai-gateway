@@ -92,11 +92,11 @@ func init() {
 
 // WrapWithJupyterNotebook builds wrapper docker images
 func WrapWithJupyterNotebook(ctx context.Context, id, image, builder string) (*string, error) {
-	pkg, setup, pip, python, lib, workdir, err := DetectImageContent(ctx, image)
+	pkg, setup, python, lib, workdir, err := DetectImageContent(ctx, image, false)
 	if err != nil {
 		return nil, err
 	}
-	config, err := makeJupyterNotebookBuildContext(pkg, image, workdir, lib, setup, pip, python)
+	config, err := makeJupyterNotebookBuildContext(pkg, image, workdir, lib, setup, python)
 	if err != nil {
 		return nil, err
 	}
@@ -104,34 +104,45 @@ func WrapWithJupyterNotebook(ctx context.Context, id, image, builder string) (*s
 }
 
 // DetectImageContent detects image conditions
-func DetectImageContent(ctx context.Context, image string) (PackageManager, string, string, string, string, string, error) {
+func DetectImageContent(ctx context.Context, image string, short bool) (PackageManager, string, string, string, string, error) {
 	pkg := Unknown
 	setupScripts := ""
 
+	python := checkPython(ctx, image)
+	if python == nil {
+		return pkg, "", "", "", "", fmt.Errorf("Python is not installed on the image: %s", image)
+	}
+	version := PyVersion(ctx, image, swag.StringValue(python))
+
 	if which(ctx, image, "apt-get") {
 		pkg = Apt
-		setupScripts = "apt update && apt-get install -y bash wget && wget -qO /sbin/tini https://github.com/krallin/tini/releases/download/v0.18.0/tini && chmod +x /sbin/tini"
+		setupScripts = "apt update && apt-get install -y bash wget jq " +
+			"&& wget -qO /sbin/tini https://github.com/krallin/tini/releases/download/v0.19.0/tini " +
+			"&& chmod +x /sbin/tini"
 	}
 	if which(ctx, image, "yum") {
 		pkg = Yum
-		setupScripts = "yum install -y bash wget && wget -qO /sbin/tini https://github.com/krallin/tini/releases/download/v0.18.0/tini && chmod +x /sbin/tini"
+		setupScripts = "yum install -y epel-release bash wget jq " +
+			"&& wget -qO /sbin/tini https://github.com/krallin/tini/releases/download/v0.19.0/tini " +
+			"&& chmod +x /sbin/tini"
 	}
 	if which(ctx, image, "apk") {
 		pkg = Apk
-		setupScripts = "apk --no-cache add bash wget tini build-base linux-headers musl-dev && pip install cython"
+		pip := checkPip(ctx, image)
+		if pip == nil {
+			return pkg, "", "", "", "", fmt.Errorf("pip is not installed on the image: %s", image)
+		}
+		setupScripts = fmt.Sprintf(
+			"apk --no-cache add bash wget tini build-base linux-headers musl-dev jq && %s install cython",
+			swag.StringValue(pip),
+		)
 	}
-	python := checkPython(ctx, image)
-	if python == nil {
-		return pkg, "", "", "", "", "", fmt.Errorf("Python is not installed on the image: %s", image)
-	}
-	pip := checkPip(ctx, image)
-	if pip == nil {
-		return pkg, "", "", "", "", "", fmt.Errorf("pip is not installed on the image: %s", image)
+	if short {
+		return pkg, "", swag.StringValue(python), "", "", nil
 	}
 	workdir := DetectImageWorkDir(ctx, image)
-	version := PyVersion(ctx, image, swag.StringValue(python))
 	lib := fmt.Sprintf("%s/workspace/lib/python%s/site-packages", workdir, version)
-	return pkg, setupScripts, swag.StringValue(pip), swag.StringValue(python), lib, workdir, nil
+	return pkg, setupScripts, swag.StringValue(python), lib, workdir, nil
 }
 
 // DetectImageWorkDir detects image working directory
@@ -175,7 +186,7 @@ func which(ctx context.Context, image, cmd string) bool {
 }
 
 func inspect(ctx context.Context, image string) (*types.ImageInspect, error) {
-	cli, err := docker.NewEnvClient()
+	cli, err := docker.NewClientWithOpts(docker.FromEnv)
 	if err != nil {
 		return nil, err
 	}
@@ -203,7 +214,7 @@ func PyVersion(ctx context.Context, image, python string) string {
 	return version
 }
 
-func makeJupyterNotebookBuildContext(pkg PackageManager, image, workdir, lib, setup, pip, python string) ([]byte, error) {
+func makeJupyterNotebookBuildContext(pkg PackageManager, image, workdir, lib, setup, python string) ([]byte, error) {
 	contents := []*tarContent{}
 	pipCfg := fmt.Sprintf(string(pipConfig), workdir+"/workspace")
 	content := []byte(pipCfg)
@@ -230,7 +241,7 @@ func makeJupyterNotebookBuildContext(pkg PackageManager, image, workdir, lib, se
 		lib = fmt.Sprintf("%s:%s", workdir, lib)
 		path = fmt.Sprintf("%s/workspace/bin:", workdir)
 	}
-	dockerfile := fmt.Sprintf(string(jupyterDockerfile), image, workdir, lib, path, setup, pip, python)
+	dockerfile := fmt.Sprintf(string(jupyterDockerfile), image, workdir, lib, path, setup, python, python, python)
 	log.Debug(fmt.Sprintf("MakeJupyterNotebook -> Dockerfile: %s", dockerfile), nil, nil)
 	content = []byte(dockerfile)
 	contents = append(contents, &tarContent{
@@ -316,7 +327,7 @@ func buildJupyterNotebookImage(ctx context.Context, cfg []byte, id, image, build
 
 // RunJupyterNotebook runs the specified image as a jupter notebook
 func RunJupyterNotebook(ctx context.Context, originalImage, wrappedImage, workdirHost, workdir string) (*string, error) {
-	cli, err := docker.NewEnvClient()
+	cli, err := docker.NewClientWithOpts(docker.FromEnv)
 	if err != nil {
 		return nil, err
 	}
@@ -366,7 +377,7 @@ func RunJupyterNotebook(ctx context.Context, originalImage, wrappedImage, workdi
 		capabilities = append(capabilities, []string{"gpu"})
 		host.Resources = container.Resources{
 			DeviceRequests: []container.DeviceRequest{{
-				Count:        int(gpus),
+				Count:        gpus,
 				Capabilities: capabilities,
 			}},
 		}

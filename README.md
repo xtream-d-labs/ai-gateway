@@ -87,7 +87,7 @@ docker-compose up
 
 ```console
 curl -sX POST -H "Content-Type: application/json" \
-    -d '{"image": "tensorflow/tensorflow:2.3.0"}' \
+    -d '{"image": "tensorflow/tensorflow:2.3.2"}' \
     http://localhost:8080/api/v1/notebooks
 curl -sX GET -H "Content-Type: application/json" \
     http://localhost:8080/api/v1/notebooks

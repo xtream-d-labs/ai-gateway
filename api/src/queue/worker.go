@@ -358,9 +358,9 @@ func worker(name string) (err error) {
 		// Create a new job
 		input := rescale.JobInput{
 			Name: strings.TrimRight(filepath.Base(j.Arg3), ".simg"),
-			JobAnalyses: []rescale.JobInputAnalyse{rescale.JobInputAnalyse{
+			JobAnalyses: []rescale.JobInputAnalyse{{
 				Command: fmt.Sprintf("singularity run %s\nrm -rf %s", meta.Name, meta.Name),
-				InputFiles: []rescale.JobInputFile{rescale.JobInputFile{
+				InputFiles: []rescale.JobInputFile{{
 					ID:         meta.ID,
 					Decompress: true,
 				}},
@@ -453,7 +453,7 @@ func pullImage(ctx context.Context, imageName, authConfig string) error {
 	log.Info("Worker triggers 'pullImage'", nil, &log.Map{
 		"image": imageName,
 	})
-	cli, err := docker.NewEnvClient()
+	cli, err := docker.NewClientWithOpts(docker.FromEnv)
 	if err != nil {
 		return err
 	}

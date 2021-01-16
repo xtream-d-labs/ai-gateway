@@ -27,6 +27,7 @@ services:
       - DOCKER_HOST=unix:///var/run/docker.sock
     volumes:
       - ../../api/src:/go/src/github.com/xtream-d-labs/ai-gateway/api/src
+      - ../../api/templates:/go/src/github.com/xtream-d-labs/ai-gateway/api/templates
       - ../../api/certs:/certs
       - ./tmp/db:/tmp/badger
       - ./tmp/simg:/tmp/simg

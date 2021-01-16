@@ -82,7 +82,7 @@ js = "images/index.js"
       <form class="input-field" autocomplete="off" v-on:submit.prevent>
         <p>You can use any docker images which contains Python & pip.</p>
         <input type="text" class="form-control" required style="font-size: 1.7rem;"
-               placeholder="tensorflow/tensorflow:2.3.0"
+               placeholder="tensorflow/tensorflow:2.3.2"
                v-model="name" v-on:input="$v.name.$touch" v-on:change="nameChanged"
                v-bind:class="{invalid: $v.name.$error, valid: $v.name.$dirty && !$v.name.$invalid}" />
         <p class="errors"><transition name="fade">

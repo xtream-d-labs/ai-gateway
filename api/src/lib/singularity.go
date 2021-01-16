@@ -60,7 +60,7 @@ func BuildSingularityImage(jobID, authConfig, builder string) (*string, error) {
 	if err = os.MkdirAll(dir, 0755); err != nil { // nolint
 		return nil, err
 	}
-	pkg, _, _, python, _, _, err := DetectImageContent(ctx, job.DockerImage)
+	pkg, _, python, _, _, err := DetectImageContent(ctx, job.DockerImage, true)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +82,7 @@ func BuildSingularityImage(jobID, authConfig, builder string) (*string, error) {
 		builder,
 		lib,
 		setup,
-		strings.Replace(job.Commands, ",", " ", -1))
+		strings.ReplaceAll(job.Commands, ",", " "))
 	log.Debug("Singularityfile", nil, &log.Map{
 		"content": sfile,
 	})
@@ -189,7 +189,7 @@ func ConvertToSingularityImage(id, name string) (*string, error) {
 }
 
 func pullSingularityImage(ctx context.Context) error {
-	cli, err := docker.NewEnvClient()
+	cli, err := docker.NewClientWithOpts(docker.FromEnv)
 	if err != nil {
 		return err
 	}
@@ -205,7 +205,7 @@ func pullSingularityImage(ctx context.Context) error {
 }
 
 func pullDoc2SingularityImage(ctx context.Context) error {
-	cli, err := docker.NewEnvClient()
+	cli, err := docker.NewClientWithOpts(docker.FromEnv)
 	if err != nil {
 		return err
 	}

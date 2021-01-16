@@ -5,7 +5,8 @@ ENV WORKDIR=%s \
     PATH="%s$PATH"
 
 RUN %s
-RUN %s install jupyter backcall bash_kernel \
+RUN %s -m pip install --upgrade pip \
+    && %s -m pip install jupyterlab backcall bash_kernel yq \
     && %s -m bash_kernel.install \
     && rm -rf /root/.cache
 
@@ -16,4 +17,4 @@ COPY bash-scripts.ipynb "$WORKDIR/bash-scripts.ipynb"
 COPY python-get-started.ipynb "$WORKDIR/python-get-started.ipynb"
 
 ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["jupyter", "notebook"]
+CMD ["jupyter", "lab"]

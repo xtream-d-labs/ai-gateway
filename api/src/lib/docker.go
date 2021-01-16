@@ -55,7 +55,7 @@ func init() {
 }
 
 func dockerServerVersion() (types.Version, error) {
-	cli, err := docker.NewEnvClient()
+	cli, err := docker.NewClientWithOpts(docker.FromEnv)
 	if err != nil {
 		return types.Version{}, err
 	}
@@ -69,7 +69,7 @@ const (
 )
 
 func buildDockerImage(ctx context.Context, reader io.Reader, options types.ImageBuildOptions) error {
-	cli, err := docker.NewEnvClient()
+	cli, err := docker.NewClientWithOpts(docker.FromEnv)
 	if err != nil {
 		return err
 	}
@@ -104,7 +104,7 @@ func RunAndWaitDockerContainer(ctx context.Context, name string,
 func runDockerContainer(ctx context.Context, name string,
 	config *container.Config, host *container.HostConfig,
 	net *network.NetworkingConfig) (*string, error) {
-	cli, err := docker.NewEnvClient()
+	cli, err := docker.NewClientWithOpts(docker.FromEnv)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ func runDockerContainer(ctx context.Context, name string,
 }
 
 func waitforExitDockerContainer(ctx context.Context, id string) (*string, error) {
-	cli, err := docker.NewEnvClient()
+	cli, err := docker.NewClientWithOpts(docker.FromEnv)
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +176,7 @@ func BuildJobImage(ctx context.Context, jobID, builder string, fqdnToPush bool) 
 	if err != nil {
 		return nil, err
 	}
-	pkg, _, _, python, _, _, err := DetectImageContent(ctx, job.DockerImage)
+	pkg, _, python, _, _, err := DetectImageContent(ctx, job.DockerImage, true)
 	if err != nil {
 		return nil, err
 	}
@@ -204,7 +204,7 @@ func BuildJobImage(ctx context.Context, jobID, builder string, fqdnToPush bool) 
 		builder,
 		lib,
 		setup,
-		"\""+strings.Replace(job.Commands, ",", "\",\"", -1)+"\"")), 0600)
+		"\""+strings.ReplaceAll(job.Commands, ",", "\",\"")+"\"")), 0600)
 	if err != nil {
 		return nil, err
 	}
@@ -227,11 +227,10 @@ func BuildJobImage(ctx context.Context, jobID, builder string, fqdnToPush bool) 
 	name = trimDockerLib.ReplaceAllString(name, "")
 	if fqdnToPush {
 		if strings.HasPrefix(name, config.Config.DockerRegistryHostName) {
-			name = strings.Replace(
+			name = strings.ReplaceAll(
 				name,
 				config.Config.DockerRegistryHostName,
 				config.Config.DockerRegistryHostName+"/"+builder,
-				-1,
 			)
 		} else {
 			name = fmt.Sprintf(
@@ -270,7 +269,7 @@ func BuildJobImage(ctx context.Context, jobID, builder string, fqdnToPush bool) 
 
 // PushJobImage pushes a docker image for the job
 func PushJobImage(ctx context.Context, imageName, authConfig string) error {
-	cli, e := docker.NewEnvClient()
+	cli, e := docker.NewClientWithOpts(docker.FromEnv)
 	if e != nil {
 		return e
 	}
@@ -317,7 +316,7 @@ func PushJobImage(ctx context.Context, imageName, authConfig string) error {
 
 // DeleteImage deletes a docker image
 func DeleteImage(ctx context.Context, imageName string) error {
-	cli, err := docker.NewEnvClient()
+	cli, err := docker.NewClientWithOpts(docker.FromEnv)
 	if err != nil {
 		return err
 	}
